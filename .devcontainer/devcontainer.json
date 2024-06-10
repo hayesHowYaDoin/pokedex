@@ -1,0 +1,23 @@
+{
+    "name": "rust_template",
+    "image": "mcr.microsoft.com/devcontainers/rust:latest",
+    // "build": {
+    //     "dockerfile": "../tools/docker/Dockerfile",
+    //     "args": { "VARIANT": "ubuntu-20.04"},
+    //     "context": "../tools/docker/"
+    // }
+
+    "customizations": {
+        "vscode": {
+            "settings": {},
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "yzhang.markdown-all-in-one"
+            ]
+        }
+    },
+
+    "forwardPorts": [8000]
+
+    // "postCreateCommand": "example-command --arg1 --arg2"
+}
