@@ -1,3 +1,10 @@
+mod infrastructure;
+
+use infrastructure::database::get_pokemon;
+
 fn main() {
-    println!("Hello, world!");
+    let pokemon = get_pokemon().expect("Failed to get pokemon");
+    for p in pokemon {
+        println!("{:?}", p);
+    }
 }
