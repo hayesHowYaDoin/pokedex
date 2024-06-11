@@ -17,3 +17,11 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+# Sqlite
+*.sqlite
+
+.cache
+.dotnet
+.bash_history
+.vscode-server
