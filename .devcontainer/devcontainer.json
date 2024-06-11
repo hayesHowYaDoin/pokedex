@@ -17,9 +17,5 @@
 
     "forwardPorts": [8000],
 
-    // "mounts": [
-    //     "source=${localWorkspaceFolder}/pokedex.db,target=/workspaces/pokedex,type=bind,consistency=cached"
-    // ],
-
-    // "postCreateCommand": "sqlite /tools/sqlite/pokedex.sqlite"
+    "postCreateCommand": "sqlite3 /workspaces/pokedex/tools/sqlite3/pokedex.db < /workspaces/pokedex/tools/sqlite3/pokedex.sql"
 }
