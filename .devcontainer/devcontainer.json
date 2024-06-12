@@ -1,11 +1,9 @@
 {
-    "name": "rust_template",
-    "image": "mcr.microsoft.com/devcontainers/rust:latest",
-    // "build": {
-    //     "dockerfile": "../tools/docker/Dockerfile",
-    //     "args": { "VARIANT": "ubuntu-20.04"},
-    //     "context": "../tools/docker/"
-    // }
+    "name": "pokedex",
+    "build": {
+        "dockerfile": "../tools/docker/Dockerfile",
+        "context": "../tools/docker/"
+    },
 
     "customizations": {
         "vscode": {
@@ -17,7 +15,7 @@
         }
     },
 
-    "forwardPorts": [8000]
+    "forwardPorts": [8000],
 
-    // "postCreateCommand": "example-command --arg1 --arg2"
+    "postCreateCommand": "sqlite3 /workspaces/pokedex/tools/sqlite3/pokedex.db < /workspaces/pokedex/tools/sqlite3/pokedex.sql"
 }
