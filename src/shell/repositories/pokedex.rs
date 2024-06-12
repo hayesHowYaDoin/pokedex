@@ -1,5 +1,3 @@
-
-
 #[derive(Debug)]
 pub struct Pokemon {
     pub number: i32,
