@@ -19,8 +19,10 @@
 
     "forwardPorts": [8000],
 
+    // Port over the user's shell configurations (assumes all config files are in ~/.config)
     "mounts": [
-        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,type=bind,consistency=cached",
+        "source=/etc/fish/,target=/etc/fish,type=bind,consistency=cached",
+        "source=/etc/zsh/,target=/etc/zsh,type=bind,consistency=cached",
         "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=${localEnv:HOME}${localEnv:USERPROFILE}/.config,type=bind,consistency=cached"
     ],
 
