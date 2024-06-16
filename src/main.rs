@@ -2,8 +2,8 @@ mod infrastructure;
 mod shell;
 
 use crate::infrastructure::database::Database;
-use crate::infrastructure::tui::run_tui;
 use crate::shell::repositories::pokedex::PokedexRepository;
+use crate::infrastructure::tui::run::run_tui;
 
 fn main() {
     println!("Gotta' fetch 'em all!");
