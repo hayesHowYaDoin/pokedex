@@ -8,20 +8,16 @@ pub struct ListPage {
     // TODO: Add fields for page state
 }
 
-impl<B: Backend> ListPage {
+impl ListPage {
     pub fn new() -> Self {
         Self {}
     }
 
-    fn render(&self, terminal: &mut Terminal<B>) -> Result<()>
-        where B: Backend
-    {
+    pub fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {
         terminal.draw(|frame| {
             let area = frame.size();
             frame.render_widget(
-                Paragraph::new("Hello Ratatui! (press 'q' to quit)")
-                    .white()
-                    .on_blue(),
+                Paragraph::new("Hello Ratatui! (press 'q' to quit)"),
                 area,
             );
         })?;

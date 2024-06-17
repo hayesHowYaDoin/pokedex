@@ -4,20 +4,22 @@ use crossterm::{
     ExecutableCommand,
 };
 use ratatui::prelude::{Backend, CrosstermBackend, Terminal};
-use std::io::{stdout, Result};
+use std::io::{Stdout, stdout, Result};
 
 use crate::infrastructure::tui::pages::ListPage;
+
+pub type TerminalImpl = Terminal<CrosstermBackend<Stdout>>;
 
 pub fn run_tui() -> Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
-    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
+    let mut terminal: TerminalImpl = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
     let page = ListPage::new();
 
     loop {
-        render_page(terminal, page)?;
+        render_page(&mut terminal, &page)?;
 
         if event::poll(std::time::Duration::from_millis(16))? {
             if let event::Event::Key(key) = event::read()? {
@@ -33,8 +35,6 @@ pub fn run_tui() -> Result<()> {
     Ok(())
 }
 
-pub fn render_page<B>(terminal: &mut Terminal<B>, page: &ListPage) -> Result<()> 
-    where B: Backend
-{
-    page.render(&terminal)?
+pub fn render_page<B: Backend>(terminal: &mut Terminal<B>, page: &ListPage) -> Result<()> {
+    page.render(terminal)
 }
