@@ -12,13 +12,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Install rust dependencies
-RUN curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
 # Install and configure SQLite
 RUN apt-get update
 RUN apt-get install -y \ 
-    cargo \
     git \
     libsqlite3-dev \
     sqlite3
@@ -38,3 +34,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USERNAME
+
+# Install rust
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+RUN echo which cargo
+ENV PATH="$HOME/.cargo/bin:$PATH"

@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 crossterm = "0.27.0"
-ratatui = "0.26.3"
+ratatui = { version = "0.26.3", features = ["unstable-widget-ref"] }
 rusqlite = "0.31.0"
