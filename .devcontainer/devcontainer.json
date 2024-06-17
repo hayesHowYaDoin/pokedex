@@ -3,7 +3,7 @@
     "build": {
         "dockerfile": "../tools/docker/Dockerfile",
         "context": "../tools/docker/",
-        "args": {"USERNAME": "${localEnv:USER}"}
+        "args": {"USERNAME": "vscode"}
     },
 
     "customizations": {
@@ -15,7 +15,8 @@
         }
     },
 
-    "containerUser": "${localEnv:USER}",
+    "remoteUser": "vscode",
+    "privileged": true,
 
     "forwardPorts": [8000],
 
@@ -23,8 +24,12 @@
     "mounts": [
         "source=/etc/fish/,target=/etc/fish,type=bind,consistency=cached",
         "source=/etc/zsh/,target=/etc/zsh,type=bind,consistency=cached",
-        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=${localEnv:HOME}${localEnv:USERPROFILE}/.config,type=bind,consistency=cached"
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
     ],
 
-    "postCreateCommand": "sudo sqlite3 /workspaces/pokedex/tools/sqlite3/pokedex.db < /workspaces/pokedex/tools/sqlite3/pokedex.sql"
+    "postCreateCommand": "sudo sqlite3 /workspaces/pokedex/tools/sqlite3/pokedex.db < /workspaces/pokedex/tools/sqlite3/pokedex.sql",
+
+    "remoteEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}"
+    }
 }

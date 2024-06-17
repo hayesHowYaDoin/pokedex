@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 LABEL maintainer="Jordan Hayes jordanhayes98@gmail.com"
 
 # Declare container arguments
-ARG USERNAME=default
+ARG USERNAME=root
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
@@ -15,6 +15,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install and configure SQLite
 RUN apt-get update
 RUN apt-get install -y \ 
+    curl \
     git \
     libsqlite3-dev \
     sqlite3
@@ -37,5 +38,4 @@ USER $USERNAME
 
 # Install rust
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-RUN echo which cargo
 ENV PATH="$HOME/.cargo/bin:$PATH"
