@@ -1,3 +1,5 @@
+#![feature(lazy_cell)]
+
 mod infrastructure;
 mod shell;
 
