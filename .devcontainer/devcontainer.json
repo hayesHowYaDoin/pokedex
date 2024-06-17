@@ -17,6 +17,8 @@
 
     "remoteUser": "vscode",
     "privileged": true,
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind,consistency=cached",
+    "workspaceFolder": "/home/vscode/workspace",
 
     "forwardPorts": [8000],
 
@@ -27,7 +29,7 @@
         "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
     ],
 
-    "postCreateCommand": "sudo sqlite3 /workspaces/pokedex/tools/sqlite3/pokedex.db < /workspaces/pokedex/tools/sqlite3/pokedex.sql",
+    "postCreateCommand": "sudo sqlite3 ~/workspace/tools/sqlite3/pokedex.db < ~/workspace/tools/sqlite3/pokedex.sql",
 
     "remoteEnv": {
         "DISPLAY": "${localEnv:DISPLAY}"

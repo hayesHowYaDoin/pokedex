@@ -15,6 +15,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Install and configure SQLite
 RUN apt-get update
 RUN apt-get install -y \ 
+    build-essential \
     curl \
     git \
     libsqlite3-dev \
