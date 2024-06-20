@@ -1,7 +1,7 @@
 use ratatui::{
     prelude::{Buffer, Rect},
     style::{Color, Style},
-    widgets::{Block, Widget, WidgetRef},
+    widgets::{Block, Paragraph, Widget, WidgetRef},
 };
 
 pub struct InputBox<'a> {
@@ -22,12 +22,12 @@ impl<'a> InputBox<'a> {
 
 impl Widget for InputBox<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        buf.set_string(area.left(), area.top(), &self.text, Style::default().fg(Color::Green));
+        Paragraph::new("Input text here").render(area, buf);
     }
 }
 
 impl WidgetRef for InputBox<'_> {
     fn render_ref(&self, area: Rect, buf: &mut Buffer) {
-        buf.set_string(area.left(), area.top(), &self.text, Style::default().fg(Color::Green));
+        Paragraph::new("Input text here").render(area, buf);
     }
 }
