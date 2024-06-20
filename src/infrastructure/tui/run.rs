@@ -4,16 +4,14 @@ use crossterm::{
     ExecutableCommand,
 };
 use ratatui::prelude::{Backend, CrosstermBackend, Terminal};
-use std::io::{Stdout, stdout, Result};
+use std::io::{stdout, Result};
 
 use crate::infrastructure::tui::pages::ListPage;
-
-pub type TerminalImpl = Terminal<CrosstermBackend<Stdout>>;
 
 pub fn run_tui() -> Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
-    let mut terminal: TerminalImpl = Terminal::new(CrosstermBackend::new(stdout()))?;
+    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
 
     let page = ListPage::new();
