@@ -29,7 +29,9 @@
         "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
     ],
 
-    "postCreateCommand": "sudo sqlite3 ~/workspace/tools/sqlite3/pokedex.db < ~/workspace/tools/sqlite3/pokedex.sql",
+    "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/workspace && sudo chmod -R 755 /home/vscode/workspace",
+
+    "postStartCommand": "sudo sqlite3 ~/workspace/tools/sqlite3/pokedex.db < ~/workspace/tools/sqlite3/pokedex.sql",
 
     "remoteEnv": {
         "DISPLAY": "${localEnv:DISPLAY}"

@@ -1,3 +1,3 @@
-pub mod widgets;
+pub mod tui;
 pub mod pages;
-pub mod run;
+pub mod app;
