@@ -1,10 +1,15 @@
+use std::cell::LazyCell;
+
+use color_eyre::eyre::Result;
+use crossterm::event::KeyCode;
 use ratatui::{
     prelude::{Backend, Constraint, Direction, Layout, Style, Terminal}, 
     style::{Color, Stylize}, 
     widgets::{Block, Paragraph, Row, TableState, Table}
 };
-use std::io::Result;
-use std::cell::LazyCell;
+
+use crate::infrastructure::tui::tui::Event;
+use super::page::Page;
 
 const SEARCH_WIDGET_LAYOUT_IDX: usize = 0;
 const LIST_WIDGET_LAYOUT_IDX: usize = 1;
@@ -26,6 +31,12 @@ const WIDTHS: [Constraint; 4] = [
     Constraint::Length(10),
 ];
 
+enum Action {
+    Quit,
+    Noop,
+}
+
+#[derive(Default)]
 pub struct ListPage<'a> {
     search_widget: Paragraph<'a>,
     list_widget: Table<'a>,
@@ -62,7 +73,31 @@ impl ListPage<'_> {
         Self {search_widget, list_widget}
     }
 
-    pub fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {
+    fn handle_event(&self, event: &Option<Event>) -> Action {
+        match event {
+            Some(Event::Key(key_event)) => {
+                match key_event.code {
+                    KeyCode::Char('q') => Action::Quit,
+                    _ => Action::Noop,
+                }
+            },
+            Some(_) => Action::Noop,
+            None => Action::Noop,
+        }
+    }
+
+    fn update(&mut self, _action: &Action) {
+        // TODO: Implement function
+    }
+}
+
+impl Page for ListPage<'_> {
+    fn update(&mut self, event: &Option<Event>) {
+        let action = self.handle_event(event);
+        self.update(&action);
+    }
+
+    fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {
         let mut table_state = TableState::default();
         table_state.select(Some(0));
 
@@ -76,4 +111,5 @@ impl ListPage<'_> {
 
         Ok(())
     }
+
 }
