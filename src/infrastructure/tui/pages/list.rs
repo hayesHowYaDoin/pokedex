@@ -1,10 +1,18 @@
+use std::{
+    cell::LazyCell,
+    default::Default,
+};
+
+use color_eyre::eyre::Result;
+use crossterm::event::KeyCode;
 use ratatui::{
     prelude::{Backend, Constraint, Direction, Layout, Style, Terminal}, 
     style::{Color, Stylize}, 
     widgets::{Block, Paragraph, Row, TableState, Table}
 };
-use std::io::Result;
-use std::cell::LazyCell;
+
+use crate::infrastructure::tui::tui::Event;
+use super::page::Page;
 
 const SEARCH_WIDGET_LAYOUT_IDX: usize = 0;
 const LIST_WIDGET_LAYOUT_IDX: usize = 1;
@@ -26,14 +34,79 @@ const WIDTHS: [Constraint; 4] = [
     Constraint::Length(10),
 ];
 
+enum Action {
+    NewCharacter(char),
+    Delete,
+    ScrollUp,
+    ScrollDown,
+    Noop,
+}
+
 pub struct ListPage<'a> {
     search_widget: Paragraph<'a>,
+    search_widget_state: String,
     list_widget: Table<'a>,
+    list_widget_state: TableState,
 }
 
 impl ListPage<'_> {
     pub fn new() -> Self {
-        let search_widget = Paragraph::new("Enter search query here!")
+        Self::default()
+    }
+
+    fn handle_event(&self, event: &Option<Event>) -> Action {
+        match event {
+            Some(Event::Key(key_event)) => {
+                match key_event.code {
+                    KeyCode::Up => Action::ScrollUp,
+                    KeyCode::Down => Action::ScrollDown,
+                    KeyCode::Char(c) => Action::NewCharacter(c),
+                    KeyCode::Backspace => Action::Delete,
+                    _ => Action::Noop,
+                }
+            },
+            Some(_) => Action::Noop,
+            None => Action::Noop,
+        }
+    }
+
+    fn handle_action(&mut self, action: &Action) {
+        match action {
+            Action::NewCharacter(c) => {
+                self.search_widget_state.push(*c);
+                self.search_widget = Paragraph::new(self.search_widget_state.clone())
+                    .block(Block::bordered().title("Search"));
+            }
+            Action::Delete => {
+                self.search_widget_state.pop();
+                self.search_widget = Paragraph::new(self.search_widget_state.clone())
+                    .block(Block::bordered().title("Search"));
+            }
+            Action::ScrollUp => {
+                if let Some(index) = self.list_widget_state.selected() {
+                    if index > 0 {
+                        self.list_widget_state.select(Some(index - 1));
+                    }
+                }
+            }
+            Action::ScrollDown => {
+                if let Some(index) = self.list_widget_state.selected() {
+                    // TODO: Determine max limit based on number of rows assigned to table
+                    if index < 8 {
+                        self.list_widget_state.select(Some(index + 1));
+                    }
+                }
+            }
+            Action::Noop => {},
+        
+        }
+    }
+}
+
+impl Default for ListPage<'_> {
+    fn default() -> Self {
+        let search_widget_state = String::default();
+        let search_widget = Paragraph::new(search_widget_state.clone())
             .block(Block::bordered().title("Search"));
 
         let rows = [
@@ -59,21 +132,28 @@ impl ListPage<'_> {
         .highlight_style(Style::new().reversed())
         .highlight_symbol(">>");
 
-        Self {search_widget, list_widget}
+        let list_widget_state = TableState::default().with_selected(0);
+
+        Self {search_widget, search_widget_state, list_widget, list_widget_state}
+    }
+}
+
+impl Page for ListPage<'_> {
+    fn update(&mut self, event: &Option<Event>) {
+        let action = self.handle_event(event);
+        self.handle_action(&action);
     }
 
-    pub fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {
-        let mut table_state = TableState::default();
-        table_state.select(Some(0));
-
+    fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>) -> Result<()> {
         terminal.draw(|frame| {
             let layout = LAYOUT.split(frame.size());
 
             frame.render_widget(&self.search_widget, layout[SEARCH_WIDGET_LAYOUT_IDX]);
-            frame.render_stateful_widget(&self.list_widget, layout[LIST_WIDGET_LAYOUT_IDX], &mut table_state);
+            frame.render_stateful_widget(&self.list_widget, layout[LIST_WIDGET_LAYOUT_IDX], &mut self.list_widget_state);
             frame.render_widget(Paragraph::new("Press 'enter' for detailed view, 'q' to quit").fg(Color::DarkGray), layout[FOOTER_WIDGET_LAYOUT_IDX]);
         })?;
 
         Ok(())
     }
+
 }
