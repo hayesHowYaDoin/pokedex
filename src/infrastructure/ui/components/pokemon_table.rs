@@ -1,5 +1,5 @@
 use std::{
-    cell::LazyCell,
+    sync::LazyLock,
     default::Default,
 };
 
@@ -12,7 +12,7 @@ use ratatui::{
 
 use super::StatefulComponent;
 
-const ROWS: LazyCell<Vec<Row>> = LazyCell::new(|| vec![
+static ROWS: LazyLock<Vec<Row>> = LazyLock::new(|| vec![
     Row::new(vec!["1", "Bulbasaur", "Grass", "Poison"]).green(),
     Row::new(vec!["2", "Ivysaur", "Grass", "Poison"]).green(),
     Row::new(vec!["3", "Venusaur", "Grass", "Poison"]).green(),

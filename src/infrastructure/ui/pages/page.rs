@@ -1,7 +1,7 @@
 use color_eyre::eyre::Result;
 use ratatui::prelude::{Backend, Terminal};
 
-use crate::infrastructure::tui::tui::Event;
+use crate::infrastructure::ui::tui::Event;
 
 pub trait Renderable<B: Backend> {
     fn render(&mut self, terminal: &mut Terminal<B>) -> Result<()>;

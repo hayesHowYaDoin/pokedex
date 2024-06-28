@@ -3,7 +3,7 @@ use std::default::Default;
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
 
-use crate::infrastructure::tui::{
+use crate::infrastructure::ui::{
     tui::{Event, Tui, TuiBackend},
     pages::{Page, ListPage},
 };

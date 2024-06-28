@@ -1,5 +1,5 @@
 use std::{
-    cell::LazyCell,
+    sync::LazyLock,
     default::Default,
 };
 
@@ -11,7 +11,7 @@ use ratatui::{
     widgets::Paragraph,
 };
 
-use crate::infrastructure::tui::{
+use crate::infrastructure::ui::{
     components::{InputBox, PokemonTable, Component, StatefulComponent},
     tui::Event
 };
@@ -21,8 +21,8 @@ const SEARCH_WIDGET_LAYOUT_IDX: usize = 0;
 const LIST_WIDGET_LAYOUT_IDX: usize = 1;
 const FOOTER_WIDGET_LAYOUT_IDX: usize = 2;
 
-const LAYOUT: LazyCell<Layout> = 
-    LazyCell::new(|| Layout::default()
+static LAYOUT: LazyLock<Layout> = 
+    LazyLock::new(|| Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(3),
@@ -121,7 +121,7 @@ impl<B: Backend> Page<B> for ListPage {
     fn update(&mut self, event: &Option<Event>) -> Box<dyn Page<B>> {
         let action = self.handle_event(event);
         self.handle_action(&action);
-
+        
         self.next_page()
     }
 }

@@ -20,9 +20,7 @@ impl From<rusqlite::Error> for PokedexRepositoryError {
     fn from(err: rusqlite::Error) -> PokedexRepositoryError {
         type Error = rusqlite::Error;
         match err {
-            Error::QueryReturnedNoRows => {
-                return PokedexRepositoryError::PokemonNotFound(err.to_string());
-            }
+            Error::QueryReturnedNoRows => PokedexRepositoryError::PokemonNotFound(err.to_string()),
             _ => PokedexRepositoryError::ConnectionError(err.to_string()),
         }
     }
@@ -49,7 +47,7 @@ impl PokedexRepository for Database {
             })
         })?;
 
-        Ok(Pokemon::from(pokemon))
+        Ok(pokemon)
     }
 
     fn fetch_all(&self) -> Result<Vec<Pokemon>, PokedexRepositoryError> {
@@ -63,7 +61,7 @@ impl PokedexRepository for Database {
 
         let mut pokemon = Vec::new();
         for p in pokemon_iter {
-            pokemon.push(Pokemon::from(p?));
+            pokemon.push(p?);
         }
 
         Ok(pokemon)
