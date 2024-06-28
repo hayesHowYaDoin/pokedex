@@ -6,5 +6,5 @@ use crate::infrastructure::tui::tui::Event;
 pub trait Page {
     fn update(&mut self, event: &Option<Event>);
 
-    fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()>;
+    fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>) -> Result<()>;
 }

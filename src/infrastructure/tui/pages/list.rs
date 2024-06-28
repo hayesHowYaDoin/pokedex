@@ -35,6 +35,8 @@ const WIDTHS: [Constraint; 4] = [
 ];
 
 enum Action {
+    ScrollUp,
+    ScrollDown,
     Quit,
     Noop,
 }
@@ -42,6 +44,7 @@ enum Action {
 pub struct ListPage<'a> {
     search_widget: Paragraph<'a>,
     list_widget: Table<'a>,
+    list_widget_state: TableState,
 }
 
 impl ListPage<'_> {
@@ -53,7 +56,8 @@ impl ListPage<'_> {
         match event {
             Some(Event::Key(key_event)) => {
                 match key_event.code {
-                    KeyCode::Char('q') => Action::Quit,
+                    KeyCode::Up => Action::ScrollUp,
+                    KeyCode::Down => Action::ScrollDown,
                     _ => Action::Noop,
                 }
             },
@@ -62,8 +66,27 @@ impl ListPage<'_> {
         }
     }
 
-    fn handle_action(&mut self, _action: &Action) {
-        // TODO: Implement function
+    fn handle_action(&mut self, action: &Action) {
+        match action {
+            Action::ScrollUp => {
+                if let Some(index) = self.list_widget_state.selected() {
+                    if index > 0 {
+                        self.list_widget_state.select(Some(index - 1));
+                    }
+                }
+            }
+            Action::ScrollDown => {
+                if let Some(index) = self.list_widget_state.selected() {
+                    // TODO: Determine max limit based on number of rows assigned to table
+                    if index < 8 {
+                        self.list_widget_state.select(Some(index + 1));
+                    }
+                }
+            }
+            Action::Quit => {},
+            Action::Noop => {},
+        
+        }
     }
 }
 
@@ -95,7 +118,9 @@ impl Default for ListPage<'_> {
         .highlight_style(Style::new().reversed())
         .highlight_symbol(">>");
 
-        Self {search_widget, list_widget}
+        let list_widget_state = TableState::default().with_selected(0);
+
+        Self {search_widget, list_widget, list_widget_state}
     }
 }
 
@@ -105,15 +130,12 @@ impl Page for ListPage<'_> {
         self.handle_action(&action);
     }
 
-    fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {
-        let mut table_state = TableState::default();
-        table_state.select(Some(0));
-
+    fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>) -> Result<()> {
         terminal.draw(|frame| {
             let layout = LAYOUT.split(frame.size());
 
             frame.render_widget(&self.search_widget, layout[SEARCH_WIDGET_LAYOUT_IDX]);
-            frame.render_stateful_widget(&self.list_widget, layout[LIST_WIDGET_LAYOUT_IDX], &mut table_state);
+            frame.render_stateful_widget(&self.list_widget, layout[LIST_WIDGET_LAYOUT_IDX], &mut self.list_widget_state);
             frame.render_widget(Paragraph::new("Press 'enter' for detailed view, 'q' to quit").fg(Color::DarkGray), layout[FOOTER_WIDGET_LAYOUT_IDX]);
         })?;
 
