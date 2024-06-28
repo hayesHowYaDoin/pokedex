@@ -3,8 +3,10 @@ use ratatui::prelude::{Backend, Terminal};
 
 use crate::infrastructure::tui::tui::Event;
 
-pub trait Page {
-    fn update(&mut self, event: &Option<Event>);
+pub trait Renderable<B: Backend> {
+    fn render(&mut self, terminal: &mut Terminal<B>) -> Result<()>;
+}
 
-    fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>) -> Result<()>;
+pub trait Page<B: Backend>: Renderable<B> {
+    fn update(&mut self, event: &Option<Event>) -> Box<dyn Page<B>>;
 }
