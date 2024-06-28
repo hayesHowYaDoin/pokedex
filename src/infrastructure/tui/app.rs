@@ -30,11 +30,11 @@ impl App<'_> {
         loop {
             let event = tui.next().await;
 
-            let action = self.handle_events(&event);
-            self.update(&action);
-
             self.page.update(&event);
             self.page.render(&mut tui.terminal)?;
+
+            let action = self.handle_events(&event);
+            self.update(&action);
 
             if self.should_quit { break }
         };
