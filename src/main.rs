@@ -5,7 +5,7 @@ use color_eyre::eyre::Result;
 
 use crate::infrastructure::database::Database;
 use crate::shell::repositories::pokedex::PokedexRepository;
-use crate::infrastructure::tui::app::App;
+use crate::infrastructure::ui::app::App;
 
 async fn tokio_main() -> Result<()> {
     let db = Database::new().expect("Failed to create database connection");
