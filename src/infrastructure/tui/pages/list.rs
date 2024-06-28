@@ -1,4 +1,7 @@
-use std::cell::LazyCell;
+use std::{
+    cell::LazyCell,
+    default::Default,
+};
 
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
@@ -36,7 +39,6 @@ enum Action {
     Noop,
 }
 
-#[derive(Default)]
 pub struct ListPage<'a> {
     search_widget: Paragraph<'a>,
     list_widget: Table<'a>,
@@ -44,6 +46,29 @@ pub struct ListPage<'a> {
 
 impl ListPage<'_> {
     pub fn new() -> Self {
+        Self::default()
+    }
+
+    fn handle_event(&self, event: &Option<Event>) -> Action {
+        match event {
+            Some(Event::Key(key_event)) => {
+                match key_event.code {
+                    KeyCode::Char('q') => Action::Quit,
+                    _ => Action::Noop,
+                }
+            },
+            Some(_) => Action::Noop,
+            None => Action::Noop,
+        }
+    }
+
+    fn handle_action(&mut self, _action: &Action) {
+        // TODO: Implement function
+    }
+}
+
+impl Default for ListPage<'_> {
+    fn default() -> Self {
         let search_widget = Paragraph::new("Enter search query here!")
             .block(Block::bordered().title("Search"));
 
@@ -71,23 +96,6 @@ impl ListPage<'_> {
         .highlight_symbol(">>");
 
         Self {search_widget, list_widget}
-    }
-
-    fn handle_event(&self, event: &Option<Event>) -> Action {
-        match event {
-            Some(Event::Key(key_event)) => {
-                match key_event.code {
-                    KeyCode::Char('q') => Action::Quit,
-                    _ => Action::Noop,
-                }
-            },
-            Some(_) => Action::Noop,
-            None => Action::Noop,
-        }
-    }
-
-    fn handle_action(&mut self, _action: &Action) {
-        // TODO: Implement function
     }
 }
 
