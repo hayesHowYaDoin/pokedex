@@ -1,8 +1,10 @@
+use std::default::Default;
+
 use color_eyre::eyre::Result;
 use crossterm::event::KeyCode;
 
-use crate::infrastructure::tui::{
-    tui::{Event, Tui},
+use crate::infrastructure::ui::{
+    tui::{Event, Tui, TuiBackend},
     pages::{Page, ListPage},
 };
 
@@ -11,13 +13,12 @@ enum Action {
     Noop,
 }
 
-#[derive(Default)]
-pub struct App<'a> {
+pub struct App {
     should_quit: bool,
-    page: ListPage<'a>,
+    page: Box<dyn Page<TuiBackend>>,
 }
 
-impl App<'_> {
+impl App {
     pub fn new() -> Self {
         Self::default()
     }
@@ -30,7 +31,7 @@ impl App<'_> {
         loop {
             let event = tui.next().await;
 
-            self.page.update(&event);
+            self.page = self.page.update(&event);
             self.page.render(&mut tui.terminal)?;
 
             let action = self.handle_events(&event);
@@ -62,5 +63,12 @@ impl App<'_> {
             },
             _ => Action::Noop,
         }
+    }
+}
+
+impl Default for App {
+    fn default() -> Self {
+        let page = Box::new(ListPage::new());
+        Self {should_quit: false, page}
     }
 }

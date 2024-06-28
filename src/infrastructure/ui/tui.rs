@@ -17,6 +17,7 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 use futures::{FutureExt, StreamExt};
 
+pub type TuiBackend = ratatui::backend::CrosstermBackend<std::io::Stderr>;
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
 const TICK_RATE: Duration = Duration::from_millis(100);
@@ -65,16 +66,12 @@ impl Tui {
                     }
                     maybe_event = crossterm_event => {
                         match maybe_event {
-                            Some(Ok(evt)) => {
-                                match evt {
-                                    CrosstermEvent::Key(key) => {
-                                        if key.kind == KeyEventKind::Press {
-                                            _tx.send(Event::Key(key)).unwrap();
-                                        }
-                                    }
-                                    _ => {}, // unimplemented!(),
+                            Some(Ok(CrosstermEvent::Key(key))) => {
+                                if key.kind == KeyEventKind::Press {
+                                    _tx.send(Event::Key(key)).unwrap();
                                 }
                             }
+                            Some(Ok(_)) => {}, // unimplemented!(),
                             Some(Err(_)) => {
                                 _tx.send(Event::Error).unwrap();
                             }
