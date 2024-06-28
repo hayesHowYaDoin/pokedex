@@ -66,16 +66,12 @@ impl Tui {
                     }
                     maybe_event = crossterm_event => {
                         match maybe_event {
-                            Some(Ok(evt)) => {
-                                match evt {
-                                    CrosstermEvent::Key(key) => {
-                                        if key.kind == KeyEventKind::Press {
-                                            _tx.send(Event::Key(key)).unwrap();
-                                        }
-                                    }
-                                    _ => {}, // unimplemented!(),
+                            Some(Ok(CrosstermEvent::Key(key))) => {
+                                if key.kind == KeyEventKind::Press {
+                                    _tx.send(Event::Key(key)).unwrap();
                                 }
                             }
+                            Some(Ok(_)) => {}, // unimplemented!(),
                             Some(Err(_)) => {
                                 _tx.send(Event::Error).unwrap();
                             }
