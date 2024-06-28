@@ -86,7 +86,7 @@ impl ListPage<'_> {
         }
     }
 
-    fn update(&mut self, _action: &Action) {
+    fn handle_action(&mut self, _action: &Action) {
         // TODO: Implement function
     }
 }
@@ -94,7 +94,7 @@ impl ListPage<'_> {
 impl Page for ListPage<'_> {
     fn update(&mut self, event: &Option<Event>) {
         let action = self.handle_event(event);
-        self.update(&action);
+        self.handle_action(&action);
     }
 
     fn render<B: Backend>(&self, terminal: &mut Terminal<B>) -> Result<()> {

@@ -19,7 +19,10 @@ use futures::{FutureExt, StreamExt};
 
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
+const TICK_RATE: Duration = Duration::from_millis(100);
+
 pub enum Event {
+    AppTick,
     Key(KeyEvent),
     Error,
 }
@@ -50,8 +53,10 @@ impl Tui {
 
         self.task = tokio::spawn(async move {
             let mut reader = EventStream::new();
-
+            let mut interval = tokio::time::interval(TICK_RATE);
+            
             loop {
+                let delay = interval.tick();
                 let crossterm_event = reader.next().fuse();
 
                 tokio::select! {
@@ -75,16 +80,18 @@ impl Tui {
                             }
                             None => {},
                         }
-                    }
+                    }          
+                    _ = delay => {
+                        _tx.send(Event::AppTick).unwrap();
+                    },
                 }
             }
         });
     }
 
     pub fn enter(&mut self) -> Result<()> {
+        crossterm::execute!(std::io::stdout(), EnterAlternateScreen, cursor::Hide)?;
         crossterm::terminal::enable_raw_mode()?;
-        crossterm::execute!(std::io::stderr(), EnterAlternateScreen, cursor::Hide)?;
-        self.start();
         Ok(())
     }
     
@@ -92,7 +99,7 @@ impl Tui {
         self.stop()?;
         if crossterm::terminal::is_raw_mode_enabled()? {
           self.flush()?;
-          crossterm::execute!(std::io::stderr(), LeaveAlternateScreen, cursor::Show)?;
+          crossterm::execute!(std::io::stdout(), LeaveAlternateScreen, cursor::Show)?;
           crossterm::terminal::disable_raw_mode()?;
         }
         Ok(())
