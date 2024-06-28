@@ -35,14 +35,16 @@ const WIDTHS: [Constraint; 4] = [
 ];
 
 enum Action {
+    NewCharacter(char),
+    Delete,
     ScrollUp,
     ScrollDown,
-    Quit,
     Noop,
 }
 
 pub struct ListPage<'a> {
     search_widget: Paragraph<'a>,
+    search_widget_state: String,
     list_widget: Table<'a>,
     list_widget_state: TableState,
 }
@@ -58,6 +60,8 @@ impl ListPage<'_> {
                 match key_event.code {
                     KeyCode::Up => Action::ScrollUp,
                     KeyCode::Down => Action::ScrollDown,
+                    KeyCode::Char(c) => Action::NewCharacter(c),
+                    KeyCode::Backspace => Action::Delete,
                     _ => Action::Noop,
                 }
             },
@@ -68,6 +72,16 @@ impl ListPage<'_> {
 
     fn handle_action(&mut self, action: &Action) {
         match action {
+            Action::NewCharacter(c) => {
+                self.search_widget_state.push(*c);
+                self.search_widget = Paragraph::new(self.search_widget_state.clone())
+                    .block(Block::bordered().title("Search"));
+            }
+            Action::Delete => {
+                self.search_widget_state.pop();
+                self.search_widget = Paragraph::new(self.search_widget_state.clone())
+                    .block(Block::bordered().title("Search"));
+            }
             Action::ScrollUp => {
                 if let Some(index) = self.list_widget_state.selected() {
                     if index > 0 {
@@ -83,7 +97,6 @@ impl ListPage<'_> {
                     }
                 }
             }
-            Action::Quit => {},
             Action::Noop => {},
         
         }
@@ -92,7 +105,8 @@ impl ListPage<'_> {
 
 impl Default for ListPage<'_> {
     fn default() -> Self {
-        let search_widget = Paragraph::new("Enter search query here!")
+        let search_widget_state = String::default();
+        let search_widget = Paragraph::new(search_widget_state.clone())
             .block(Block::bordered().title("Search"));
 
         let rows = [
@@ -120,7 +134,7 @@ impl Default for ListPage<'_> {
 
         let list_widget_state = TableState::default().with_selected(0);
 
-        Self {search_widget, list_widget, list_widget_state}
+        Self {search_widget, search_widget_state, list_widget, list_widget_state}
     }
 }
 
