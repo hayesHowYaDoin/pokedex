@@ -17,6 +17,7 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 use futures::{FutureExt, StreamExt};
 
+pub type TuiBackend = ratatui::backend::CrosstermBackend<std::io::Stderr>;
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
 const TICK_RATE: Duration = Duration::from_millis(100);
