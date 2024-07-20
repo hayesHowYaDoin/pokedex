@@ -8,8 +8,10 @@ edition = "2021"
 [dependencies]
 color-eyre = "0.6.3"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
+derive_more = "0.99.18"
 futures = "0.3.30"
 log = "0.4.21"
+num-traits = "0.2.19"
 ratatui = { version = "0.26.3", features = ["unstable-widget-ref"] }
 rusqlite = "0.31.0"
 signal-hook = "0.3.17"
