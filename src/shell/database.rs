@@ -1,5 +1,5 @@
 use rusqlite::{Connection, Result};
-use crate::shell::repositories::pokedex::{Pokemon, PokedexRepository, PokedexRepositoryError};
+use crate::core::repositories::pokedex::{Pokemon, PokedexRepository, PokedexRepositoryError};
 
 #[derive(Debug)]
 struct PokemonDTO {

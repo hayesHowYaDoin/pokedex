@@ -3,10 +3,10 @@ use ratatui::{
     terminal::Frame,
 };
 
-pub trait Component {
+pub trait TuiComponent {
     fn render(&mut self, frame: &mut Frame, layout: &Rect);
 }
 
-pub trait StatefulComponent {
+pub trait TuiStatefulComponent {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect);
 }
