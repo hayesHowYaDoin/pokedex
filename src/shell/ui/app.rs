@@ -1,21 +1,15 @@
 use std::default::Default;
 
 use color_eyre::eyre::Result;
-use crossterm::event::KeyCode;
 
 use crate::shell::ui::{
-    tui::{Tui, TuiBackend, TuiEvent},
+    tui::{Tui, TuiBackend},
     pages::TuiPage,
 };
 use crate::core::ui::{
     Event,
     pages::ListPage
 };
-
-enum Action {
-    Quit,
-    Noop,
-}
 
 pub struct App {
     should_quit: bool,
@@ -37,7 +31,7 @@ impl App {
 
             self.update(&event);
 
-            self.page.update(&event);
+            self.page.update(&event).next();
             self.page.render(&mut tui.terminal)?;
 
             if self.should_quit { break }

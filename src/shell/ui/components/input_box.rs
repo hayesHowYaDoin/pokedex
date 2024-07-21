@@ -9,7 +9,7 @@ use super::TuiComponent;
 
 impl TuiComponent for InputBox {
     fn render(&mut self, frame: &mut Frame, layout: &Rect) {
-        let widget = Paragraph::new(self.text().clone())
+        let widget = Paragraph::new(self.text())
             .block(Block::bordered().title("Search"));
 
         frame.render_widget(&widget, *layout);
