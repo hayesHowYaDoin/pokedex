@@ -60,14 +60,14 @@ impl PokemonTable {
         PokemonTable {selected_row}
     }
 
-    pub fn up(mut self) -> Self {
+    pub fn up(&mut self) -> Self {
         self.selected_row -= 1;
-        self
+        *self
     }
 
-    pub fn down(mut self) -> Self {
+    pub fn down(&mut self) -> Self {
         self.selected_row += 1;
-        self
+        *self
     }
 
     pub fn selected_index(&self) -> RowIndex {
