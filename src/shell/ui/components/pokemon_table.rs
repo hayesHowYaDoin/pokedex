@@ -31,8 +31,7 @@ const WIDTHS: [Constraint; 4] = [
 
 impl Into<usize> for RowIndex {
     fn into(self) -> usize {
-        let RowIndex(index) = self;
-        index as usize
+        self.value() as usize
     }
 }
 

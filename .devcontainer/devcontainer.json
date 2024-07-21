@@ -10,6 +10,7 @@
         "vscode": {
             "extensions": [
                 "rust-lang.rust-analyzer",
+                "swellaby.vscode-rust-test-adapter",
                 "vadimcn.vscode-lldb",
                 "yzhang.markdown-all-in-one"
             ]
