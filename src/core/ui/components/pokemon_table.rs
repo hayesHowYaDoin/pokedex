@@ -1,15 +1,38 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, AddAssign, SubAssign};
 
-use derive_more::{Add, AddAssign, SubAssign};
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
+pub struct RowIndex {
+    index: i32,
+    number_of_rows: u32,
+}
 
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Add, AddAssign, SubAssign)]
-pub struct RowIndex(pub u32);
+impl RowIndex {
+    pub fn new(index: i32, number_of_rows: u32) -> Self {
+        let index: i32 = match index {
+            i if i >= number_of_rows as i32 => number_of_rows as i32 - 1,
+            i if i < 1 => 0,
+            _ => index,
+        };
+
+        RowIndex {index, number_of_rows}
+    }
+
+    pub fn value(&self) -> u32 {
+        self.index as u32
+    }
+}
 
 impl Add<u32> for RowIndex {
     type Output = RowIndex;
 
     fn add(self, rhs: u32) -> Self::Output {
-        RowIndex(self.0 + rhs)
+        RowIndex::new(self.index + rhs as i32, self.number_of_rows)
+    }
+}
+
+impl AddAssign<u32> for RowIndex {
+    fn add_assign(&mut self, rhs: u32) {
+        *self = *self + rhs;
     }
 }
 
@@ -17,33 +40,33 @@ impl Sub<u32> for RowIndex {
     type Output = RowIndex;
 
     fn sub(self, rhs: u32) -> Self::Output {
-        RowIndex(self.0 - rhs)
+        RowIndex::new(self.index - rhs as i32, self.number_of_rows)
+    }
+}
+
+impl SubAssign<u32> for RowIndex {
+    fn sub_assign(&mut self, rhs: u32) {
+        *self = *self - rhs;
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct PokemonTable {
     selected_row: RowIndex,
-    number_of_rows: u32,
 }
 
 impl PokemonTable {
-    pub fn new(selected_row: RowIndex, number_of_rows: u32) -> Self {
-        let selected_row = match selected_row {
-            RowIndex(row) if row >= number_of_rows => RowIndex(number_of_rows - 1),
-            _ => selected_row,
-        };
-
-        PokemonTable {selected_row, number_of_rows}
+    pub fn new(selected_row: RowIndex) -> Self {
+        PokemonTable {selected_row}
     }
 
-    pub fn up(&mut self) -> &Self {
-        self.selected_row -= RowIndex(1);
+    pub fn up(mut self) -> Self {
+        self.selected_row -= 1;
         self
     }
 
-    pub fn down(&mut self) -> &Self {
-        self.selected_row = self.selected_row + 1;
+    pub fn down(mut self) -> Self {
+        self.selected_row += 1;
         self
     }
 
@@ -57,46 +80,38 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_new_valid() {
-        let table = PokemonTable::new(RowIndex(0), 5);
-        assert_eq!(table.selected_index(), RowIndex(0));
+    fn test_index_new_valid() {
+        let index = RowIndex::new(0, 5);
+        assert_eq!(index.value(), 0);
     }
 
     #[test]
-    fn test_new_invalid_selected_index() {
-        let table = PokemonTable::new(RowIndex(5), 5);
-        assert_eq!(table.selected_index(), RowIndex(4));
+    fn test_index_new_too_large() {
+        let index = RowIndex::new(5, 5);
+        assert_eq!(index.value(), 4);
     }
 
     #[test]
     fn test_up() {
-        let mut table = PokemonTable::new(RowIndex(0), 5);
-        table.up();
-
-        assert_eq!(table.selected_index(), RowIndex(0));
+        let table = PokemonTable::new(RowIndex::new(1, 5)).up();
+        assert_eq!(table.selected_index().value(), 0);
     }
 
     #[test]
     fn test_up_limit() {
-        let mut table = PokemonTable::new(RowIndex(4), 5);
-        table.up();
-
-        assert_eq!(table.selected_index(), RowIndex(4));
+        let table = PokemonTable::new(RowIndex::new(0, 5)).up();
+        assert_eq!(table.selected_index().value(), 0);
     }
 
     #[test]
     fn test_down() {
-        let mut table = PokemonTable::new(RowIndex(3), 5);
-        table.down();
-        
-        assert_eq!(table.selected_index(), RowIndex(2));
+        let table = PokemonTable::new(RowIndex::new(1, 5)).down();
+        assert_eq!(table.selected_index().value(), 2);
     }
 
     #[test]
     fn test_down_limit() {
-        let mut table = PokemonTable::new(RowIndex(0), 5);
-        table.down();
-        
-        assert_eq!(table.selected_index(), RowIndex(0));
+        let table = PokemonTable::new(RowIndex::new(4, 5)).down();
+        assert_eq!(table.selected_index().value(), 4);
     }
 }
