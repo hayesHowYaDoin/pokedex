@@ -1,2 +1,2 @@
+pub mod pokemon;
 pub mod ui;
-pub mod repositories;

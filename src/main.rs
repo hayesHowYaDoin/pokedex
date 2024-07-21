@@ -3,9 +3,9 @@ mod core;
 
 use color_eyre::eyre::Result;
 
-use crate::shell::database::Database;
-use crate::core::repositories::pokedex::PokedexRepository;
+use crate::shell::pokemon::Database;
 use crate::shell::ui::app::App;
+use crate::core::pokemon::PokemonRepository;
 
 async fn tokio_main() -> Result<()> {
     let db = Database::new().expect("Failed to create database connection");

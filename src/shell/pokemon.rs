@@ -1,5 +1,5 @@
 use rusqlite::{Connection, Result};
-use crate::core::repositories::pokedex::{Pokemon, PokedexRepository, PokedexRepositoryError};
+use crate::core::pokemon::{Pokemon, PokemonRepository, PokemonRepositoryError};
 
 #[derive(Debug)]
 struct PokemonDTO {
@@ -16,12 +16,12 @@ impl From<PokemonDTO> for Pokemon {
     }
 }
 
-impl From<rusqlite::Error> for PokedexRepositoryError {
-    fn from(err: rusqlite::Error) -> PokedexRepositoryError {
+impl From<rusqlite::Error> for PokemonRepositoryError {
+    fn from(err: rusqlite::Error) -> PokemonRepositoryError {
         type Error = rusqlite::Error;
         match err {
-            Error::QueryReturnedNoRows => PokedexRepositoryError::PokemonNotFound(err.to_string()),
-            _ => PokedexRepositoryError::ConnectionError(err.to_string()),
+            Error::QueryReturnedNoRows => PokemonRepositoryError::PokemonNotFound(err.to_string()),
+            _ => PokemonRepositoryError::ConnectionError(err.to_string()),
         }
     }
 }
@@ -31,14 +31,14 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn new() -> Result<Database, PokedexRepositoryError> {
+    pub fn new() -> Result<Database, PokemonRepositoryError> {
         let conn = Connection::open("tools/sqlite3/pokedex.db")?;
         Ok(Database { conn })
     }
 }
 
-impl PokedexRepository for Database {
-    fn fetch(&self, number: i32) -> Result<Pokemon, PokedexRepositoryError> {
+impl PokemonRepository for Database {
+    fn fetch(&self, number: i32) -> Result<Pokemon, PokemonRepositoryError> {
         let mut stmt = self.conn.prepare("SELECT number, name FROM pokemon WHERE number = ?")?;
         let pokemon = stmt.query_row([number], |row| {
             Ok(Pokemon {
@@ -50,7 +50,7 @@ impl PokedexRepository for Database {
         Ok(pokemon)
     }
 
-    fn fetch_all(&self) -> Result<Vec<Pokemon>, PokedexRepositoryError> {
+    fn fetch_all(&self) -> Result<Vec<Pokemon>, PokemonRepositoryError> {
         let mut stmt = self.conn.prepare("SELECT number, name FROM pokemon")?;
         let pokemon_iter = stmt.query_map([], |row| {
             Ok(Pokemon {
