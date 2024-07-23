@@ -9,9 +9,9 @@ use crate::core::pokemon::PokemonRepository;
 
 async fn tokio_main() -> Result<()> {
     let db = Database::new().expect("Failed to create database connection");
-    let _pokemon = db.fetch_all().expect("Failed to fetch all Pokemon");
+    let pokemon = db.fetch_all().expect("Failed to fetch all Pokemon");
 
-    let mut app = App::new();
+    let mut app = App::new(&pokemon);
     app.run().await?;
   
     Ok(())

@@ -1,10 +1,13 @@
-#[derive(Debug)]
+use thiserror::Error;
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Pokemon {
     pub number: i32,
     pub name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
+#[error("{0}")]
 pub enum PokemonRepositoryError {
     ConnectionError(String),
     PokemonNotFound(String),

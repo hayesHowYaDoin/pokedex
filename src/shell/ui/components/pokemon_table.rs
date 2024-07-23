@@ -7,7 +7,7 @@ use ratatui::{
     widgets::{Block, Row, Table, TableState},
 };
 
-use crate::core::ui::components::{PokemonTable, RowIndex};
+use crate::core::ui::components::PokemonTable;
 use super::TuiStatefulComponent;
 
 static ROWS: LazyLock<Vec<Row>> = LazyLock::new(|| vec![
@@ -29,12 +29,6 @@ const WIDTHS: [Constraint; 4] = [
     Constraint::Length(10),
 ];
 
-impl Into<usize> for RowIndex {
-    fn into(self) -> usize {
-        self.value() as usize
-    }
-}
-
 impl TuiStatefulComponent for PokemonTable {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
         let table = Table::new(ROWS.to_owned(), WIDTHS)
@@ -48,7 +42,7 @@ impl TuiStatefulComponent for PokemonTable {
             .highlight_style(Style::new().reversed())
             .highlight_symbol(">>");
 
-        let mut table_state = TableState::default().with_selected(Some(self.selected_index().into()));
+        let mut table_state = TableState::default().with_selected(Some(self.get_selected_index()));
         frame.render_stateful_widget(table, *layout, &mut table_state);
     }
 }
