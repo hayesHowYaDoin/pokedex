@@ -17,12 +17,11 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 use futures::{FutureExt, StreamExt};
 
-pub type TuiBackend = ratatui::backend::CrosstermBackend<std::io::Stderr>;
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
 const TICK_RATE: Duration = Duration::from_millis(100);
 
-pub enum Event {
+pub enum TuiEvent {
     AppTick,
     Key(KeyEvent),
     Error,
@@ -32,8 +31,8 @@ pub struct Tui {
     pub terminal: Terminal,
     task: JoinHandle<()>,
     cancellation_token: CancellationToken,
-    tx: UnboundedSender<Event>,
-    rx: UnboundedReceiver<Event>,
+    tx: UnboundedSender<TuiEvent>,
+    rx: UnboundedReceiver<TuiEvent>,
 }
 
 impl Tui {
@@ -68,18 +67,18 @@ impl Tui {
                         match maybe_event {
                             Some(Ok(CrosstermEvent::Key(key))) => {
                                 if key.kind == KeyEventKind::Press {
-                                    _tx.send(Event::Key(key)).unwrap();
+                                    _tx.send(TuiEvent::Key(key)).unwrap();
                                 }
                             }
                             Some(Ok(_)) => {}, // unimplemented!(),
                             Some(Err(_)) => {
-                                _tx.send(Event::Error).unwrap();
+                                _tx.send(TuiEvent::Error).unwrap();
                             }
                             None => {},
                         }
                     }          
                     _ = delay => {
-                        _tx.send(Event::AppTick).unwrap();
+                        _tx.send(TuiEvent::AppTick).unwrap();
                     },
                 }
             }
@@ -135,7 +134,7 @@ impl Tui {
         Ok(())
     }
 
-    pub async fn next(&mut self) -> Option<Event> {
+    pub async fn next(&mut self) -> Option<TuiEvent> {
         self.rx.recv().await
     }
 }

@@ -1,17 +1,17 @@
-mod infrastructure;
 mod shell;
+mod core;
 
 use color_eyre::eyre::Result;
 
-use crate::infrastructure::database::Database;
-use crate::shell::repositories::pokedex::PokedexRepository;
-use crate::infrastructure::ui::app::App;
+use crate::shell::pokemon::Database;
+use crate::shell::ui::app::App;
+use crate::core::pokemon::PokemonRepository;
 
 async fn tokio_main() -> Result<()> {
     let db = Database::new().expect("Failed to create database connection");
-    let _pokemon = db.fetch_all().expect("Failed to fetch all Pokemon");
+    let pokemon = db.fetch_all().expect("Failed to fetch all Pokemon");
 
-    let mut app = App::new();
+    let mut app = App::new(&pokemon);
     app.run().await?;
   
     Ok(())
