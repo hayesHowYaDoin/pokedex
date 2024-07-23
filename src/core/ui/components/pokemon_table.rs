@@ -74,8 +74,8 @@ impl PokemonTable {
         self.selected_row += 1;
     }
 
-    pub fn get_selected(&self) -> Pokemon {
-        self.pokemon.get(self.selected_row.value() as usize).unwrap().clone()
+    pub fn get_selected(&self) -> Option<&Pokemon> {
+        self.pokemon.get(self.selected_row.value() as usize)
     }
 
     pub fn get_selected_index(&self) -> usize {
