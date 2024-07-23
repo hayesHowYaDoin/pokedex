@@ -11,10 +11,10 @@ pub struct ListPage {
 
 impl ListPage {
     pub fn new(pokemon: &[Pokemon]) -> Self {
-        let search_widget = InputBox::default();
-        let list_widget = PokemonTable::new(pokemon, 0);
-
-        ListPage {search_widget, list_widget}
+        ListPage {
+            search_widget: InputBox::default(),
+            list_widget: PokemonTable::new(pokemon, 0),
+        }
     }
 
     pub fn get_selected(&self) -> Pokemon {
