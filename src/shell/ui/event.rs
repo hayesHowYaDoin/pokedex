@@ -13,6 +13,7 @@ impl From<Option<TuiEvent>> for Event {
                     KeyCode::Down => Event::Down,
                     KeyCode::Char(c) => Event::NewCharacter(c),
                     KeyCode::Backspace => Event::DeleteCharacter,
+                    KeyCode::Enter => Event::Select,
                     _ => Event::Noop,
                 } 
             },

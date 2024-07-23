@@ -33,7 +33,7 @@ impl App {
 
             self.update(&event);
 
-            match self.state.next(&event) {
+            match self.state.next(&event).clone() {
                 PageState::List(mut list_page) => {
                     list_page.render(&mut tui.terminal)?;
                 }
