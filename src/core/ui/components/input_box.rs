@@ -1,7 +1,7 @@
 use std::default::Default;
 
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InputBox {
     text: String,
 }
@@ -11,19 +11,16 @@ impl InputBox {
         Self {text: text.to_string()}
     }
 
-    pub fn push_char(&mut self, c: char) -> &Self {
-        self.text.push(c);
-        self
+    pub fn push_char(&mut self, c: impl Into<char>) {
+        self.text.push(c.into());
     }
 
-    pub fn pop_char(&mut self) -> &Self {
+    pub fn pop_char(&mut self) {
         self.text.pop();
-        self
     }
 
-    pub fn clear(&mut self) -> &Self {
+    pub fn clear(&mut self) {
         self.text.clear();
-        self
     }
 
     pub fn text(&self) -> &str {
@@ -42,6 +39,8 @@ impl Default for InputBox {
 mod tests {
     use super::*;
 
+    use cascade::cascade;
+
     #[test]
     fn test_new() {
         let input_box = InputBox::new("Hello");
@@ -50,25 +49,28 @@ mod tests {
 
     #[test]
     fn test_push_char() {
-        let mut input_box = InputBox::new("Hello");
-        input_box.push_char('!');
-
+        let input_box = cascade! {
+            InputBox::new("Hello");
+            ..push_char('!');
+        };
         assert_eq!(input_box.text(), "Hello!");
     }
 
     #[test]
     fn test_pop_char() {
-        let mut input_box = InputBox::new("Hello");
-        input_box.pop_char();
-
+        let input_box = cascade! {
+            InputBox::new("Hello");
+            ..pop_char();
+        };
         assert_eq!(input_box.text(), "Hell");
     }
 
     #[test]
     fn test_clear() {
-        let mut input_box = InputBox::new("Hello");
-        input_box.clear();
-
+        let input_box = cascade! {
+            InputBox::new("Hello");
+            ..clear();
+        };
         assert_eq!(input_box.text(), "");
     }
 }

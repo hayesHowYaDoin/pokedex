@@ -1,24 +1,26 @@
-use std::default::Default;
-
 use color_eyre::eyre::Result;
 
-use crate::shell::ui::{
-    tui::{Tui, TuiBackend},
-    pages::TuiPage,
+use crate::{
+    core::pokemon::Pokemon, 
+    shell::ui::{
+        pages::TuiPage,
+        tui::Tui,
+    }
 };
 use crate::core::ui::{
     Event,
-    pages::ListPage
+    PageState,
+    PageStateMachine,
 };
 
 pub struct App {
     should_quit: bool,
-    page: Box<dyn TuiPage<TuiBackend>>,
+    state: PageStateMachine,
 }
 
 impl App {
-    pub fn new() -> Self {
-        Self::default()
+    pub fn new(pokemon: &[Pokemon]) -> Self {
+        App { should_quit: false, state: PageStateMachine::new(pokemon) }
     }
 
     pub async fn run(&mut self) -> Result<()> {
@@ -31,10 +33,13 @@ impl App {
 
             self.update(&event);
 
-            self.page.update(&event).next();
-            self.page.render(&mut tui.terminal)?;
-
-            if self.should_quit { break }
+            match self.state.next(&event) {
+                PageState::List(mut list_page) => {
+                    list_page.render(&mut tui.terminal)?;
+                }
+                PageState::Detail => {},
+                PageState::Exit => break,
+            }
         };
 
         tui.exit()?;
@@ -45,12 +50,5 @@ impl App {
         if event == &Event::NewCharacter('q') {
             self.should_quit = true;
         }
-    }
-}
-
-impl Default for App {
-    fn default() -> Self {
-        let page = Box::new(ListPage::new(151));
-        Self {should_quit: false, page}
     }
 }
