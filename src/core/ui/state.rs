@@ -1,5 +1,3 @@
-use color_eyre::eyre::{Result, WrapErr};
-
 use crate::core::pokemon::Pokemon;
 use super::{
     pages::ListPage,

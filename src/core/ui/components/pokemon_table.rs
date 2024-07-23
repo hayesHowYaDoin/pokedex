@@ -83,57 +83,72 @@ impl PokemonTable {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     use cascade::cascade;
+    use cascade::cascade;
 
-//     #[test]
-//     fn test_index_new_valid() {
-//         let index = RowIndex::new(0, 5);
-//         assert_eq!(index.value(), 0);
-//     }
+    use std::sync::LazyLock;
 
-//     #[test]
-//     fn test_index_new_too_large() {
-//         let index = RowIndex::new(5, 5);
-//         assert_eq!(index.value(), 4);
-//     }
+    
+    static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
+        Pokemon {number: 1, name: "Bulbasaur".to_string()},
+        Pokemon {number: 2, name: "Ivysaur".to_string()},
+        Pokemon {number: 3, name: "Venusaur".to_string()},
+        Pokemon {number: 4, name: "Charmander".to_string()},
+        Pokemon {number: 5, name: "Charmeleon".to_string()},
+    ]);
 
-//     #[test]
-//     fn test_up() {
-//         let table = cascade! {
-//             PokemonTable::new(RowIndex::new(1, 5));
-//             ..up();
-//         };
-//         assert_eq!(table.get_selected_index().value(), 0);
-//     }
+    #[test]
+    fn test_index_new_valid() {
+        let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
+        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
 
-//     #[test]
-//     fn test_up_limit() {
-//         let table = cascade! {
-//             PokemonTable::new(RowIndex::new(0, 5));
-//             ..up();
-//         };
-//         assert_eq!(table.get_selected_index().value(), 0);
-//     }
+        
+        let table = PokemonTable::new(&POKEMON.as_slice(), 0);
+        assert_eq!(table.get_selected_index(), 0);
+    }
 
-//     #[test]
-//     fn test_down() {
-//         let table = cascade! {
-//             PokemonTable::new(RowIndex::new(1, 5));
-//             ..down();
-//         };
-//         assert_eq!(table.get_selected_index().value(), 2);
-//     }
+    #[test]
+    fn test_index_out_of_bounds() {
+        let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len());
+        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+    }
 
-//     #[test]
-//     fn test_down_limit() {
-//         let table = cascade! {
-//             PokemonTable::new(RowIndex::new(4, 5));
-//             ..down();
-//         };
-//         assert_eq!(table.get_selected_index().value(), 4);
-//     }
-// }
+    #[test]
+    fn test_up() {
+        let table = cascade! {
+            PokemonTable::new(&POKEMON.as_slice(), 1);
+            ..up();
+        };
+        assert_eq!(table.get_selected_index(), 0);
+    }
+
+    #[test]
+    fn test_up_limit() {
+        let table = cascade! {
+            PokemonTable::new(&POKEMON.as_slice(), 0);
+            ..up();
+        };
+        assert_eq!(table.get_selected_index(), 0);
+    }
+
+    #[test]
+    fn test_down() {
+        let table = cascade! {
+            PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 2);
+            ..down();
+        };
+        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+    }
+
+    #[test]
+    fn test_down_limit() {
+        let table = cascade! {
+            PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
+            ..down();
+        };
+        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+    }
+}
