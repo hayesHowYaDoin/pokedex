@@ -42,7 +42,7 @@ impl TuiStatefulComponent for PokemonTable {
             .highlight_style(Style::new().reversed())
             .highlight_symbol(">>");
 
-        let mut table_state = TableState::default().with_selected(Some(self.get_selected_index()));
+        let mut table_state = TableState::default().with_selected(self.get_selected_index());
         frame.render_stateful_widget(table, *layout, &mut table_state);
     }
 }

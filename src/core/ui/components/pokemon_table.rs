@@ -75,11 +75,19 @@ impl PokemonTable {
     }
 
     pub fn get_selected(&self) -> Option<&Pokemon> {
-        self.pokemon.get(self.selected_row.value() as usize)
+        if let Some(row) = self.get_selected_index() {
+            return self.pokemon.get(row);
+        }
+        
+        None
     }
 
-    pub fn get_selected_index(&self) -> usize {
-        self.selected_row.value() as usize
+    pub fn get_selected_index(&self) -> Option<usize> {
+        if self.pokemon.is_empty() {
+            return None;
+        }
+
+        Some(self.selected_row.value() as usize)
     }
 }
 
@@ -103,17 +111,17 @@ mod tests {
     #[test]
     fn test_index_new_valid() {
         let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
-        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+        assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
 
         
         let table = PokemonTable::new(&POKEMON.as_slice(), 0);
-        assert_eq!(table.get_selected_index(), 0);
+        assert_eq!(table.get_selected_index(), Some(0));
     }
 
     #[test]
     fn test_index_out_of_bounds() {
         let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len());
-        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+        assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
     }
 
     #[test]
@@ -122,7 +130,7 @@ mod tests {
             PokemonTable::new(&POKEMON.as_slice(), 1);
             ..up();
         };
-        assert_eq!(table.get_selected_index(), 0);
+        assert_eq!(table.get_selected_index(), Some(0));
     }
 
     #[test]
@@ -131,7 +139,7 @@ mod tests {
             PokemonTable::new(&POKEMON.as_slice(), 0);
             ..up();
         };
-        assert_eq!(table.get_selected_index(), 0);
+        assert_eq!(table.get_selected_index(), Some(0));
     }
 
     #[test]
@@ -140,7 +148,7 @@ mod tests {
             PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 2);
             ..down();
         };
-        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+        assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
     }
 
     #[test]
@@ -149,6 +157,27 @@ mod tests {
             PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
             ..down();
         };
-        assert_eq!(table.get_selected_index(), POKEMON.len() - 1);
+        assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
+    }
+
+    #[test]
+    fn test_get_selected() {
+        let table = cascade! {
+            PokemonTable::new(&POKEMON.as_slice(), 1);
+            ..down();
+        };
+        assert_eq!(table.get_selected(), Some(&POKEMON[2]));
+    }
+
+    #[test]
+    fn test_get_selected_empty() {
+        let table = PokemonTable::new(&[], 1);
+        assert_eq!(table.get_selected(), None);
+
+        let down_table = cascade! { table.clone();..down(); };
+        assert_eq!(down_table.get_selected(), None);
+
+        let up_table = cascade! { table.clone();..up(); };
+        assert_eq!(up_table.get_selected(), None);
     }
 }
