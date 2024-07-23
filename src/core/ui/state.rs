@@ -18,13 +18,13 @@ pub struct PageStateMachine {
 impl PageStateMachine {
     pub fn new(pokemon: &[Pokemon]) -> Self {
         PageStateMachine {
-            page: PageState::List(ListPage::new(&pokemon)),
+            page: PageState::List(ListPage::new(pokemon)),
         }
     }
 
     pub fn next(&mut self, event: &Event) -> PageState {
         let next_page = match &self.page {
-            PageState::List(list_page) => next_list(&list_page, event),
+            PageState::List(list_page) => next_list(list_page, event),
             PageState::Detail => PageState::Detail,
             _ => PageState::Exit,
         };
