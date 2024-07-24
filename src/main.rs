@@ -3,8 +3,8 @@ mod core;
 
 use color_eyre::eyre::Result;
 
-use crate::shell::database::DatabaseMapper;
-use crate::shell::ui::app::App;
+use crate::shell::sql::DatabaseMapper;
+use crate::shell::ratatui::app::App;
 
 async fn tokio_main() -> Result<()> {
     let db = DatabaseMapper::new("tools/sqlite3/pokedex.db")

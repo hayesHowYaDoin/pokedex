@@ -1,2 +1,2 @@
-pub mod database;
-pub mod ui;
+pub mod sql;
+pub mod ratatui;

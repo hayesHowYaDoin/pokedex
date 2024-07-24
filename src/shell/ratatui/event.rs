@@ -1,7 +1,7 @@
 
 use crossterm::event::KeyCode;
 
-use crate::shell::ui::tui::TuiEvent;
+use crate::shell::ratatui::tui::TuiEvent;
 use crate::core::ui::Event;
 
 impl From<Option<TuiEvent>> for Event {

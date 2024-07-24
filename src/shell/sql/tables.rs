@@ -13,6 +13,7 @@ pub trait PokemonTableRepository {
 
 #[derive(Debug)]
 pub struct TypesDTO {
+    #[allow(dead_code)]
     pub number: i32,
     pub primary_type: String,
     pub secondary_type: Option<String>,
@@ -20,5 +21,6 @@ pub struct TypesDTO {
 
 pub trait TypesTableRepository {
     fn fetch(&self, number: i32) -> Result<TypesDTO, DatabaseError>;
+    #[allow(dead_code)]
     fn fetch_all(&self) -> Result<Vec<TypesDTO>, DatabaseError>;
 }

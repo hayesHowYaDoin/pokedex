@@ -129,12 +129,15 @@ pub trait PokemonNumberRepository {
 
 pub trait PokemonNameRepository {
     fn fetch_name(&self, number: i32) -> Result<String, PokemonNameRepositoryError>;
+    #[allow(dead_code)]
     fn fetch_all_names(&self) -> Result<Vec<String>, PokemonNameRepositoryError>;
 }
 
 pub trait PokemonTypesRepository {
     fn fetch_primary_type(&self, number: i32) -> Result<String, PokemonTypesRepositoryError>;
+    #[allow(dead_code)]
     fn fetch_all_primary_types(&self) -> Result<Vec<String>, PokemonTypesRepositoryError>;
     fn fetch_secondary_type(&self, number: i32) -> Result<Option<String>, PokemonTypesRepositoryError>;
+    #[allow(dead_code)]
     fn fetch_all_secondary_types(&self) -> Result<Vec<Option<String>>, PokemonTypesRepositoryError>;
 }
