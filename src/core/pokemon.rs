@@ -22,6 +22,10 @@ impl Pokemon {
 
 #[derive(Debug, Error)]
 #[error("{0}")]
+pub struct PokemonNumberRepositoryError(pub String);
+
+#[derive(Debug, Error)]
+#[error("{0}")]
 pub struct PokemonNameRepositoryError(pub String);
 
 #[derive(Clone, Debug)]
@@ -43,11 +47,18 @@ impl PokemonTypes {
 #[error("{0}")]
 pub struct PokemonTypesRepositoryError(pub String);
 
+pub trait PokemonNumberRepository {
+    fn fetch_all_numbers(&self) -> Result<Vec<i32>, PokemonNumberRepositoryError>;
+}
+
 pub trait PokemonNameRepository {
     fn fetch_name(&self, number: i32) -> Result<String, PokemonNameRepositoryError>;
+    fn fetch_all_names(&self) -> Result<Vec<String>, PokemonNameRepositoryError>;
 }
 
 pub trait PokemonTypesRepository {
     fn fetch_primary_type(&self, number: i32) -> Result<String, PokemonTypesRepositoryError>;
+    fn fetch_all_primary_types(&self) -> Result<Vec<String>, PokemonTypesRepositoryError>;
     fn fetch_secondary_type(&self, number: i32) -> Result<Option<String>, PokemonTypesRepositoryError>;
+    fn fetch_all_secondary_types(&self) -> Result<Vec<Option<String>>, PokemonTypesRepositoryError>;
 }

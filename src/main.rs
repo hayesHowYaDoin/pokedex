@@ -3,14 +3,14 @@ mod core;
 
 use color_eyre::eyre::Result;
 
-use crate::shell::database::{Database, DatabaseMapper};
+use crate::shell::database::DatabaseMapper;
 use crate::shell::ui::app::App;
 
 async fn tokio_main() -> Result<()> {
-    let db = Database::new().expect("Failed to create database connection");
-    let db_mapper = DatabaseMapper::new(db);
+    let db = DatabaseMapper::new("tools/sqlite3/pokedex.db")
+        .expect("Failed to create database connection");
 
-    let mut app = App::new(&pokemon);
+    let mut app = App::new(db).expect("Failed to create application");
     app.run().await?;
   
     Ok(())
