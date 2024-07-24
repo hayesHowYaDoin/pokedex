@@ -1,6 +1,6 @@
 use crate::core::ui::components::{InputBox, PokemonTable, PokemonTableEntry};
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ListPage {
     pub search_widget: InputBox,
     pub list_widget: PokemonTable,
