@@ -38,12 +38,12 @@ impl TuiStatefulComponent for PokemonTable {
 
 impl From<PokemonTableEntry> for Row<'_> {
     fn from(entry: PokemonTableEntry) -> Self {
-        let color = type_color(&entry.type1);
+        let color = type_color(&entry.primary_type);
         Row::new(vec![
             entry.number.to_string(),
             entry.name,
-            entry.type1.to_string(),
-            entry.type2.map_or("".to_string(), |t| t.to_string()),
+            entry.primary_type.to_string(),
+            entry.secondary_type.map_or("".to_string(), |t| t.to_string()),
         ]).fg(color)
     }
 }

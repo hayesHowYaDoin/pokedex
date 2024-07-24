@@ -56,13 +56,13 @@ impl SubAssign<u32> for RowIndex {
 pub struct PokemonTableEntry {
     pub number: i32,
     pub name: String,
-    pub type1: Type,
-    pub type2: Option<Type>,
+    pub primary_type: Type,
+    pub secondary_type: Option<Type>,
 }
 
 impl PokemonTableEntry {
-    pub fn new(number: i32, name: String, type1: Type, type2: Option<Type>) -> Self {
-        PokemonTableEntry {number, name, type1, type2}
+    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
+        PokemonTableEntry {number, name, primary_type, secondary_type}
     }
 }
 
@@ -92,6 +92,11 @@ impl PokemonTable {
         &self.pokemon
     }
 
+    pub fn set_pokemon(&mut self, pokemon: &[PokemonTableEntry]) {
+        self.pokemon = pokemon.to_vec();
+        self.selected_row = RowIndex::new(0, pokemon.len() as u32);
+    }
+
     pub fn get_selected(&self) -> Option<&PokemonTableEntry> {
         if let Some(row) = self.get_selected_index() {
             return self.pokemon.get(row);
@@ -119,11 +124,11 @@ mod tests {
 
     
     static POKEMON: LazyLock<Vec<PokemonTableEntry>> = LazyLock::new(|| vec![
-        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
-        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
-        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
-        PokemonTableEntry {number: 4, name: "Charmander".to_string(), type1: Type::Fire, type2: None},
-        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), type1: Type::Fire, type2: None},
+        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 4, name: "Charmander".to_string(), primary_type: Type::Fire, secondary_type: None},
+        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), primary_type: Type::Fire, secondary_type: None},
     ]);
 
     #[test]

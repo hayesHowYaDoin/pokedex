@@ -27,7 +27,7 @@ impl PageStateMachine {
             .collect();
 
         PageStateMachine {
-            page: PageState::List(ListPage::new(&pokemon_table_entries)),
+            page: PageState::List(ListPage::new(&pokemon_table_entries, ""))
         }
     }
 
@@ -49,22 +49,26 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
             if *c == 'q' { return PageState::Exit; }
 
             let mut next_page = page.clone();
-            next_page.search_widget.push_char(*c);
+            next_page.push_char(*c);
+
             PageState::List(next_page)
         }
         Event::DeleteCharacter => {
             let mut next_page = page.clone();
-            next_page.search_widget.pop_char();
+            next_page.pop_char();
+
             PageState::List(next_page)
         }
         Event::Up => {
             let mut next_page = page.clone();
             next_page.list_widget.up();
+
             PageState::List(next_page)
         }
         Event::Down => {
             let mut next_page = page.clone();
             next_page.list_widget.down();
+
             PageState::List(next_page)
         }
         Event::Select | Event::Noop => PageState::List(page.clone()),
@@ -76,8 +80,8 @@ impl<'a> From<&'a Pokemon> for PokemonTableEntry {
         PokemonTableEntry {
             number: pokemon.number,
             name: pokemon.name.clone(),
-            type1: pokemon.types.primary.clone(),
-            type2: pokemon.types.secondary.clone(),
+            primary_type: pokemon.types.primary.clone(),
+            secondary_type: pokemon.types.secondary.clone(),
         }
     }
 }
@@ -110,7 +114,7 @@ mod test {
 
     #[test]
     fn test_next_list_new_character_other() {
-        let mut list_page = ListPage::new(&[]);
+        let mut list_page = ListPage::new(&[], "");
         list_page.search_widget.push_char('a');
 
         let next_list_page = PageStateMachine::new(&[]).next(&Event::NewCharacter('a'));
@@ -119,10 +123,19 @@ mod test {
 
     #[test]
     fn test_next_list_delete_character() {
-        let mut state_machine = PageStateMachine::new(&[]);
-        let event = Event::DeleteCharacter;
-        let next_state = state_machine.next(&event);
-        assert_eq!(next_state, PageState::List(ListPage::new(&[])));
+        let mut state_machine = PageStateMachine::new(&POKEMON);
+        let initial_state = state_machine.page.clone();
+
+        match state_machine.page {
+            PageState::List(ref mut page) => {
+                page.search_widget.push_char('a');
+            }
+            _ => panic!("Expected state machine to be initialize with PageState::List"),
+        }
+
+        let next_state = state_machine.next(&Event::DeleteCharacter);
+
+        assert_eq!(next_state, initial_state);
     }
 
     #[test]
@@ -135,7 +148,7 @@ mod test {
             .map(|p| p.into())
             .collect();
 
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries);
+        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
         expected_next_page.list_widget.down();
 
         assert_eq!(next_state, PageState::List(expected_next_page));
@@ -156,7 +169,7 @@ mod test {
         .map(|p| p.into())
         .collect();
 
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries);
+        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
         expected_next_page.list_widget = cascade! {
             expected_next_page.list_widget;
             ..down();
@@ -170,9 +183,9 @@ mod test {
     #[test]
     fn test_next_list_select() {
         let mut state_machine = PageStateMachine::new(&[]);
-        let event = Event::Select;
-        let next_state = state_machine.next(&event);
-        assert_eq!(next_state, PageState::Detail);
+        let previous_state = state_machine.page.clone();
+        let next_state = state_machine.next(&Event::Select);
+        assert_eq!(next_state, previous_state);
     }
 
     #[test]
