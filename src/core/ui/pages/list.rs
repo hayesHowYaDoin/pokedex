@@ -4,7 +4,7 @@ use crate::core::ui::components::{InputBox, PokemonTable, PokemonTableEntry};
 pub struct ListPage {
     pub search_widget: InputBox,
     pub list_widget: PokemonTable,
-    pokemon: Vec<PokemonTableEntry>,
+    pub pokemon: Vec<PokemonTableEntry>,
 }
 
 impl ListPage {

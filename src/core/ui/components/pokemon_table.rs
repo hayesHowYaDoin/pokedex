@@ -86,6 +86,10 @@ impl PokemonTable {
         self.selected_row += 1;
     }
 
+    pub fn get_pokemon(&self) -> &[PokemonTableEntry] {
+        &self.pokemon
+    }
+
     pub fn get_selected(&self) -> Option<&PokemonTableEntry> {
         if let Some(row) = self.get_selected_index() {
             return self.pokemon.get(row);
