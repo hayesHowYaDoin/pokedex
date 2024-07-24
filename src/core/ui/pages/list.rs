@@ -1,19 +1,18 @@
-use crate::core::{
-    pokemon::Pokemon, 
-    ui::components::{InputBox, PokemonTable},
-};
+use crate::core::ui::components::{InputBox, PokemonTable, PokemonTableEntry};
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ListPage {
     pub search_widget: InputBox,
     pub list_widget: PokemonTable,
+    pokemon: Vec<PokemonTableEntry>,
 }
 
 impl ListPage {
-    pub fn new(pokemon: &[Pokemon]) -> Self {
+    pub fn new(pokemon: &[PokemonTableEntry]) -> Self {
         ListPage {
             search_widget: InputBox::default(),
             list_widget: PokemonTable::new(pokemon, 0),
+            pokemon: pokemon.to_vec(),
         }
     }
 }

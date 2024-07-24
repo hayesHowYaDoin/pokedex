@@ -3,13 +3,12 @@ mod core;
 
 use color_eyre::eyre::Result;
 
-use crate::shell::pokemon::Database;
+use crate::shell::database::{Database, DatabaseMapper};
 use crate::shell::ui::app::App;
-use crate::core::pokemon::PokemonRepository;
 
 async fn tokio_main() -> Result<()> {
     let db = Database::new().expect("Failed to create database connection");
-    let pokemon = db.fetch_all().expect("Failed to fetch all Pokemon");
+    let db_mapper = DatabaseMapper::new(db);
 
     let mut app = App::new(&pokemon);
     app.run().await?;
