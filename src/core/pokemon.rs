@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pokemon {
     pub number: i32,
     pub name: String,
@@ -96,7 +96,7 @@ impl From<String> for Type {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonTypes {
     pub primary: Type,
     pub secondary: Option<Type>,
