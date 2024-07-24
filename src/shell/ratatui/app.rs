@@ -1,7 +1,7 @@
 use color_eyre::eyre::Result;
 
 use crate::core::pokemon::{Pokemon, PokemonNameRepository, PokemonNumberRepository, PokemonTypesRepository};
-use crate::shell::ui::{pages::TuiPage, tui::Tui};
+use crate::shell::ratatui::{pages::TuiPage, tui::Tui};
 use crate::core::ui::{
     Event,
     PageState,

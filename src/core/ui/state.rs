@@ -1,5 +1,5 @@
 use crate::core::{
-    pokemon::{Pokemon, Type},
+    pokemon::Pokemon,
     ui::components::PokemonTableEntry,
 };
 use super::{
@@ -10,13 +10,13 @@ use super::{
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PageState {
     List(ListPage),
+    #[allow(dead_code)]
     Detail,
     Exit,
 }
 
 pub struct PageStateMachine {
     page: PageState,
-    pokemon: Vec<Pokemon>,
 }
 
 impl PageStateMachine {
@@ -28,7 +28,6 @@ impl PageStateMachine {
 
         PageStateMachine {
             page: PageState::List(ListPage::new(&pokemon_table_entries)),
-            pokemon: pokemon.to_vec(),
         }
     }
 
@@ -89,6 +88,10 @@ mod test {
 
     use cascade::cascade;
 
+    use crate::core::{
+        pokemon::Type,
+        ui::components::PokemonTableEntry,
+    };
     use super::*;
 
     static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![

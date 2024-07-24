@@ -28,7 +28,7 @@ impl From<rusqlite::Error> for DatabaseError {
 
 impl Database {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Database, DatabaseError> {
-        let conn = Connection::open(path)?.into();
+        let conn = Connection::open(path)?;
         Ok(Database { conn })
     }
 }
