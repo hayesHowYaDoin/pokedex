@@ -1,5 +1,7 @@
-use crate::core::pokemon::Pokemon;
-use crate::core::ui::components::PokemonTableEntry;
+use crate::core::{
+    pokemon::Pokemon,
+    ui::components::PokemonTableEntry,
+};
 use super::{
     pages::ListPage,
     Event,

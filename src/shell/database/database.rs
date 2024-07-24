@@ -1,23 +1,40 @@
+use std::path::Path;
+
+use thiserror::Error;
 use rusqlite::Connection;
 
-use super::tables::{
-    pokemon::{PokemonDTO, PokemonTableRepository, PokemonTableRepositoryError},
-    types::{TypesDTO, TypesTableRepository, TypesTableRepositoryError},
-};
+use super::tables::{PokemonDTO, PokemonTableRepository, TypesDTO, TypesTableRepository};
 
 pub struct Database {
     conn: Connection,
 }
 
+#[derive(Debug, Error)]
+#[error("{0}")]
+pub enum DatabaseError {
+    ConnectionError(String),
+    FetchError(String),
+}
+
+impl From<rusqlite::Error> for DatabaseError {
+    fn from(err: rusqlite::Error) -> DatabaseError {
+        type Error = rusqlite::Error;
+        match err {
+            Error::QueryReturnedNoRows => DatabaseError::FetchError(err.to_string()),
+            _ => DatabaseError::ConnectionError(err.to_string()),
+        }
+    }
+}
+
 impl Database {
-    pub fn new() -> Result<Database, PokemonTableRepositoryError> {
-        let conn = Connection::open("tools/sqlite3/pokedex.db")?;
+    pub fn new<P: AsRef<Path>>(path: P) -> Result<Database, DatabaseError> {
+        let conn = Connection::open(path)?.into();
         Ok(Database { conn })
     }
 }
 
 impl PokemonTableRepository for Database {
-    fn fetch(&self, number: i32) -> Result<PokemonDTO, PokemonTableRepositoryError> {
+    fn fetch(&self, number: i32) -> Result<PokemonDTO, DatabaseError> {
         let mut stmt = self.conn.prepare("SELECT number, name FROM pokemon WHERE number = ?")?;
         let pokemon = stmt.query_row([number], |row| {
             Ok(PokemonDTO {
@@ -29,7 +46,7 @@ impl PokemonTableRepository for Database {
         Ok(pokemon)
     }
 
-    fn fetch_all(&self) -> Result<Vec<PokemonDTO>, PokemonTableRepositoryError> {
+    fn fetch_all(&self) -> Result<Vec<PokemonDTO>, DatabaseError> {
         let mut stmt = self.conn.prepare("SELECT number, name FROM pokemon")?;
         let pokemon_iter = stmt.query_map([], |row| {
             Ok(PokemonDTO {
@@ -48,8 +65,8 @@ impl PokemonTableRepository for Database {
 }
 
 impl TypesTableRepository for Database {
-    fn fetch(&self, number: i32) -> Result<TypesDTO, TypesTableRepositoryError> {
-        let sql_cmd = "SELECT pokemon_number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
+    fn fetch(&self, number: i32) -> Result<TypesDTO, DatabaseError> {
+        let sql_cmd = "SELECT number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
         let mut stmt = self.conn.prepare(sql_cmd)?;
         let types = stmt.query_row([number], |row| {
             Ok(TypesDTO {
@@ -62,8 +79,8 @@ impl TypesTableRepository for Database {
         Ok(types)
     }
 
-    fn fetch_all(&self) -> Result<Vec<TypesDTO>, TypesTableRepositoryError> {
-        let sql_cmd = "SELECT pokemon_number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
+    fn fetch_all(&self) -> Result<Vec<TypesDTO>, DatabaseError> {
+        let sql_cmd = "SELECT number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
         let mut stmt = self.conn.prepare(sql_cmd)?;
         let types_iter = stmt.query_map([], |row| {
             Ok(TypesDTO {
