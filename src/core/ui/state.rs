@@ -1,4 +1,5 @@
 use crate::core::pokemon::Pokemon;
+use crate::core::ui::components::PokemonTableEntry;
 use super::{
     pages::ListPage,
     Event,
@@ -13,12 +14,19 @@ pub enum PageState {
 
 pub struct PageStateMachine {
     page: PageState,
+    pokemon: Vec<Pokemon>,
 }
 
 impl PageStateMachine {
     pub fn new(pokemon: &[Pokemon]) -> Self {
+        let pokemon_table_entries: Vec<PokemonTableEntry> = pokemon
+            .iter()
+            .map(|p| p.into())
+            .collect();
+
         PageStateMachine {
-            page: PageState::List(ListPage::new(pokemon)),
+            page: PageState::List(ListPage::new(&pokemon_table_entries)),
+            pokemon: pokemon.to_vec(),
         }
     }
 
@@ -37,9 +45,7 @@ impl PageStateMachine {
 fn next_list(page: &ListPage, event: &Event) -> PageState {
     match event {
         Event::NewCharacter(c) => {
-            if *c == 'q' {
-                return PageState::Exit;
-            }
+            if *c == 'q' { return PageState::Exit; }
 
             let mut next_page = page.clone();
             next_page.search_widget.push_char(*c);
@@ -64,6 +70,17 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
     }
 }
 
+impl<'a> From<&'a Pokemon> for PokemonTableEntry {
+    fn from(pokemon: &'a Pokemon) -> Self {
+        PokemonTableEntry {
+            number: pokemon.number,
+            name: pokemon.name.clone(),
+            type1: pokemon.types.primary.clone(),
+            type2: pokemon.types.secondary.clone(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use std::sync::LazyLock;
@@ -73,11 +90,11 @@ mod test {
     use super::*;
 
     static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
-        Pokemon {number: 1, name: "Bulbasaur".to_string()},
-        Pokemon {number: 2, name: "Ivysaur".to_string()},
-        Pokemon {number: 3, name: "Venusaur".to_string()},
-        Pokemon {number: 4, name: "Charmander".to_string()},
-        Pokemon {number: 5, name: "Charmeleon".to_string()},
+        Pokemon::new(1, "".to_string(), "".to_string(), None),
+        Pokemon::new(2, "".to_string(), "".to_string(), None),
+        Pokemon::new(3, "".to_string(), "".to_string(), None),
+        Pokemon::new(4, "".to_string(), "".to_string(), None),
+        Pokemon::new(5, "".to_string(), "".to_string(), None),
     ]);
 
     #[test]
@@ -108,7 +125,12 @@ mod test {
         let mut state_machine = PageStateMachine::new(&POKEMON);
         let next_state = state_machine.next(&Event::Down);
 
-        let mut expected_next_page = ListPage::new(&POKEMON);
+        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
+            .iter()
+            .map(|p| p.into())
+            .collect();
+
+        let mut expected_next_page = ListPage::new(&pokemon_table_entries);
         expected_next_page.list_widget.down();
 
         assert_eq!(next_state, PageState::List(expected_next_page));
@@ -123,8 +145,13 @@ mod test {
             ..next(&Event::Down);
             ..next(&Event::Up);
         };
+        
+        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
+        .iter()
+        .map(|p| p.into())
+        .collect();
 
-        let mut expected_next_page = ListPage::new(&POKEMON);
+        let mut expected_next_page = ListPage::new(&pokemon_table_entries);
         expected_next_page.list_widget = cascade! {
             expected_next_page.list_widget;
             ..down();
