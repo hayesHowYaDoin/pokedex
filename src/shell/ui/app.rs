@@ -22,7 +22,7 @@ impl App {
                 let name = repository.fetch_name(number)?;
                 let primary_type = repository.fetch_primary_type(number)?;
                 let secondary_type = repository.fetch_secondary_type(number)?;
-                Ok(Pokemon::new(number, name, primary_type, secondary_type))
+                Ok(Pokemon::new(number, name, primary_type.into(), secondary_type.map(|t| t.into())))
                 })
             .collect::<Result<Vec<Pokemon>>>()?;
 

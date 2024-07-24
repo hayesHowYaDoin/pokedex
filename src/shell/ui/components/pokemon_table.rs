@@ -1,26 +1,15 @@
-use std::sync::LazyLock;
-
 use ratatui::{
     prelude::{Constraint, Rect, Style},
-    style::{Color, Stylize},
+    style::Stylize,
     terminal::Frame,
     widgets::{Block, Row, Table, TableState},
 };
 
 use crate::core::ui::components::{PokemonTable, PokemonTableEntry};
-use super::TuiStatefulComponent;
-
-static ROWS: LazyLock<Vec<Row>> = LazyLock::new(|| vec![
-    Row::new(vec!["1", "Bulbasaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["2", "Ivysaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["3", "Venusaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["4", "Charmander", "Fire", ""]).red(),
-    Row::new(vec!["5", "Charmeleon", "Fire", ""]).red(),
-    Row::new(vec!["6", "Charizard", "Fire", "Flying"]).red(),
-    Row::new(vec!["7", "Squirtle", "Water", ""]).blue(),
-    Row::new(vec!["8", "Wartortle", "Water", ""]).blue(),
-    Row::new(vec!["9", "Blastoise", "Water", ""]).blue(),
-]);
+use super::{
+    TuiStatefulComponent,
+    super::palette::type_color,
+};
 
 const WIDTHS: [Constraint; 4] = [
     Constraint::Length(5),
@@ -47,18 +36,14 @@ impl TuiStatefulComponent for PokemonTable {
     }
 }
 
-fn row_color(_entry: &PokemonTableEntry) -> Color {
-    Color::Green
-}
-
 impl From<PokemonTableEntry> for Row<'_> {
     fn from(entry: PokemonTableEntry) -> Self {
-        let color = row_color(&entry);
+        let color = type_color(&entry.type1);
         Row::new(vec![
             entry.number.to_string(),
             entry.name,
-            entry.type1,
-            entry.type2.unwrap_or_else(|| "".to_string()),
+            entry.type1.to_string(),
+            entry.type2.map_or("".to_string(), |t| t.to_string()),
         ]).fg(color)
     }
 }

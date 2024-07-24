@@ -1,5 +1,7 @@
 use std::ops::{Add, Sub, AddAssign, SubAssign};
 
+use crate::core::pokemon::Type;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct RowIndex {
     index: i32,
@@ -50,21 +52,21 @@ impl SubAssign<u32> for RowIndex {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonTableEntry {
     pub number: i32,
     pub name: String,
-    pub type1: String,
-    pub type2: Option<String>,
+    pub type1: Type,
+    pub type2: Option<Type>,
 }
 
 impl PokemonTableEntry {
-    pub fn new(number: i32, name: String, type1: String, type2: Option<String>) -> Self {
+    pub fn new(number: i32, name: String, type1: Type, type2: Option<Type>) -> Self {
         PokemonTableEntry {number, name, type1, type2}
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonTable {
     pokemon: Vec<PokemonTableEntry>,
     selected_row: RowIndex,
@@ -117,11 +119,11 @@ mod tests {
 
     
     static POKEMON: LazyLock<Vec<PokemonTableEntry>> = LazyLock::new(|| vec![
-        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), type1: "Grass".to_string(), type2: Some("Poison".to_string())},
-        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), type1: "Grass".to_string(), type2: Some("Poison".to_string())},
-        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), type1: "Grass".to_string(), type2: Some("Poison".to_string())},
-        PokemonTableEntry {number: 4, name: "Charmander".to_string(), type1: "Fire".to_string(), type2: None},
-        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), type1: "Fire".to_string(), type2: None},
+        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
+        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
+        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), type1: Type::Grass, type2: Some(Type::Poison)},
+        PokemonTableEntry {number: 4, name: "Charmander".to_string(), type1: Type::Fire, type2: None},
+        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), type1: Type::Fire, type2: None},
     ]);
 
     #[test]

@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 cascade = "1.0.1"
 color-eyre = "0.6.3"
+colors-transform = "0.2.11"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 derivative = "2.2.0"
 derive_more = "0.99.18"

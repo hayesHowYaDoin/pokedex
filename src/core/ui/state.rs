@@ -1,5 +1,5 @@
 use crate::core::{
-    pokemon::Pokemon,
+    pokemon::{Pokemon, Type},
     ui::components::PokemonTableEntry,
 };
 use super::{
@@ -92,11 +92,11 @@ mod test {
     use super::*;
 
     static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
-        Pokemon::new(1, "".to_string(), "".to_string(), None),
-        Pokemon::new(2, "".to_string(), "".to_string(), None),
-        Pokemon::new(3, "".to_string(), "".to_string(), None),
-        Pokemon::new(4, "".to_string(), "".to_string(), None),
-        Pokemon::new(5, "".to_string(), "".to_string(), None),
+        Pokemon::new(1, "".to_string(), Type::Normal, None),
+        Pokemon::new(2, "".to_string(), Type::Normal, None),
+        Pokemon::new(3, "".to_string(), Type::Normal, None),
+        Pokemon::new(4, "".to_string(), Type::Normal, None),
+        Pokemon::new(5, "".to_string(), Type::Normal, None),
     ]);
 
     #[test]
