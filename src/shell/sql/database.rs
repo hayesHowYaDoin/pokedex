@@ -83,18 +83,15 @@ impl TypesTableRepository for Database {
         let sql_cmd = "SELECT number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
         let mut stmt = self.conn.prepare(sql_cmd)?;
         let types_iter = stmt.query_map([], |row| {
-            Ok(TypesDTO {
-                number: row.get(0)?,
-                primary_type: row.get(1)?,
-                secondary_type: row.get(2)?,
-            })
-        })?;
+                Ok(TypesDTO {
+                    number: row.get(0)?,
+                    primary_type: row.get(1)?,
+                    secondary_type: row.get(2)?,
+                })
+            })?
+            .map(|t| t.unwrap())
+            .collect();
 
-        let mut types = Vec::new();
-        for p in types_iter {
-            types.push(p?);
-        }
-
-        Ok(types)
+        Ok(types_iter)
     }
 }
