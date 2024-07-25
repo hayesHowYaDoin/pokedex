@@ -1,5 +1,3 @@
-use std::sync::LazyLock;
-
 use ratatui::{
     prelude::{Constraint, Rect, Style},
     style::Stylize,
@@ -7,20 +5,11 @@ use ratatui::{
     widgets::{Block, Row, Table, TableState},
 };
 
-use crate::core::ui::components::PokemonTable;
-use super::TuiStatefulComponent;
-
-static ROWS: LazyLock<Vec<Row>> = LazyLock::new(|| vec![
-    Row::new(vec!["1", "Bulbasaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["2", "Ivysaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["3", "Venusaur", "Grass", "Poison"]).green(),
-    Row::new(vec!["4", "Charmander", "Fire", ""]).red(),
-    Row::new(vec!["5", "Charmeleon", "Fire", ""]).red(),
-    Row::new(vec!["6", "Charizard", "Fire", "Flying"]).red(),
-    Row::new(vec!["7", "Squirtle", "Water", ""]).blue(),
-    Row::new(vec!["8", "Wartortle", "Water", ""]).blue(),
-    Row::new(vec!["9", "Blastoise", "Water", ""]).blue(),
-]);
+use crate::core::ui::components::{PokemonTable, PokemonTableEntry};
+use super::{
+    TuiStatefulComponent,
+    super::palette::type_color,
+};
 
 const WIDTHS: [Constraint; 4] = [
     Constraint::Length(5),
@@ -31,7 +20,7 @@ const WIDTHS: [Constraint; 4] = [
 
 impl TuiStatefulComponent for PokemonTable {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
-        let table = Table::new(ROWS.to_owned(), WIDTHS)
+        let table = Table::new(self.get_pokemon().to_owned(), WIDTHS)
             .column_spacing(1)
             .header(
                 Row::new(vec!["#", "Name", "Type 1", "Type 2"])
@@ -44,5 +33,17 @@ impl TuiStatefulComponent for PokemonTable {
 
         let mut table_state = TableState::default().with_selected(self.get_selected_index());
         frame.render_stateful_widget(table, *layout, &mut table_state);
+    }
+}
+
+impl From<PokemonTableEntry> for Row<'_> {
+    fn from(entry: PokemonTableEntry) -> Self {
+        let color = type_color(&entry.primary_type);
+        Row::new(vec![
+            entry.number.to_string(),
+            entry.name,
+            entry.primary_type.to_string(),
+            entry.secondary_type.map_or("".to_string(), |t| t.to_string()),
+        ]).fg(color)
     }
 }

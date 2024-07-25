@@ -1,6 +1,6 @@
 use std::ops::{Add, Sub, AddAssign, SubAssign};
 
-use crate::core::pokemon::Pokemon;
+use crate::core::pokemon::Type;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct RowIndex {
@@ -52,14 +52,28 @@ impl SubAssign<u32> for RowIndex {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct PokemonTableEntry {
+    pub number: i32,
+    pub name: String,
+    pub primary_type: Type,
+    pub secondary_type: Option<Type>,
+}
+
+impl PokemonTableEntry {
+    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
+        PokemonTableEntry {number, name, primary_type, secondary_type}
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonTable {
-    pokemon: Vec<Pokemon>,
+    pokemon: Vec<PokemonTableEntry>,
     selected_row: RowIndex,
 }
 
 impl PokemonTable {
-    pub fn new(pokemon: &[Pokemon], selected_row: usize) -> Self {
+    pub fn new(pokemon: &[PokemonTableEntry], selected_row: usize) -> Self {
         PokemonTable {
             pokemon: pokemon.to_vec(),
             selected_row: RowIndex::new(selected_row as i32, pokemon.len() as u32)
@@ -74,7 +88,16 @@ impl PokemonTable {
         self.selected_row += 1;
     }
 
-    pub fn get_selected(&self) -> Option<&Pokemon> {
+    pub fn get_pokemon(&self) -> &[PokemonTableEntry] {
+        &self.pokemon
+    }
+
+    pub fn set_pokemon(&mut self, pokemon: &[PokemonTableEntry]) {
+        self.pokemon = pokemon.to_vec();
+        self.selected_row = RowIndex::new(0, pokemon.len() as u32);
+    }
+
+    pub fn get_selected(&self) -> Option<&PokemonTableEntry> {
         if let Some(row) = self.get_selected_index() {
             return self.pokemon.get(row);
         }
@@ -100,12 +123,12 @@ mod tests {
     use std::sync::LazyLock;
 
     
-    static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
-        Pokemon {number: 1, name: "Bulbasaur".to_string()},
-        Pokemon {number: 2, name: "Ivysaur".to_string()},
-        Pokemon {number: 3, name: "Venusaur".to_string()},
-        Pokemon {number: 4, name: "Charmander".to_string()},
-        Pokemon {number: 5, name: "Charmeleon".to_string()},
+    static POKEMON: LazyLock<Vec<PokemonTableEntry>> = LazyLock::new(|| vec![
+        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 4, name: "Charmander".to_string(), primary_type: Type::Fire, secondary_type: None},
+        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), primary_type: Type::Fire, secondary_type: None},
     ]);
 
     #[test]
