@@ -1,12 +1,7 @@
 use color_eyre::eyre::Result;
 
-use crate::{
-    core::pokemon::Pokemon, 
-    shell::ui::{
-        pages::TuiPage,
-        tui::Tui,
-    }
-};
+use crate::core::pokemon::{Pokemon, PokemonNameRepository, PokemonNumberRepository, PokemonTypesRepository};
+use crate::shell::ratatui::{pages::TuiPage, tui::Tui};
 use crate::core::ui::{
     Event,
     PageState,
@@ -19,8 +14,19 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(pokemon: &[Pokemon]) -> Self {
-        App { should_quit: false, state: PageStateMachine::new(pokemon) }
+    pub fn new<R>(repository: R) -> Result<Self> 
+    where R: PokemonNumberRepository + PokemonNameRepository + PokemonTypesRepository {
+        let pokemon = repository.fetch_all_numbers()?
+            .into_iter()
+            .map(|number| {
+                let name = repository.fetch_name(number)?;
+                let primary_type = repository.fetch_primary_type(number)?;
+                let secondary_type = repository.fetch_secondary_type(number)?;
+                Ok(Pokemon::new(number, name, primary_type.into(), secondary_type.map(|t| t.into())))
+                })
+            .collect::<Result<Vec<Pokemon>>>()?;
+
+        Ok(App { should_quit: false, state: PageStateMachine::new(&pokemon) })
     }
 
     pub async fn run(&mut self) -> Result<()> {

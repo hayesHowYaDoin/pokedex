@@ -11,7 +11,7 @@ use ratatui::{
 };
 
 use crate::core::ui::pages::ListPage;
-use crate::shell::ui::components::{TuiComponent, TuiStatefulComponent};
+use crate::shell::ratatui::components::{TuiComponent, TuiStatefulComponent};
 use super::TuiPage;
 
 const SEARCH_WIDGET_LAYOUT_IDX: usize = 0;
