@@ -20,7 +20,7 @@ impl Pokemon {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Type {
     Normal,
     Fire,

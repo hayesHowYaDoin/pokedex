@@ -42,12 +42,6 @@ mod tests {
     use cascade::cascade;
 
     #[test]
-    fn test_new() {
-        let input_box = InputBox::new("Hello");
-        assert_eq!(input_box.text(), "Hello");
-    }
-
-    #[test]
     fn test_push_char() {
         let input_box = cascade! {
             InputBox::new("Hello");
@@ -72,5 +66,11 @@ mod tests {
             ..clear();
         };
         assert_eq!(input_box.text(), "");
+    }
+
+    #[test]
+    fn test_text() {
+        let input_box = InputBox::new("Hello");
+        assert_eq!(input_box.text(), "Hello");
     }
 }

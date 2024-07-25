@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::core::ui::components::{InputBox, PokemonTable, PokemonTableEntry};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -59,9 +61,13 @@ fn filter_pokemon(pokemon: &[PokemonTableEntry], query: &str) -> Vec<PokemonTabl
     result.extend(filtered_by_primary_type);
     result.extend(filtered_by_secondary_type);
 
-    result.clone().into_iter()
-        .filter(|p| result.iter().filter(|&x| x == p).count() == 1)
-        .collect()
+    result.into_iter()
+        .fold((Vec::new(), HashSet::new()), |(mut result, mut seen), item| {
+            if seen.insert(item.clone()) {
+                result.push(item);
+            }
+            (result, seen)
+        }).0
 }
 
 fn filter_pokemon_by_name(pokemon: &PokemonTableEntry, query: &str) -> bool {
@@ -87,8 +93,21 @@ fn filter_pokemon_by_secondary_type(pokemon: &PokemonTableEntry, query: &str) ->
 
 #[cfg(test)]
 mod tests {
+    use std::sync::LazyLock;
+
     use crate::core::pokemon::Type;
     use super::*;
+
+    static POKEMON: LazyLock<Vec<PokemonTableEntry>> = LazyLock::new(|| vec![
+        PokemonTableEntry {number: 1, name: "Bulbasaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 2, name: "Ivysaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 3, name: "Venusaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
+        PokemonTableEntry {number: 4, name: "Charmander".to_string(), primary_type: Type::Fire, secondary_type: None},
+        PokemonTableEntry {number: 5, name: "Charmeleon".to_string(), primary_type: Type::Fire, secondary_type: None},
+        PokemonTableEntry {number: 6, name: "Charizard".to_string(), primary_type: Type::Fire, secondary_type: Some(Type::Flying)},
+        PokemonTableEntry {number: 16, name: "Pidgey".to_string(), primary_type: Type::Normal, secondary_type: Some(Type::Flying)},
+        PokemonTableEntry {number: 22, name: "Fearow".to_string(), primary_type: Type::Normal, secondary_type: Some(Type::Flying)},
+    ]);
     
     #[test]
     fn test_new() {
@@ -99,13 +118,29 @@ mod tests {
 
     #[test]
     fn test_empty_query() {
-        let pokemon = vec![
-            PokemonTableEntry::new(1, "Bulbasaur".to_string(), Type::Grass, Some(Type::Poison)),
-            PokemonTableEntry::new(2, "Ivysaur".to_string(), Type::Grass, Some(Type::Poison)),
-            PokemonTableEntry::new(3, "Venusaur".to_string(), Type::Grass, Some(Type::Poison)),
-        ];
+        let list_page = ListPage::new(&POKEMON, "");
+        assert_eq!(list_page.list_widget.get_pokemon(), POKEMON.as_slice());
+    }
 
-        let list_page = ListPage::new(&pokemon, "");
-        assert_eq!(list_page.list_widget.get_pokemon(), &pokemon);
+    #[test]
+    fn test_query_name() {
+        let list_page = ListPage::new(&POKEMON, "saur");
+        let filtered_pokemon = list_page.list_widget.get_pokemon();
+        assert_eq!(filtered_pokemon.len(), 3);
+        assert_eq!(filtered_pokemon[0].name, "Bulbasaur");
+        assert_eq!(filtered_pokemon[1].name, "Ivysaur");
+        assert_eq!(filtered_pokemon[2].name, "Venusaur");
+    }
+
+    #[test]
+    fn test_query_name_primary_secondary() {
+        let list_page = ListPage::new(&POKEMON, "F");
+        let filtered_pokemon = list_page.list_widget.get_pokemon();
+        assert_eq!(filtered_pokemon.len(), 5);
+        assert_eq!(filtered_pokemon[0].name, "Fearow");
+        assert_eq!(filtered_pokemon[1].name, "Charmander");
+        assert_eq!(filtered_pokemon[2].name, "Charmeleon");
+        assert_eq!(filtered_pokemon[3].name, "Charizard");
+        assert_eq!(filtered_pokemon[4].name, "Pidgey");
     }
 }
