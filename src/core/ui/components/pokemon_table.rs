@@ -52,7 +52,7 @@ impl SubAssign<u32> for RowIndex {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PokemonTableEntry {
     pub number: i32,
     pub name: String,
