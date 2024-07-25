@@ -1,4 +1,4 @@
-pub mod tables;
+mod tables;
 mod database;
 pub use database::*;
 mod mapper;
