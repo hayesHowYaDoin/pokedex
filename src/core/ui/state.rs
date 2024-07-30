@@ -3,15 +3,14 @@ use crate::core::{
     ui::components::PokemonTableEntry,
 };
 use super::{
-    pages::ListPage,
+    pages::{DetailPage, ListPage},
     Event,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PageState {
     List(ListPage),
-    #[allow(dead_code)]
-    Detail,
+    Detail(DetailPage),
     Exit,
 }
 
@@ -29,12 +28,16 @@ impl PageStateMachine {
         PageStateMachine {
             page: PageState::List(ListPage::new(&pokemon_table_entries, ""))
         }
+
+        // PageStateMachine {
+        //     page: PageState::Detail(DetailPage::new()),
+        // }
     }
 
     pub fn next(&mut self, event: &Event) -> PageState {
         let next_page = match &self.page {
-            PageState::List(list_page) => next_list(list_page, event),
-            PageState::Detail => PageState::Detail,
+            PageState::List(page) => next_list(page, event),
+            PageState::Detail(page) => next_detail(page, event),
             _ => PageState::Exit,
         };
 
@@ -73,6 +76,10 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
         }
         Event::Select | Event::Noop => PageState::List(page.clone()),
     }
+}
+
+fn next_detail(page: &DetailPage, _event: &Event) -> PageState {
+    PageState::Detail(page.clone())
 }
 
 impl<'a> From<&'a Pokemon> for PokemonTableEntry {
