@@ -1,9 +1,9 @@
-use crate::core::{
-    pokemon::Pokemon,
-    ui::components::PokemonTableEntry,
-};
+use color_eyre::Result;
+
+use crate::core::ui::components::PokemonTableEntry;
 use super::{
-    pages::{DetailPage, ListPage},
+    pages::{DetailPage, ListPage, ListPagePokemon},
+    repository::ListPagePokemonRepository,
     Event,
 };
 
@@ -19,19 +19,10 @@ pub struct PageStateMachine {
 }
 
 impl PageStateMachine {
-    pub fn new(pokemon: &[Pokemon]) -> Self {
-        let pokemon_table_entries: Vec<PokemonTableEntry> = pokemon
-            .iter()
-            .map(|p| p.into())
-            .collect();
-
-        PageStateMachine {
-            page: PageState::List(ListPage::new(&pokemon_table_entries, ""))
-        }
-
-        // PageStateMachine {
-        //     page: PageState::Detail(DetailPage::new()),
-        // }
+    pub fn new(pokemon_repository: &impl ListPagePokemonRepository) -> Result<Self> {
+        Ok(PageStateMachine {
+            page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
+        })
     }
 
     pub fn next(&mut self, event: &Event) -> PageState {
@@ -82,13 +73,13 @@ fn next_detail(page: &DetailPage, _event: &Event) -> PageState {
     PageState::Detail(page.clone())
 }
 
-impl<'a> From<&'a Pokemon> for PokemonTableEntry {
-    fn from(pokemon: &'a Pokemon) -> Self {
+impl<'a> From<&'a ListPagePokemon> for PokemonTableEntry {
+    fn from(pokemon: &'a ListPagePokemon) -> Self {
         PokemonTableEntry {
             number: pokemon.number,
             name: pokemon.name.clone(),
-            primary_type: pokemon.types.primary.clone(),
-            secondary_type: pokemon.types.secondary.clone(),
+            primary_type: pokemon.primary_type,
+            secondary_type: pokemon.secondary_type,
         }
     }
 }
@@ -101,36 +92,56 @@ mod test {
 
     use crate::core::{
         pokemon::Type,
-        ui::components::PokemonTableEntry,
+        ui::{
+            components::PokemonTableEntry, pages::ListPagePokemon, repository
+        }
     };
     use super::*;
 
-    static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
-        Pokemon::new(1, "".to_string(), Type::Normal, None),
-        Pokemon::new(2, "".to_string(), Type::Normal, None),
-        Pokemon::new(3, "".to_string(), Type::Normal, None),
-        Pokemon::new(4, "".to_string(), Type::Normal, None),
-        Pokemon::new(5, "".to_string(), Type::Normal, None),
+    static LIST_POKEMON: LazyLock<Vec<ListPagePokemon>> = LazyLock::new(|| vec![
+        ListPagePokemon::new(1, "".to_string(), Type::Normal, None),
+        ListPagePokemon::new(2, "".to_string(), Type::Normal, None),
+        ListPagePokemon::new(3, "".to_string(), Type::Normal, None),
+        ListPagePokemon::new(4, "".to_string(), Type::Normal, None),
+        ListPagePokemon::new(5, "".to_string(), Type::Normal, None),
     ]);
+
+    struct TestRepository();
+    
+    impl ListPagePokemonRepository for TestRepository {
+        fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
+            Ok(LIST_POKEMON.clone())
+        }
+    }
 
     #[test]
     fn test_next_list_new_character_q() {
-        let mut state_machine = PageStateMachine::new(&[]);
+        let repository = TestRepository();
+        let mut state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+        
         assert_eq!(state_machine.next(&Event::NewCharacter('q')), PageState::Exit);
     }
 
     #[test]
     fn test_next_list_new_character_other() {
-        let mut list_page = ListPage::new(&[], "");
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+
+        let mut list_page = ListPage::new(&pokemon, "");
         list_page.search_widget.push_char('a');
 
-        let next_list_page = PageStateMachine::new(&[]).next(&Event::NewCharacter('a'));
+        let next_list_page = PageStateMachine::new(&repository).unwrap().next(&Event::NewCharacter('a'));
         assert_eq!(next_list_page, PageState::List(list_page));
     }
 
     #[test]
     fn test_next_list_delete_character() {
-        let mut state_machine = PageStateMachine::new(&POKEMON);
+        let repository = TestRepository();
+
+        let mut state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+
         let initial_state = state_machine.page.clone();
 
         match state_machine.page {
@@ -147,15 +158,15 @@ mod test {
 
     #[test]
     fn test_next_list_down() {
-        let mut state_machine = PageStateMachine::new(&POKEMON);
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+
+        let mut state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+
         let next_state = state_machine.next(&Event::Down);
 
-        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
-            .iter()
-            .map(|p| p.into())
-            .collect();
-
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
+        let mut expected_next_page = ListPage::new(&pokemon, "");
         expected_next_page.list_widget.down();
 
         assert_eq!(next_state, PageState::List(expected_next_page));
@@ -163,20 +174,20 @@ mod test {
 
     #[test]
     fn test_next_list_up() {
-        let state_machine = PageStateMachine::new(&POKEMON);
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+
+        let state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+
         let next_state: PageStateMachine = cascade! {
             state_machine;
             ..next(&Event::Down);
             ..next(&Event::Down);
             ..next(&Event::Up);
         };
-        
-        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
-        .iter()
-        .map(|p| p.into())
-        .collect();
 
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
+        let mut expected_next_page = ListPage::new(&pokemon, "");
         expected_next_page.list_widget = cascade! {
             expected_next_page.list_widget;
             ..down();
@@ -189,7 +200,10 @@ mod test {
 
     #[test]
     fn test_next_list_select() {
-        let mut state_machine = PageStateMachine::new(&[]);
+        let repository = TestRepository();
+        let mut state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+    
         let previous_state = state_machine.page.clone();
         let next_state = state_machine.next(&Event::Select);
         assert_eq!(next_state, previous_state);
@@ -197,7 +211,10 @@ mod test {
 
     #[test]
     fn test_next_list_noop() {
-        let mut state_machine = PageStateMachine::new(&[]);
+        let repository = TestRepository();
+        let mut state_machine = PageStateMachine::new(&repository)
+            .expect("Failed to create PageStateMachine");
+
         let previous_state = state_machine.next(&Event::Up);
         let next_state = state_machine.next(&Event::Noop);
         assert_eq!(next_state, previous_state);

@@ -10,7 +10,7 @@ async fn tokio_main() -> Result<()> {
     let db = DatabaseMapper::new("tools/sqlite3/pokedex.db")
         .expect("Failed to create database connection");
 
-    let mut app = App::new(db).expect("Failed to create application");
+    let mut app = App::new(&db).expect("Failed to create application");
     app.run().await?;
   
     Ok(())
