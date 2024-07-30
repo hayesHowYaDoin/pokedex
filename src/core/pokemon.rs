@@ -1,26 +1,16 @@
-use thiserror::Error;
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pokemon {
     pub number: i32,
     pub name: String,
-    pub types: PokemonTypes,
 }
 
 impl Pokemon {
-    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
-        Pokemon {
-            number,
-            name,
-            types: PokemonTypes {
-                primary: primary_type,
-                secondary: secondary_type,
-            },
-        }
+    pub fn new(number: i32, name: String) -> Self {
+        Pokemon {number, name}
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Type {
     Normal,
     Fire,
@@ -111,33 +101,36 @@ impl PokemonTypes {
     }
 }
 
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonNumberRepositoryError(pub String);
-
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonNameRepositoryError(pub String);
-
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonTypesRepositoryError(pub String);
-
-pub trait PokemonNumberRepository {
-    fn fetch_all_numbers(&self) -> Result<Vec<i32>, PokemonNumberRepositoryError>;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonDescription {
+    pub text: String,
 }
 
-pub trait PokemonNameRepository {
-    fn fetch_name(&self, number: i32) -> Result<String, PokemonNameRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_names(&self) -> Result<Vec<String>, PokemonNameRepositoryError>;
+impl PokemonDescription {
+    pub fn new(text: String) -> Self {
+        PokemonDescription {text}
+    }
 }
 
-pub trait PokemonTypesRepository {
-    fn fetch_primary_type(&self, number: i32) -> Result<String, PokemonTypesRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_primary_types(&self) -> Result<Vec<String>, PokemonTypesRepositoryError>;
-    fn fetch_secondary_type(&self, number: i32) -> Result<Option<String>, PokemonTypesRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_secondary_types(&self) -> Result<Vec<Option<String>>, PokemonTypesRepositoryError>;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonStats {
+    pub hp: u32,
+    pub attack: u32,
+    pub defense: u32,
+    pub special_attack: u32,
+    pub special_defense: u32,
+    pub speed: u32,
+}
+
+impl PokemonStats {
+    pub fn new(hp: u32, attack: u32, defense: u32, special_attack: u32, special_defense: u32, speed: u32) -> Self {
+        PokemonStats {
+            hp,
+            attack,
+            defense,
+            special_attack,
+            special_defense,
+            speed,
+        }
+    }
 }
