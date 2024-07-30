@@ -24,13 +24,6 @@
 
     "forwardPorts": [8000],
 
-    // Port over the user's shell configurations (assumes all config files are in ~/.config)
-    "mounts": [
-        "source=/etc/fish/,target=/etc/fish,type=bind,consistency=cached",
-        "source=/etc/zsh/,target=/etc/zsh,type=bind,consistency=cached",
-        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.config,target=/home/vscode/.config,type=bind,consistency=cached"
-    ],
-
     "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/workspace && sudo chmod -R 755 /home/vscode/workspace",
 
     "postStartCommand": "sudo sqlite3 ~/workspace/tools/sqlite3/pokedex.db < ~/workspace/tools/sqlite3/pokedex.sql",
