@@ -40,10 +40,10 @@ impl App {
             self.update(&event);
 
             match self.state.next(&event).clone() {
-                PageState::List(mut list_page) => {
-                    list_page.render(&mut tui.terminal)?;
+                PageState::List(mut page) => {
+                    page.render(&mut tui.terminal)?;
                 }
-                PageState::Detail => {},
+                PageState::Detail(mut _page) => {},
                 PageState::Exit => break,
             }
         };
