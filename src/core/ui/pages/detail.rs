@@ -7,26 +7,33 @@ use crate::core::{
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DetailPage {
-    pub max_chart: PokemonStatChart,
-    pub text_box: TextBox,
+    pub title: TextBox,
+    pub stat_chart: PokemonStatChart,
+    pub description: TextBox,
 }
 
 impl DetailPage {
     pub fn new(pokemon: &DetailPagePokemon) -> Result<Self> {
+        let title = TextBox::new(&format!("#{} | {}", pokemon.number, pokemon.name));
+
         let (stats, labels) = get_stats_with_labels(&pokemon.stats);
         let max_chart = PokemonStatChart::new(&stats, &labels)?;
 
-        let text_box = TextBox::new(&pokemon.description.text);
+        let description = TextBox::new(&pokemon.description.text);
 
-        Ok(DetailPage{ max_chart, text_box })
+        Ok(DetailPage{ title, stat_chart: max_chart, description })
     }
 
-    pub fn get_max_chart(&self) -> &PokemonStatChart {
-        &self.max_chart
+    pub fn get_title_box(&self) -> &TextBox {
+        &self.title
+    }
+
+    pub fn get_stat_chart(&self) -> &PokemonStatChart {
+        &self.stat_chart
     }
 
     pub fn get_text_box(&self) -> &TextBox {
-        &self.text_box
+        &self.description
     }
 }
 

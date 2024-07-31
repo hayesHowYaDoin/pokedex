@@ -19,7 +19,7 @@ const WIDTHS: [Constraint; 4] = [
 ];
 
 impl TuiStatefulComponent for PokemonTable {
-    fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
+    fn render_mut(&mut self, frame: &mut Frame, layout: &Rect, block: &Block) {
         let table = Table::new(self.get_pokemon().to_owned(), WIDTHS)
             .column_spacing(1)
             .header(
@@ -27,7 +27,7 @@ impl TuiStatefulComponent for PokemonTable {
                     .style(Style::new().bold())
                     .bottom_margin(1),
             )
-            .block(Block::bordered())
+            .block(block.clone())
             .highlight_style(Style::new().reversed())
             .highlight_symbol(">>");
 
