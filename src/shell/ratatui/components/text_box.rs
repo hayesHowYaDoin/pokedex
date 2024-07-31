@@ -4,13 +4,13 @@ use ratatui::{
     widgets::{Block, Paragraph},
 };
 
-use crate::core::ui::components::InputBox;
+use crate::core::ui::components::TextBox;
 use super::TuiComponent;
 
-impl TuiComponent for InputBox {
+impl TuiComponent for TextBox {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
         let widget = Paragraph::new(self.text())
-            .block(Block::bordered().title("Search"));
+            .block(Block::bordered());
 
         frame.render_widget(&widget, *layout);
     }
