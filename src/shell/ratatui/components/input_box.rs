@@ -8,9 +8,9 @@ use crate::core::ui::components::InputBox;
 use super::TuiComponent;
 
 impl TuiComponent for InputBox {
-    fn render(&self, frame: &mut Frame, layout: &Rect) {
+    fn render(&self, frame: &mut Frame, layout: &Rect, block: &Block) {
         let widget = Paragraph::new(self.text())
-            .block(Block::bordered().title("Search"));
+            .block(block.clone());
 
         frame.render_widget(&widget, *layout);
     }

@@ -1,6 +1,6 @@
 mod component;
 pub use component::*;
-mod input_box;
-mod pokemon_table;
-mod text_box;
-mod stat_chart;
+pub mod input_box;
+pub mod pokemon_table;
+pub mod text_box;
+pub mod stat_chart;
