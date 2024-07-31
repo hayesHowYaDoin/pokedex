@@ -4,7 +4,7 @@ use ratatui::{
 };
 
 pub trait TuiComponent {
-    fn render(&mut self, frame: &mut Frame, layout: &Rect);
+    fn render(&self, frame: &mut Frame, layout: &Rect);
 }
 
 pub trait TuiStatefulComponent {

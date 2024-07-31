@@ -20,6 +20,14 @@ impl DetailPage {
 
         Ok(DetailPage{ max_chart, text_box })
     }
+
+    pub fn get_max_chart(&self) -> &MaxChart<255> {
+        &self.max_chart
+    }
+
+    pub fn get_text_box(&self) -> &TextBox {
+        &self.text_box
+    }
 }
 
 fn get_stats_with_labels(stats: &PokemonStats) -> ([i32; 6], [&str; 6]) {
