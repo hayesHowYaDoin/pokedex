@@ -33,7 +33,7 @@ impl<B: Backend> TuiPage<B> for DetailPage {
             let layout = LAYOUT.split(frame.size());
 
             self.get_text_box().render(frame, &layout[DESCRIPTION_LAYOUT_IDX]);
-            // self.get_max_chart().render(frame, layout[STATS_LAYOUT_IDX]);
+            self.get_max_chart().render(frame, &layout[STATS_LAYOUT_IDX]);
 
             frame.render_widget(
                 Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray), 

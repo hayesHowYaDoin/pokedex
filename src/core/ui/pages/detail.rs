@@ -2,26 +2,26 @@ use color_eyre::Result;
 
 use crate::core::{
     pokemon::{PokemonDescription, PokemonStats, PokemonTypes},
-    ui::components::{MaxChart, TextBox},
+    ui::components::{PokemonStatChart, TextBox},
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DetailPage {
-    pub max_chart: MaxChart<255>,
+    pub max_chart: PokemonStatChart,
     pub text_box: TextBox,
 }
 
 impl DetailPage {
     pub fn new(pokemon: &DetailPagePokemon) -> Result<Self> {
         let (stats, labels) = get_stats_with_labels(&pokemon.stats);
-        let max_chart = MaxChart::new(&stats, &labels)?;
+        let max_chart = PokemonStatChart::new(&stats, &labels)?;
 
         let text_box = TextBox::new(&pokemon.description.text);
 
         Ok(DetailPage{ max_chart, text_box })
     }
 
-    pub fn get_max_chart(&self) -> &MaxChart<255> {
+    pub fn get_max_chart(&self) -> &PokemonStatChart {
         &self.max_chart
     }
 

@@ -4,7 +4,6 @@ use color_eyre::{
 };
 use num_traits::bounds::Bounded;
 
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChartFieldValue<const M: i32>(i32);
 
@@ -17,6 +16,16 @@ impl<const M: i32> Bounded for ChartFieldValue<M> {
 pub struct ChartField<const M: i32> {
     value: ChartFieldValue<M>,
     label: String,
+}
+
+impl<const M: i32> ChartField<M> {
+    pub fn get_value(&self) -> i32 {
+        self.value.0
+    }
+
+    pub fn get_label(&self) -> &str {
+        &self.label
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -42,5 +51,9 @@ impl<const M: i32> MaxChart<M> {
 
     pub fn get_fields(&self) -> &[ChartField<M>] {
         &self.fields
+    }
+
+    pub fn get_max_value(&self) -> i32 {
+        M
     }
 }
