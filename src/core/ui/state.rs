@@ -2,10 +2,13 @@ use color_eyre::Result;
 
 use crate::core::ui::components::PokemonTableEntry;
 use super::{
-    pages::{DetailPage, ListPage, ListPagePokemon},
+    pages::{DetailPage, DetailPagePokemon, ListPage, ListPagePokemon},
     repository::ListPagePokemonRepository,
     Event,
 };
+
+// TODO: Remove when no longer needed for testing
+use crate::core::pokemon::{PokemonDescription, PokemonStats, PokemonTypes, Type};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PageState {
@@ -19,9 +22,21 @@ pub struct PageStateMachine {
 }
 
 impl PageStateMachine {
-    pub fn new(pokemon_repository: &impl ListPagePokemonRepository) -> Result<Self> {
+    pub fn new(_pokemon_repository: &impl ListPagePokemonRepository) -> Result<Self> {
+        // Ok(PageStateMachine {
+        //     page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
+        // })
+
+        let test_pokemon = DetailPagePokemon::new(
+            1,
+            "Bulbasaur".to_string(),
+            PokemonTypes::new(Type::Grass, Some(Type::Poison)),
+            PokemonDescription::new("A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()),
+            PokemonStats::new(45, 49, 49, 65, 65, 45),
+        );
+
         Ok(PageStateMachine {
-            page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
+            page: PageState::Detail(DetailPage::new(&test_pokemon)?)
         })
     }
 
@@ -69,8 +84,12 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
     }
 }
 
-fn next_detail(page: &DetailPage, _event: &Event) -> PageState {
-    PageState::Detail(page.clone())
+fn next_detail(page: &DetailPage, event: &Event) -> PageState {
+    match event {
+        Event::NewCharacter(c) if *c == 'q' => return PageState::Exit,
+        _ => PageState::Detail(page.clone())
+    }
+    
 }
 
 impl<'a> From<&'a ListPagePokemon> for PokemonTableEntry {
