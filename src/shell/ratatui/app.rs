@@ -1,7 +1,10 @@
 use color_eyre::eyre::Result;
 
 use crate::core::ui::repository::ListPagePokemonRepository;
-use crate::shell::ratatui::{pages::TuiPage, tui::Tui};
+use crate::shell::ratatui::{
+    pages::TuiPage,
+    tui::Tui
+};
 use crate::core::ui::{
     Event,
     PageState,
@@ -32,7 +35,9 @@ impl App {
                 PageState::List(mut page) => {
                     page.render(&mut tui.terminal)?;
                 }
-                PageState::Detail(mut _page) => {},
+                PageState::Detail(mut page) => {
+                    page.render(&mut tui.terminal)?;
+                },
                 PageState::Exit => break,
             }
         };
