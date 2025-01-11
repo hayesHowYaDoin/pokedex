@@ -11,7 +11,7 @@ use ratatui::{
 };
 use ratatui_image::picker::Picker;
 
-use crate::core::ui::pages::DetailPage;
+use crate::{core::ui::pages::DetailPage, shell::ratatui::components::metadata_box::TuiMetadataBox};
 use crate::shell::ratatui::components::{
     TuiComponent,
     TuiStatefulComponent,
@@ -86,14 +86,14 @@ impl<B: Backend> TuiPage<B> for DetailPage {
 
             // Description
             TuiTextBox::new(
-                self.get_description().to_owned(),
+                self.get_description_box().to_owned(),
                 Block::bordered().title("Description"),
             ).render(frame, &inner_right_vertical_layout[0]);
 
-            // Other
-            TuiTextBox::new(
-                self.get_other().to_owned(),
-                Block::bordered().title("Other")
+            // Metadata
+            TuiMetadataBox::new(
+                self.get_metadata_box().to_owned(),
+                Block::bordered()
             ).render(frame, &inner_right_vertical_layout[1]);
 
             // Stats

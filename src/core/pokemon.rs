@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pokemon {
     pub number: i32,
@@ -109,6 +111,40 @@ pub struct PokemonDescription {
 impl PokemonDescription {
     pub fn new(text: String) -> Self {
         PokemonDescription {text}
+    }
+}
+
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum PokemonGenders {
+    Male,
+    Female,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PokemonMetadata {
+    pub height: String,
+    pub weight: String,
+    pub category: String,
+    pub abilities: Vec<String>,
+    pub genders: HashSet<PokemonGenders>,
+}
+
+impl PokemonMetadata {
+    pub fn new(
+        height: String,
+        weight: String,
+        category: String,
+        abilities: Vec<String>,
+        genders: HashSet<PokemonGenders>
+    ) -> Self {
+        PokemonMetadata {
+            height,
+            weight,
+            category,
+            abilities,
+            genders,
+        }
     }
 }
 

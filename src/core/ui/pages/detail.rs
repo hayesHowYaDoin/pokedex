@@ -2,8 +2,8 @@ use color_eyre::Result;
 use image::DynamicImage;
 
 use crate::core::{
-    pokemon::{PokemonDescription, PokemonStats, PokemonTypes},
-    ui::components::{PokemonStatChart, TextBox, ImageBox},
+    pokemon::{PokemonDescription, PokemonStats, PokemonTypes, PokemonMetadata},
+    ui::components::{PokemonStatChart, TextBox, ImageBox, MetadataBox},
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -12,7 +12,7 @@ pub struct DetailPage {
     pub image: ImageBox,
     pub stat_chart: PokemonStatChart,
     pub description: TextBox,
-    pub other: TextBox,
+    pub metadata: MetadataBox,
 }
 
 impl DetailPage {
@@ -26,9 +26,9 @@ impl DetailPage {
 
         let description = TextBox::new(&pokemon.description.text);
 
-        let other = TextBox::new("Height: 2' 04\"\nWeight: 15.2 lbs\nCategory: Seed\nAbilities: Overgrow\nGender: ♂ ♀");
+        let metadata = MetadataBox::new(&pokemon.metadata);
 
-        Ok(DetailPage{ title, image, stat_chart, description, other })
+        Ok(DetailPage{ title, image, stat_chart, description, metadata })
     }
 
     pub fn get_title_box(&self) -> &TextBox {
@@ -39,12 +39,12 @@ impl DetailPage {
         &self.image
     }
 
-    pub fn get_description(&self) -> &TextBox {
+    pub fn get_description_box(&self) -> &TextBox {
         &self.description
     }
 
-    pub fn get_other(&self) -> &TextBox {
-        &self.other
+    pub fn get_metadata_box(&self) -> &MetadataBox {
+        &self.metadata
     }
 
     pub fn get_stat_chart(&self) -> &PokemonStatChart {
@@ -75,11 +75,20 @@ pub struct DetailPagePokemon {
     pub image: DynamicImage,
     pub types: PokemonTypes,
     pub description: PokemonDescription,
+    pub metadata: PokemonMetadata,
     pub stats: PokemonStats,
 }
 
 impl DetailPagePokemon {
-    pub fn new(number: i32, name: String, image: DynamicImage, types: PokemonTypes, description: PokemonDescription, stats: PokemonStats) -> Self {
-        DetailPagePokemon{ number, name, image, types, description, stats }
+    pub fn new(
+        number: i32,
+        name: String,
+        image: DynamicImage,
+        types: PokemonTypes,
+        description: PokemonDescription,
+        metadata: PokemonMetadata,
+        stats: PokemonStats
+    ) -> Self {
+        DetailPagePokemon{ number, name, image, types, description, metadata, stats }
     }
 }

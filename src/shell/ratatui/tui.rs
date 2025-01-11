@@ -20,7 +20,7 @@ use futures::{FutureExt, StreamExt};
 
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
-const TICK_RATE: Duration = Duration::from_millis(400);
+const TICK_RATE: Duration = Duration::from_millis(500);
 
 pub enum TuiEvent {
     AppTick,
