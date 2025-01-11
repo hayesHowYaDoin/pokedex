@@ -10,7 +10,7 @@ use super::{
 // TODO: Remove when no longer needed for testing
 use crate::core::pokemon::{PokemonDescription, PokemonStats, PokemonTypes, Type};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum PageState {
     List(ListPage),
     Detail(DetailPage),

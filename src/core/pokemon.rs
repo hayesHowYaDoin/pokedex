@@ -134,3 +134,8 @@ impl PokemonStats {
         }
     }
 }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonImage {
+    pub image: String,
+}
