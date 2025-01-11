@@ -1,7 +1,6 @@
 use ratatui::{
-    prelude::Rect,
     Frame,
-    widgets::Block,
+    prelude::Rect,
 };
 use ratatui_image::{
     picker::Picker,
