@@ -80,7 +80,7 @@ impl<B: Backend> TuiPage<B> for DetailPage {
 
             // Image
             TuiImageBox::new(
-                self.get_image_box().to_owned(),
+                self.get_image_box(),
                 picker,
             ).render_mut(frame, &inner_first_horizontal_layout[0]);
 
