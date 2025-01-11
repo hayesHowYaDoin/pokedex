@@ -112,7 +112,7 @@ fn filter_pokemon_by_secondary_type(pokemon: &ListPagePokemon, query: &str) -> b
     let query = query.to_lowercase();
     let secondary = pokemon.secondary_type.as_ref().map(|t| t.to_string().to_lowercase());
 
-    secondary.map_or(false, |t| t.contains(&query))
+    secondary.is_some_and(|t| t.contains(&query))
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

@@ -86,9 +86,15 @@ impl<B: Backend> TuiPage<B> for DetailPage {
 
             // Description
             TuiTextBox::new(
-                self.get_text_box().to_owned(),
-                Block::bordered().title("Description")
+                self.get_description().to_owned(),
+                Block::bordered().title("Description"),
             ).render(frame, &inner_right_vertical_layout[0]);
+
+            // Other
+            TuiTextBox::new(
+                self.get_other().to_owned(),
+                Block::bordered().title("Other")
+            ).render(frame, &inner_right_vertical_layout[1]);
 
             // Stats
             TuiPokemonStatChart::new(
