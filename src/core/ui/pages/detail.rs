@@ -2,7 +2,7 @@ use color_eyre::Result;
 
 use crate::core::{
     pokemon::{PokemonDescription, PokemonStats, PokemonTypes},
-    ui::components::{PokemonStatChart, TextBox},
+    ui::components::{PokemonStatChart, TextBox, TextImage},
 };
 
 #[derive(Clone, Debug, PartialEq, Eq)]

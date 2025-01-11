@@ -1,6 +1,6 @@
 use ratatui::{
     prelude::Rect,
-    terminal::Frame,
+    Frame,
     widgets::{Block, Paragraph},
 };
 
