@@ -33,10 +33,10 @@ impl App {
 
             match self.state.next(&event).clone() {
                 PageState::List(mut page) => {
-                    page.render(&mut tui.terminal)?;
+                    page.render(&mut tui.terminal, &mut tui.picker)?;
                 }
                 PageState::Detail(mut page) => {
-                    page.render(&mut tui.terminal)?;
+                    page.render(&mut tui.terminal, &mut tui.picker)?;
                 },
                 PageState::Exit => break,
             }

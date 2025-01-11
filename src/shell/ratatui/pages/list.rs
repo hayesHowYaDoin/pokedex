@@ -9,10 +9,16 @@ use ratatui::{
     style::{Color, Stylize},
     widgets::{Block, Paragraph},
 };
+use ratatui_image::picker::Picker;
 
 use crate::core::ui::pages::ListPage;
 use crate::shell::ratatui::{
-    components::{TuiComponent, TuiStatefulComponent},
+    components::{
+        TuiComponent,
+        TuiStatefulComponent,
+        input_box::TuiInputBox,
+        pokemon_table::TuiPokemonTable,
+    },
     pages::TuiPage,
 };
 
@@ -30,15 +36,15 @@ static LAYOUT: LazyLock<Layout> =
         ]));
 
 impl<B: Backend> TuiPage<B> for ListPage {
-    fn render(&mut self, terminal: &mut Terminal<B>) -> Result<()> {
-        let search_block = Block::bordered().title("Search");
-        let list_block = Block::bordered();
-
+    fn render(&mut self, terminal: &mut Terminal<B>, _picker: &mut Picker) -> Result<()> {
         terminal.draw(|frame| {
-            let layout = LAYOUT.split(frame.size());
+            let layout = LAYOUT.split(frame.area());
 
-            self.search_widget.render(frame, &layout[SEARCH_LAYOUT_IDX], &search_block);
-            self.list_widget.render_mut(frame, &layout[LIST_LAYOUT_IDX], &list_block);
+            let search = TuiInputBox::new(self.search_widget.clone(), Block::bordered().title("Search"));
+            search.render(frame, &layout[SEARCH_LAYOUT_IDX]);
+
+            let mut list = TuiPokemonTable::new(self.list_widget.clone(), Block::bordered());
+            list.render_mut(frame, &layout[LIST_LAYOUT_IDX]);
 
             frame.render_widget(
                 Paragraph::new("Press 'enter' for detailed view, 'q' to quit").fg(Color::DarkGray), 
