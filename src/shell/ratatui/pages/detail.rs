@@ -9,12 +9,6 @@ use ratatui::{
     style::{Color, Stylize},
     widgets::{Block, Paragraph},
 };
-use ratatui_image::{
-    picker::Picker,
-    StatefulImage,
-    Resize,
-};
-use crossterm::terminal::size;
 
 use crate::core::ui::pages::DetailPage;
 use crate::shell::ratatui::components::TuiComponent;
@@ -60,12 +54,6 @@ impl<B: Backend> TuiPage<B> for DetailPage {
         let description_block = Block::bordered().title("Description");
         let stats_block = Block::bordered().title("Stats");
 
-        let mut picker = Picker::from_query_stdio().expect("Unable to font size.");
-        picker.set_background_color([0, 0, 0, 0]);
-        let dyn_image = image::ImageReader::open("./test_images/Pokémon_Bulbasaur_art.png").expect("Unable to open image.").decode()?;
-        let mut image_protocol = picker.new_resize_protocol(dyn_image);
-        let image = StatefulImage::default();
-
         terminal.draw(|frame: &mut ratatui::Frame<'_>| {
             let outer_vertical_layout = OUTERMOST_VERTICAL.split(frame.area());
             let inner_first_horizontal_layout = INNER_FIRST_HORIZONTAL.split(outer_vertical_layout[1]);
@@ -77,7 +65,7 @@ impl<B: Backend> TuiPage<B> for DetailPage {
             self.get_text_box().render(frame, &inner_right_vertical_layout[0], &description_block);
             self.get_stat_chart().render(frame, &inner_second_horizontal_layout[0], &stats_block);
 
-            frame.render_stateful_widget(image, frame.area(), &mut image_protocol);
+            self.get_image_box().render(frame, &inner_first_horizontal_layout[0], &Block::default());
 
             frame.render_widget(
                 Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray), 

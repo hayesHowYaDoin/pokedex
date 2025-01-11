@@ -1,5 +1,5 @@
-mod text_image;
-pub use text_image::*;
+mod image_box;
+pub use image_box::*;
 mod input_box;
 pub use input_box::*;
 mod pokemon_table;
