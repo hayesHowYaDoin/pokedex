@@ -9,10 +9,10 @@ use crate::core::{
 #[derive(Clone, Debug, PartialEq)]
 pub struct DetailPage {
     pub title: TextBox,
+    pub image: ImageBox,
     pub stat_chart: PokemonStatChart,
     pub description: TextBox,
     pub other: TextBox,
-    pub image: ImageBox
 }
 
 impl DetailPage {
