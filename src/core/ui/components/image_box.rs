@@ -1,4 +1,3 @@
-use std::default::Default;
 use image::DynamicImage;
 
 
@@ -8,21 +7,13 @@ pub struct ImageBox {
 }
 
 impl ImageBox {
-    pub fn new() -> Self {
-        Self {image: image::ImageReader::open("./test_images/Pokémon_Bulbasaur_art.png")
-        .expect("Unable to open image.").decode().unwrap()}
+    pub fn new(image: DynamicImage) -> Self {
+        Self {image: image}
     }
 
     pub fn image(&self) -> &DynamicImage {
         &self.image
     }
-}
-
-impl Default for ImageBox {
-    fn default() -> Self {
-        Self::new()
-    }
-
 }
 
 #[cfg(test)]

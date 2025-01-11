@@ -31,7 +31,7 @@ impl App {
 
             self.update(&event);
 
-            match self.state.next(&event).clone() {
+            match self.state.next(&event) {
                 PageState::List(mut page) => {
                     page.render(&mut tui.terminal, &mut tui.picker)?;
                 }

@@ -1,7 +1,5 @@
 use ratatui::{
-    prelude::Rect,
-    Frame,
-    widgets::{Block, Paragraph}
+    prelude::Rect, widgets::{Block, Paragraph, Wrap}, Frame
 };
 
 use crate::core::ui::components::TextBox;
@@ -21,6 +19,7 @@ impl<'a> TuiTextBox<'a> {
 impl TuiComponent for TuiTextBox<'_> {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
         let widget: Paragraph = Paragraph::new(self.text_box.text())
+            .wrap(Wrap { trim: false })
             .block(self.block.clone());
 
         frame.render_widget(&widget, *layout);

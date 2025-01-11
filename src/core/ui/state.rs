@@ -27,9 +27,16 @@ impl PageStateMachine {
         //     page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
         // })
 
+        let image = image::ImageReader::open("./test_images/1.png")
+            .expect("Unable to open image.")
+            .decode()
+            .unwrap()
+            .resize(3000, 3000, image::imageops::FilterType::Nearest);
+
         let test_pokemon = DetailPagePokemon::new(
             1,
             "Bulbasaur".to_string(),
+            image,
             PokemonTypes::new(Type::Grass, Some(Type::Poison)),
             PokemonDescription::new("A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()),
             PokemonStats::new(45, 49, 49, 65, 65, 45),
@@ -86,14 +93,13 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
 
 fn next_detail(page: &DetailPage, event: &Event) -> PageState {
     match event {
-        Event::NewCharacter(c) if *c == 'q' => return PageState::Exit,
+        Event::NewCharacter(c) if *c == 'q' => PageState::Exit,
         _ => PageState::Detail(page.clone())
     }
-    
 }
 
-impl<'a> From<&'a ListPagePokemon> for PokemonTableEntry {
-    fn from(pokemon: &'a ListPagePokemon) -> Self {
+impl From<& ListPagePokemon> for PokemonTableEntry {
+    fn from(pokemon: &ListPagePokemon) -> Self {
         PokemonTableEntry {
             number: pokemon.number,
             name: pokemon.name.clone(),
@@ -111,9 +117,7 @@ mod test {
 
     use crate::core::{
         pokemon::Type,
-        ui::{
-            components::PokemonTableEntry, pages::ListPagePokemon, repository
-        }
+        ui::pages::ListPagePokemon,
     };
     use super::*;
 
