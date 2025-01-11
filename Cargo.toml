@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ansi-to-tui = "7.0.0"
 cascade = "1.0.1"
 color-eyre = "0.6.3"
 colors-transform = "0.2.11"
@@ -13,10 +14,12 @@ crossterm = { version = "0.27.0", features = ["event-stream"] }
 derivative = "2.2.0"
 derive_more = "0.99.18"
 futures = "0.3.30"
+image = "0.25.5"
 log = "0.4.21"
 num-traits = "0.2.19"
-ratatui = { version = "0.26.3", features = ["unstable-widget-ref"] }
-rusqlite = "0.31.0"
+ratatui = "0.29.0"
+ratatui-image = "4.2.0"
+rusqlite = { version = "0.31.0", features = ["bundled"] }
 signal-hook = "0.3.17"
 thiserror = "1.0.61"
 tokio = { version = "1.38.0", features = ["sync", "rt", "macros", "time", "rt-multi-thread"] }

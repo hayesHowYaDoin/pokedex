@@ -9,25 +9,50 @@ use ratatui::{
     style::{Color, Stylize},
     widgets::{Block, Paragraph},
 };
+use ratatui_image::{
+    picker::Picker,
+    StatefulImage,
+    Resize,
+};
+use crossterm::terminal::size;
 
 use crate::core::ui::pages::DetailPage;
 use crate::shell::ratatui::components::TuiComponent;
 use super::TuiPage;
 
-const TITLE_LAYOUT_IDX: usize = 0;
-const DESCRIPTION_LAYOUT_IDX: usize = 1;
-const STATS_LAYOUT_IDX: usize = 2;
-const FOOTER_LAYOUT_IDX: usize = 3;
-
-static LAYOUT: LazyLock<Layout> = 
+static OUTERMOST_VERTICAL: LazyLock<Layout> =
     LazyLock::new(|| Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(1),
-            Constraint::Min(5),
-            Constraint::Min(5),
+            Constraint::Length(30),
+            Constraint::Length(5),
             Constraint::Length(2),
         ]));
+
+static INNER_FIRST_HORIZONTAL: LazyLock<Layout> = 
+    LazyLock::new(|| Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(65),
+            Constraint::Percentage(35),
+        ]));
+
+static INNER_SECOND_HORIZONTAL: LazyLock<Layout> = 
+    LazyLock::new(|| Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Percentage(50),
+                Constraint::Percentage(50),
+            ]));
+
+static INNER_RIGHT_VERTICAL: LazyLock<Layout> =
+LazyLock::new(|| Layout::default()
+    .direction(Direction::Vertical)
+    .constraints([
+        Constraint::Min(10),
+        Constraint::Min(10),
+    ]));
 
 impl<B: Backend> TuiPage<B> for DetailPage {
     fn render(&mut self, terminal: &mut Terminal<B>) -> Result<()> {
@@ -35,16 +60,28 @@ impl<B: Backend> TuiPage<B> for DetailPage {
         let description_block = Block::bordered().title("Description");
         let stats_block = Block::bordered().title("Stats");
 
-        terminal.draw(|frame| {
-            let layout = LAYOUT.split(frame.size());
+        let mut picker = Picker::from_query_stdio().expect("Unable to font size.");
+        picker.set_background_color([0, 0, 0, 0]);
+        let dyn_image = image::ImageReader::open("./test_images/Pokémon_Bulbasaur_art.png").expect("Unable to open image.").decode()?;
+        let mut image_protocol = picker.new_resize_protocol(dyn_image);
+        let image = StatefulImage::default();
 
-            self.get_title_box().render(frame, &layout[TITLE_LAYOUT_IDX], &title_block);
-            self.get_text_box().render(frame, &layout[DESCRIPTION_LAYOUT_IDX], &description_block);
-            self.get_stat_chart().render(frame, &layout[STATS_LAYOUT_IDX], &stats_block);
+        terminal.draw(|frame: &mut ratatui::Frame<'_>| {
+            let outer_vertical_layout = OUTERMOST_VERTICAL.split(frame.area());
+            let inner_first_horizontal_layout = INNER_FIRST_HORIZONTAL.split(outer_vertical_layout[1]);
+            let inner_second_horizontal_layout = INNER_SECOND_HORIZONTAL.split(outer_vertical_layout[2]);
+            let inner_right_vertical_layout = INNER_RIGHT_VERTICAL.split(inner_first_horizontal_layout[1]);
+
+            self.get_title_box().render(frame, &outer_vertical_layout[0], &title_block);
+
+            self.get_text_box().render(frame, &inner_right_vertical_layout[0], &description_block);
+            self.get_stat_chart().render(frame, &inner_second_horizontal_layout[0], &stats_block);
+
+            frame.render_stateful_widget(image, frame.area(), &mut image_protocol);
 
             frame.render_widget(
                 Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray), 
-                layout[FOOTER_LAYOUT_IDX]
+                outer_vertical_layout[3]
             );
         })?;
 

@@ -1,7 +1,7 @@
 use ratatui::{
     prelude::{Rect, Style},
     style::Stylize,
-    terminal::Frame,
+    Frame,
     widgets::{BarChart, Block},
 };
 

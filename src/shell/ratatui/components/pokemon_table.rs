@@ -1,7 +1,7 @@
 use ratatui::{
     prelude::{Constraint, Rect, Style},
     style::Stylize,
-    terminal::Frame,
+    Frame,
     widgets::{Block, Row, Table, TableState},
 };
 
