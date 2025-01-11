@@ -1,3 +1,6 @@
+
+#![allow(dead_code)]
+
 mod shell;
 mod core;
 
