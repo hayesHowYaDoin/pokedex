@@ -28,31 +28,39 @@ static OUTERMOST_VERTICAL: LazyLock<Layout> =
             Constraint::Length(1),
             Constraint::Length(30),
             Constraint::Length(5),
-            Constraint::Length(2),
+            Constraint::Length(5),
+            Constraint::Length(1),
         ]));
 
 static INNER_FIRST_HORIZONTAL: LazyLock<Layout> = 
     LazyLock::new(|| Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
-            Constraint::Percentage(65),
-            Constraint::Percentage(35),
+            Constraint::Length(30),
+            Constraint::Length(30),
         ]));
 
 static INNER_SECOND_HORIZONTAL: LazyLock<Layout> = 
     LazyLock::new(|| Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Length(60),
+        ]));
+
+static INNER_THIRD_HORIZONTAL: LazyLock<Layout> = 
+    LazyLock::new(|| Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Percentage(50),
-                Constraint::Percentage(50),
+                Constraint::Length(30),
+                Constraint::Length(30),
             ]));
 
 static INNER_RIGHT_VERTICAL: LazyLock<Layout> =
 LazyLock::new(|| Layout::default()
     .direction(Direction::Vertical)
     .constraints([
-        Constraint::Min(10),
-        Constraint::Min(10),
+        Constraint::Length(15),
+        Constraint::Length(15),
     ]));
 
 impl<B: Backend> TuiPage<B> for DetailPage {
@@ -61,23 +69,37 @@ impl<B: Backend> TuiPage<B> for DetailPage {
             let outer_vertical_layout = OUTERMOST_VERTICAL.split(frame.area());
             let inner_first_horizontal_layout = INNER_FIRST_HORIZONTAL.split(outer_vertical_layout[1]);
             let inner_second_horizontal_layout = INNER_SECOND_HORIZONTAL.split(outer_vertical_layout[2]);
+            let _inner_third_horizontal_layout = INNER_THIRD_HORIZONTAL.split(outer_vertical_layout[3]);
             let inner_right_vertical_layout = INNER_RIGHT_VERTICAL.split(inner_first_horizontal_layout[1]);
 
-            let title = TuiTextBox::new(self.get_title_box().to_owned(), Block::default());
-            title.render(frame, &outer_vertical_layout[0]);
+            // Title
+            TuiTextBox::new(
+                self.get_title_box().to_owned(),
+                Block::default()
+            ).render(frame, &outer_vertical_layout[0]);
 
-            let description = TuiTextBox::new(self.get_text_box().to_owned(), Block::bordered().title("Description"));
-            description.render(frame, &inner_right_vertical_layout[0]);
+            // Image
+            TuiImageBox::new(
+                self.get_image_box().to_owned(),
+                Block::default(), *picker
+            ).render_mut(frame, &inner_first_horizontal_layout[0]);
 
-            let stat_chart = TuiPokemonStatChart::new(self.get_stat_chart().to_owned(), Block::bordered().title("Stats"));
-            stat_chart.render(frame, &inner_second_horizontal_layout[0]);
+            // Description
+            TuiTextBox::new(
+                self.get_text_box().to_owned(),
+                Block::bordered().title("Description")
+            ).render(frame, &inner_right_vertical_layout[0]);
 
-            let mut image = TuiImageBox::new(self.get_image_box().to_owned(), Block::default(), *picker);
-            image.render_mut(frame, &inner_first_horizontal_layout[0]);
+            // Stats
+            TuiPokemonStatChart::new(
+                self.get_stat_chart().to_owned(),
+                Block::bordered().title("Stats")
+            ).render(frame, &inner_second_horizontal_layout[0]);
 
+            // Footer
             frame.render_widget(
                 Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray), 
-                outer_vertical_layout[3]
+                outer_vertical_layout[4]
             );
         })?;
 
