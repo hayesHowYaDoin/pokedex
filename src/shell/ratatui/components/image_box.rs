@@ -13,13 +13,12 @@ use super::TuiStatefulComponent;
 
 pub struct TuiImageBox<'a> {
     image_box: ImageBox,
-    block: Block<'a>,
-    picker: Picker,
+    picker: &'a Picker,
 }
 
 impl<'a> TuiImageBox<'a> {
-    pub fn new(image_box: ImageBox, block: Block<'a>, picker: Picker) -> Self {
-        Self { image_box, block, picker }
+    pub fn new(image_box: ImageBox, picker: &'a Picker) -> Self {
+        Self { image_box, picker }
     }
 }
 
