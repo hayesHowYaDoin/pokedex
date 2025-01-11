@@ -1,14 +1,14 @@
 use color_eyre::Result;
 
-use crate::core::ui::components::PokemonTableEntry;
 use super::{
     pages::{DetailPage, DetailPagePokemon, ListPage, ListPagePokemon},
     repository::ListPagePokemonRepository,
     Event,
 };
+use crate::core::{pokemon::PokemonGenders, ui::components::PokemonTableEntry};
 
 // TODO: Remove when no longer needed for testing
-use crate::core::pokemon::{PokemonDescription, PokemonStats, PokemonTypes, Type};
+use crate::core::pokemon::{PokemonDescription, PokemonStats, PokemonTypes, Type, PokemonMetadata};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum PageState {
@@ -27,19 +27,34 @@ impl PageStateMachine {
         //     page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
         // })
 
-        let image = image::ImageReader::open("./test_images/Pokémon_Bulbasaur_art.png")
+        let number = 1;
+        let name = "Bulbasaur".to_string();
+        let image = image::ImageReader::open("./test_images/3.png")
             .expect("Unable to open image.")
             .decode()
             .unwrap()
             .resize(3000, 3000, image::imageops::FilterType::Nearest);
+        let types = PokemonTypes::new(Type::Grass, Some(Type::Poison));
+        let description = PokemonDescription::new(
+            "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
+        );
+        let metadata = PokemonMetadata::new(
+            "2' 04\"".to_string(), 
+            "15.2 lbs".to_string(), 
+            "Seed".to_string(), 
+            vec!["Overgrow".to_string()], 
+            [PokemonGenders::Male, PokemonGenders::Female].into_iter().collect(),
+        );
+        let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
 
         let test_pokemon = DetailPagePokemon::new(
-            1,
-            "Bulbasaur".to_string(),
+            number,
+            name,
             image,
-            PokemonTypes::new(Type::Grass, Some(Type::Poison)),
-            PokemonDescription::new("A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()),
-            PokemonStats::new(45, 49, 49, 65, 65, 45),
+            types,
+            description,
+            metadata,
+            stats,
         );
 
         Ok(PageStateMachine {

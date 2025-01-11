@@ -7,5 +7,7 @@ pub use pokemon_table::*;
 mod text_box;
 pub use text_box::*;
 mod max_chart;
+mod metadata_box;
+pub use metadata_box::*;
 mod stat_chart;
 pub use stat_chart::*;
