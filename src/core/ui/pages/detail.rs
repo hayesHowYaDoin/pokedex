@@ -2,8 +2,8 @@ use color_eyre::Result;
 use image::DynamicImage;
 
 use crate::core::{
-    pokemon::{PokemonDescription, PokemonStats, PokemonTypes, PokemonMetadata},
-    ui::components::{PokemonStatChart, TextBox, ImageBox, MetadataBox},
+    pokemon::{PokemonDescription, PokemonMetadata, PokemonStats, PokemonTypes},
+    ui::components::{ImageBox, MetadataBox, PokemonStatChart, TextBox, TypesBox},
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -13,6 +13,7 @@ pub struct DetailPage {
     pub stat_chart: PokemonStatChart,
     pub description: TextBox,
     pub metadata: MetadataBox,
+    pub types: TypesBox,
 }
 
 impl DetailPage {
@@ -28,7 +29,9 @@ impl DetailPage {
 
         let metadata = MetadataBox::new(&pokemon.metadata);
 
-        Ok(DetailPage{ title, image, stat_chart, description, metadata })
+        let types = TypesBox::new(&pokemon.types);
+
+        Ok(DetailPage{ title, image, stat_chart, description, metadata, types })
     }
 
     pub fn get_title_box(&self) -> &TextBox {
@@ -49,6 +52,10 @@ impl DetailPage {
 
     pub fn get_stat_chart(&self) -> &PokemonStatChart {
         &self.stat_chart
+    }
+
+    pub fn get_types_box(&self) -> &TypesBox {
+        &self.types
     }
 }
 

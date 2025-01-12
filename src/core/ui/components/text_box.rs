@@ -11,8 +11,4 @@ impl TextBox {
     pub fn text(&self) -> &str {
         &self.text
     }
-
-    pub fn set_text(&mut self, text: &str) {
-        self.text = text.to_string();
-    }
 }

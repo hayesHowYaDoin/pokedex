@@ -11,3 +11,5 @@ mod metadata_box;
 pub use metadata_box::*;
 mod stat_chart;
 pub use stat_chart::*;
+mod types_box;
+pub use types_box::*;
