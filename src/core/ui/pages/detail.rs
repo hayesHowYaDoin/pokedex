@@ -16,7 +16,8 @@ use crate::core::{
     ui::components::{
         ImageBox, 
         MetadataBox, 
-        PokemonStatChart, 
+        PokemonStatChart,
+        Sound,
         TextBox,
         TypesBox,
     },
@@ -31,6 +32,7 @@ pub struct DetailPage {
     pub metadata: MetadataBox,
     pub types: TypesBox,
     pub weaknesses: TypesBox,
+    pub launch_sound: Sound,
 }
 
 impl DetailPage {
@@ -54,7 +56,9 @@ impl DetailPage {
 
         let weaknesses = TypesBox::new(pokemon.weaknesses.clone());
 
-        Ok(DetailPage{ title, image, stat_chart, description, metadata, types, weaknesses })
+        let launch_sound = Sound::new();
+
+        Ok(DetailPage{ title, image, stat_chart, description, metadata, types, weaknesses, launch_sound })
     }
 
     pub fn get_title_box(&self) -> &TextBox {
@@ -83,6 +87,10 @@ impl DetailPage {
 
     pub fn get_weaknesses_box(&self) -> &TypesBox {
         &self.weaknesses
+    }
+
+    pub fn get_launch_sound(&self) -> &Sound {
+        &self.launch_sound
     }
 }
 

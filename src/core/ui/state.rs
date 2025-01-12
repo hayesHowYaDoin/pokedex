@@ -14,102 +14,102 @@ use crate::core::pokemon::{PokemonDescription, PokemonStats, PokemonTypes, Type,
 pub enum PageState {
     List(ListPage),
     Detail(DetailPage),
-    Exit,
 }
 
 pub struct PageStateMachine {
-    page: PageState,
+    pub page: PageState,
+    list_page_repository: Box<dyn ListPagePokemonRepository>,
 }
 
 impl PageStateMachine {
-    pub fn new(_pokemon_repository: &impl ListPagePokemonRepository) -> Result<Self> {
-        // Ok(PageStateMachine {
-        //     page: PageState::List(ListPage::new(&ListPagePokemonRepository::fetch_all(pokemon_repository)?, ""))
-        // })
+    pub fn new(
+        list_page_repository: Box<dyn ListPagePokemonRepository>) -> Result<Self> {
+        let pokemon = list_page_repository.fetch_all()?;
+        let page = PageState::List(ListPage::new(&pokemon, ""));
 
-        let number = 1;
-        let name = "Bulbasaur".to_string();
-        let image = image::ImageReader::open("./test_assets/1.png")
-            .expect("Unable to open image.")
-            .decode()
-            .unwrap()
-            .resize(3000, 3000, image::imageops::FilterType::Nearest);
-        let types = PokemonTypes::new(Type::Grass, Some(Type::Poison));
-        let description = PokemonDescription::new(
-            "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
-        );
-        let metadata = PokemonMetadata::new(
-            "2' 04\"".to_string(), 
-            "15.2 lbs".to_string(), 
-            "Seed".to_string(), 
-            vec!["Overgrow".to_string()], 
-            [PokemonGenders::Male, PokemonGenders::Female].into_iter().collect(),
-        );
-        let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
-
-        let test_pokemon = DetailPagePokemon::new(
-            number,
-            name,
-            image,
-            types,
-            description,
-            metadata,
-            stats,
-        );
-
-        Ok(PageStateMachine {
-            page: PageState::Detail(DetailPage::new(&test_pokemon)?)
-        })
+        Ok(PageStateMachine { page, list_page_repository})
     }
 
-    pub fn next(&mut self, event: &Event) -> PageState {
+    pub fn next(&self, event: &Event) -> Result<PageState> {
         let next_page = match &self.page {
-            PageState::List(page) => next_list(page, event),
-            PageState::Detail(page) => next_detail(page, event),
-            _ => PageState::Exit,
+            PageState::List(page) => self.next_list(page, event),
+            PageState::Detail(page) => self.next_detail(page, event)?,
         };
 
-        self.page = next_page;
-        self.page.clone()
+        Ok(next_page)
     }
-}
 
-fn next_list(page: &ListPage, event: &Event) -> PageState {
-    match event {
-        Event::NewCharacter(c) => {
-            if *c == 'q' { return PageState::Exit; }
-
-            let mut next_page = page.clone();
-            next_page.push_char(*c);
-
-            PageState::List(next_page)
+    fn next_list(&self, page: &ListPage, event: &Event) -> PageState {
+        match event {
+            Event::NewCharacter(c) => {
+                let mut next_page = page.clone();
+                next_page.push_char(*c);
+    
+                PageState::List(next_page)
+            }
+            Event::DeleteCharacter => {
+                let mut next_page = page.clone();
+                next_page.pop_char();
+    
+                PageState::List(next_page)
+            }
+            Event::Up => {
+                let mut next_page = page.clone();
+                next_page.list_widget.up();
+    
+                PageState::List(next_page)
+            }
+            Event::Down => {
+                let mut next_page = page.clone();
+                next_page.list_widget.down();
+    
+                PageState::List(next_page)
+            }
+            Event::Select => {
+                let number = 1;
+                let name = "Bulbasaur".to_string();
+                let image = image::ImageReader::open("./test_assets/1.png")
+                    .expect("Unable to open image.")
+                    .decode()
+                    .unwrap()
+                    .resize(3000, 3000, image::imageops::FilterType::Nearest);
+                let types = PokemonTypes::new(Type::Grass, Some(Type::Poison));
+                let description = PokemonDescription::new(
+                    "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
+                );
+                let metadata = PokemonMetadata::new(
+                    "2' 04\"".to_string(), 
+                    "15.2 lbs".to_string(), 
+                    "Seed".to_string(), 
+                    vec!["Overgrow".to_string()], 
+                    [PokemonGenders::Male, PokemonGenders::Female].into_iter().collect(),
+                );
+                let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
+    
+                let test_pokemon = DetailPagePokemon::new(
+                    number,
+                    name,
+                    image,
+                    types,
+                    description,
+                    metadata,
+                    stats,
+                );
+    
+                PageState::Detail(DetailPage::new(&test_pokemon).expect("Failed to create DetailPage"))
+            }
+            Event::Noop => PageState::List(page.clone()),
         }
-        Event::DeleteCharacter => {
-            let mut next_page = page.clone();
-            next_page.pop_char();
-
-            PageState::List(next_page)
-        }
-        Event::Up => {
-            let mut next_page = page.clone();
-            next_page.list_widget.up();
-
-            PageState::List(next_page)
-        }
-        Event::Down => {
-            let mut next_page = page.clone();
-            next_page.list_widget.down();
-
-            PageState::List(next_page)
-        }
-        Event::Select | Event::Noop => PageState::List(page.clone()),
     }
-}
-
-fn next_detail(page: &DetailPage, event: &Event) -> PageState {
-    match event {
-        Event::NewCharacter(c) if *c == 'q' => PageState::Exit,
-        _ => PageState::Detail(page.clone())
+    
+    fn next_detail(&self, page: &DetailPage, event: &Event) -> Result<PageState> {
+        match event {
+            Event::DeleteCharacter => {
+                let pokemon = self.list_page_repository.fetch_all()?;
+                Ok(PageState::List(ListPage::new(&pokemon, "")))
+            },
+            _ => Ok(PageState::Detail(page.clone())),
+        }
     }
 }
 

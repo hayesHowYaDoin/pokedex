@@ -17,11 +17,11 @@ use crate::shell::ratatui::components::{
     TuiStatefulComponent,
     image_box::TuiImageBox,
     metadata_box::TuiMetadataBox,
+    sound::play_sound,
     stat_chart::TuiPokemonStatChart,
     text_box::TuiTextBox,
     types_box::TuiTypesBox,
 };
-use super::TuiPage;
 
 static OUTERMOST_VERTICAL: LazyLock<Layout> =
     LazyLock::new(|| Layout::default()
@@ -65,8 +65,12 @@ LazyLock::new(|| Layout::default()
         Constraint::Length(30),
     ]));
 
-impl<B: Backend> TuiPage<B> for DetailPage {
-    fn render(&mut self, terminal: &mut Terminal<B>, picker: &mut Picker) -> Result<()> {
+impl DetailPage {
+    pub fn on_enter(&self) {
+        play_sound(&self.launch_sound);
+    }
+
+    pub fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>, picker: &mut Picker) -> Result<()> {
         terminal.draw(|frame: &mut ratatui::Frame<'_>| {
             let outer_vertical_layout = OUTERMOST_VERTICAL.split(frame.area());
             let inner_first_horizontal_layout = INNER_FIRST_HORIZONTAL.split(outer_vertical_layout[1]);
