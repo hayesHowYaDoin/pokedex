@@ -1,18 +1,16 @@
 use crate::core::pokemon::Type;
-use std::collections::HashSet;
-use std::iter::FromIterator;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TypesBox {
-    types: HashSet<Type>,
+    types: Vec<Type>,
 }
 
 impl TypesBox {
     pub fn new<T: IntoIterator<Item = Type>>(types: T) -> Self {
-        TypesBox { types: HashSet::from_iter(types) }
+        TypesBox { types: Vec::<Type>::from_iter(types) }
     }
 
-    pub fn types(&self) -> &HashSet<Type> {
+    pub fn types(&self) -> &Vec<Type> {
         &self.types
     }
 }

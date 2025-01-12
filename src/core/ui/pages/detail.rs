@@ -46,11 +46,11 @@ impl DetailPage {
 
         let metadata = MetadataBox::new(&pokemon.metadata);
 
-        let mut types_set = HashSet::from([pokemon.types.primary]);
+        let mut types_vec = vec![pokemon.types.primary];
         if let Some(secondary_type) = pokemon.types.secondary {
-            types_set.insert(secondary_type);
+            types_vec.push(secondary_type);
         }
-        let types = TypesBox::new(types_set);
+        let types = TypesBox::new(types_vec);
 
         let weaknesses = TypesBox::new(pokemon.weaknesses.clone());
 
