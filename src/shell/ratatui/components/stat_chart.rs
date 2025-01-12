@@ -1,12 +1,24 @@
 use ratatui::{
+    layout::{Constraint, Flex, Layout},
     prelude::{Rect, Style},
     style::Stylize,
     Frame,
-    widgets::{BarChart, Block},
+    widgets::{BarChart, Block, Paragraph},
 };
 
 use crate::core::ui::components::PokemonStatChart;
 use super::TuiComponent;
+
+fn center(area: Rect, horizontal: Constraint, vertical: Constraint) -> Rect {
+    let [area] = Layout::horizontal([horizontal])
+        .flex(Flex::Center)
+        .areas(area);
+    let [area] = Layout::vertical([vertical])
+        .flex(Flex::Center)
+        .areas(area);
+
+    area
+}
 
 pub struct TuiPokemonStatChart<'a> {
     stat_chart: PokemonStatChart,
@@ -26,7 +38,6 @@ impl TuiComponent for TuiPokemonStatChart<'_> {
         }).collect();
         
         let chart = BarChart::default()
-            .block(self.block.clone())
             .bar_width(8)
             .bar_gap(2)
             .group_gap(3)
@@ -35,7 +46,17 @@ impl TuiComponent for TuiPokemonStatChart<'_> {
             .label_style(Style::new().white().italic())
             .data(&data)
             .max(self.stat_chart.get_max_value() as u64);
+
+        let area = center(
+            *layout,
+            Constraint::Length(5 * 8 + 4 * 2),
+            Constraint::Length(layout.height / 2),
+        );
+
+        let border = Paragraph::new("")
+            .block(self.block.clone());
     
-        frame.render_widget(chart, *layout);
+        frame.render_widget(border, *layout);
+        frame.render_widget(chart, area);
     }
 }
