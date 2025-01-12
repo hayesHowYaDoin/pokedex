@@ -1,16 +1,18 @@
-use crate::core::pokemon::PokemonTypes;
+use crate::core::pokemon::Type;
+use std::collections::HashSet;
+use std::iter::FromIterator;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TypesBox {
-    types: PokemonTypes,
+    types: HashSet<Type>,
 }
 
 impl TypesBox {
-    pub fn new(types: &PokemonTypes) -> Self {
-        TypesBox{ types: types.clone() }
+    pub fn new<T: IntoIterator<Item = Type>>(types: T) -> Self {
+        TypesBox { types: HashSet::from_iter(types) }
     }
 
-    pub fn types(&self) -> &PokemonTypes {
+    pub fn types(&self) -> &HashSet<Type> {
         &self.types
     }
 }
