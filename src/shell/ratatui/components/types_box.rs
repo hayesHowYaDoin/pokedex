@@ -24,26 +24,13 @@ impl<'a> TuiTypesBox<'a> {
 
 impl TuiComponent for TuiTypesBox<'_> {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
-        let primary = self.types_box.types().primary;
-        let secondary = self.types_box.types().secondary;
-
-        let mut text = vec![
-                Span::styled(primary.to_string(), Style::default()
-                    .fg(type_color(&primary))
-                    .add_modifier(Modifier::BOLD)
-                ),
-        ];
-        if secondary.is_some() {
-            text.push(" ".into());
-            text.push(
-                Span::styled(
-                    secondary.map_or_else(|| "".to_string(), |t| t.to_string()), 
-                    Style::default()
-                        .fg(Color::Red)
-                        .add_modifier(Modifier::BOLD)
-                ),
-            );
-        }
+        let text = self.types_box.types()
+            .iter()
+            .map(|t| Span::styled(
+                t.to_string(), 
+                Style::default().fg(type_color(t))
+            ))
+            .collect::<Vec<Span>>();
 
         let widget: Paragraph = Paragraph::new(Line::from(text))
             .wrap(Wrap { trim: false })

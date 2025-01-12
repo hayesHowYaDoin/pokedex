@@ -29,7 +29,7 @@ impl PageStateMachine {
 
         let number = 1;
         let name = "Bulbasaur".to_string();
-        let image = image::ImageReader::open("./test_images/3.png")
+        let image = image::ImageReader::open("./test_images/1.png")
             .expect("Unable to open image.")
             .decode()
             .unwrap()

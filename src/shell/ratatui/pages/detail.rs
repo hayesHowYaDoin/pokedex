@@ -110,6 +110,12 @@ impl<B: Backend> TuiPage<B> for DetailPage {
                 Block::bordered().title("Types")
             ).render(frame, &inner_third_horizontal_layout[0]);
 
+            // Weaknesses
+            TuiTypesBox::new(
+                self.get_weaknesses_box().to_owned(),
+                Block::bordered().title("Weaknesses")
+            ).render(frame, &inner_third_horizontal_layout[1]);
+
             // Footer
             frame.render_widget(
                 Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray), 

@@ -103,6 +103,52 @@ impl PokemonTypes {
     }
 }
 
+pub fn type_defense_weaknesses(type_: &Type) -> HashSet<Type> {
+    match type_ {
+        Type::Normal => HashSet::from([Type::Fighting]),
+        Type::Fire => HashSet::from([Type::Water, Type::Rock, Type::Ground]),
+        Type::Water => HashSet::from([Type::Electric, Type::Grass]),
+        Type::Electric => HashSet::from([Type::Ground]),
+        Type::Grass => HashSet::from([Type::Fire, Type::Ice, Type::Poison, Type::Flying, Type::Bug]),
+        Type::Ice => HashSet::from([Type::Fire, Type::Fighting, Type::Rock, Type::Steel]),
+        Type::Fighting => HashSet::from([Type::Flying, Type::Psychic, Type::Fairy]),
+        Type::Poison => HashSet::from([Type::Ground, Type::Psychic]),
+        Type::Ground => HashSet::from([Type::Water, Type::Grass, Type::Ice]),
+        Type::Flying => HashSet::from([Type::Electric, Type::Ice, Type::Rock]),
+        Type::Psychic => HashSet::from([Type::Bug, Type::Ghost, Type::Dark]),
+        Type::Bug => HashSet::from([Type::Fire, Type::Flying, Type::Rock]),
+        Type::Rock => HashSet::from([Type::Water, Type::Grass, Type::Fighting, Type::Ground, Type::Steel]),
+        Type::Ghost => HashSet::from([Type::Ghost, Type::Dark]),
+        Type::Dragon => HashSet::from([Type::Ice, Type::Dragon, Type::Fairy]),
+        Type::Dark => HashSet::from([Type::Fighting, Type::Bug, Type::Fairy]),
+        Type::Steel => HashSet::from([Type::Fire, Type::Fighting, Type::Ground]),
+        Type::Fairy => HashSet::from([Type::Poison, Type::Steel]),
+    }
+}
+
+pub fn type_defense_strengths(type_: &Type) -> HashSet<Type> {
+    match type_ {
+        Type::Normal => HashSet::from([]),
+        Type::Fire => HashSet::from([Type::Bug, Type::Fire, Type::Grass, Type::Steel, Type::Ice, Type::Fairy]),
+        Type::Water => HashSet::from([Type::Fire, Type::Water, Type::Ice, Type::Steel]),
+        Type::Electric => HashSet::from([Type::Steel, Type::Electric, Type::Flying]),
+        Type::Grass => HashSet::from([Type::Water, Type::Ground, Type::Grass, Type::Electric]),
+        Type::Ice => HashSet::from([Type::Ice]),
+        Type::Fighting => HashSet::from([Type::Rock, Type::Bug, Type::Dark]),
+        Type::Poison => HashSet::from([Type::Fighting, Type::Poison, Type::Grass, Type::Bug, Type::Fairy]),
+        Type::Ground => HashSet::from([Type::Poison, Type::Rock]),
+        Type::Flying => HashSet::from([Type::Grass, Type::Fighting, Type::Bug]),
+        Type::Psychic => HashSet::from([Type::Fighting, Type::Psychic]),
+        Type::Bug => HashSet::from([Type::Grass, Type::Fighting, Type::Ground]),
+        Type::Rock => HashSet::from([Type::Normal, Type::Fire, Type::Poison, Type::Flying]),
+        Type::Ghost => HashSet::from([Type::Poison, Type::Bug]),
+        Type::Dragon => HashSet::from([Type::Fire, Type::Water, Type::Electric, Type::Grass]),
+        Type::Dark => HashSet::from([Type::Ghost, Type::Dark]),
+        Type::Steel => HashSet::from([Type::Normal, Type::Grass, Type::Ice, Type::Flying, Type::Psychic, Type::Bug, Type::Rock, Type::Dragon, Type::Steel, Type::Fairy]),
+        Type::Fairy => HashSet::from([Type::Fighting, Type::Bug, Type::Dark]),
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonDescription {
     pub text: String,
