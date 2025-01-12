@@ -29,7 +29,7 @@ static LAYOUT: LazyLock<Layout> =
         .constraints([
             Constraint::Length(3),
             Constraint::Min(5),
-            Constraint::Length(2),
+            Constraint::Length(1),
         ]));
 
 impl ListPage {
