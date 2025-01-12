@@ -8,7 +8,7 @@ use ratatui::{
 use crate::core::ui::components::{PokemonTable, PokemonTableEntry};
 use super::{
     TuiStatefulComponent,
-    super::palette::type_color,
+    super::palette::type_color_medium,
 };
 
 const WIDTHS: [Constraint; 4] = [
@@ -49,7 +49,7 @@ impl TuiStatefulComponent for TuiPokemonTable<'_> {
 
 impl From<PokemonTableEntry> for Row<'_> {
     fn from(entry: PokemonTableEntry) -> Self {
-        let color = type_color(&entry.primary_type);
+        let color = type_color_medium(&entry.primary_type);
         Row::new(vec![
             entry.number.to_string(),
             entry.name,
