@@ -1,26 +1,18 @@
-use thiserror::Error;
+use std::collections::HashSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Pokemon {
     pub number: i32,
     pub name: String,
-    pub types: PokemonTypes,
 }
 
 impl Pokemon {
-    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
-        Pokemon {
-            number,
-            name,
-            types: PokemonTypes {
-                primary: primary_type,
-                secondary: secondary_type,
-            },
-        }
+    pub fn new(number: i32, name: String) -> Self {
+        Pokemon {number, name}
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Type {
     Normal,
     Fire,
@@ -111,33 +103,121 @@ impl PokemonTypes {
     }
 }
 
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonNumberRepositoryError(pub String);
-
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonNameRepositoryError(pub String);
-
-#[derive(Debug, Error)]
-#[error("{0}")]
-pub struct PokemonTypesRepositoryError(pub String);
-
-pub trait PokemonNumberRepository {
-    fn fetch_all_numbers(&self) -> Result<Vec<i32>, PokemonNumberRepositoryError>;
+pub fn type_defense_weaknesses(type_: &Type) -> HashSet<Type> {
+    match type_ {
+        Type::Normal => HashSet::from([Type::Fighting]),
+        Type::Fire => HashSet::from([Type::Water, Type::Rock, Type::Ground]),
+        Type::Water => HashSet::from([Type::Electric, Type::Grass]),
+        Type::Electric => HashSet::from([Type::Ground]),
+        Type::Grass => HashSet::from([Type::Fire, Type::Ice, Type::Poison, Type::Flying, Type::Bug]),
+        Type::Ice => HashSet::from([Type::Fire, Type::Fighting, Type::Rock, Type::Steel]),
+        Type::Fighting => HashSet::from([Type::Flying, Type::Psychic, Type::Fairy]),
+        Type::Poison => HashSet::from([Type::Ground, Type::Psychic]),
+        Type::Ground => HashSet::from([Type::Water, Type::Grass, Type::Ice]),
+        Type::Flying => HashSet::from([Type::Electric, Type::Ice, Type::Rock]),
+        Type::Psychic => HashSet::from([Type::Bug, Type::Ghost, Type::Dark]),
+        Type::Bug => HashSet::from([Type::Fire, Type::Flying, Type::Rock]),
+        Type::Rock => HashSet::from([Type::Water, Type::Grass, Type::Fighting, Type::Ground, Type::Steel]),
+        Type::Ghost => HashSet::from([Type::Ghost, Type::Dark]),
+        Type::Dragon => HashSet::from([Type::Ice, Type::Dragon, Type::Fairy]),
+        Type::Dark => HashSet::from([Type::Fighting, Type::Bug, Type::Fairy]),
+        Type::Steel => HashSet::from([Type::Fire, Type::Fighting, Type::Ground]),
+        Type::Fairy => HashSet::from([Type::Poison, Type::Steel]),
+    }
 }
 
-pub trait PokemonNameRepository {
-    fn fetch_name(&self, number: i32) -> Result<String, PokemonNameRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_names(&self) -> Result<Vec<String>, PokemonNameRepositoryError>;
+pub fn type_defense_strengths(type_: &Type) -> HashSet<Type> {
+    match type_ {
+        Type::Normal => HashSet::from([]),
+        Type::Fire => HashSet::from([Type::Bug, Type::Fire, Type::Grass, Type::Steel, Type::Ice, Type::Fairy]),
+        Type::Water => HashSet::from([Type::Fire, Type::Water, Type::Ice, Type::Steel]),
+        Type::Electric => HashSet::from([Type::Steel, Type::Electric, Type::Flying]),
+        Type::Grass => HashSet::from([Type::Water, Type::Ground, Type::Grass, Type::Electric]),
+        Type::Ice => HashSet::from([Type::Ice]),
+        Type::Fighting => HashSet::from([Type::Rock, Type::Bug, Type::Dark]),
+        Type::Poison => HashSet::from([Type::Fighting, Type::Poison, Type::Grass, Type::Bug, Type::Fairy]),
+        Type::Ground => HashSet::from([Type::Poison, Type::Rock]),
+        Type::Flying => HashSet::from([Type::Grass, Type::Fighting, Type::Bug]),
+        Type::Psychic => HashSet::from([Type::Fighting, Type::Psychic]),
+        Type::Bug => HashSet::from([Type::Grass, Type::Fighting, Type::Ground]),
+        Type::Rock => HashSet::from([Type::Normal, Type::Fire, Type::Poison, Type::Flying]),
+        Type::Ghost => HashSet::from([Type::Poison, Type::Bug]),
+        Type::Dragon => HashSet::from([Type::Fire, Type::Water, Type::Electric, Type::Grass]),
+        Type::Dark => HashSet::from([Type::Ghost, Type::Dark]),
+        Type::Steel => HashSet::from([Type::Normal, Type::Grass, Type::Ice, Type::Flying, Type::Psychic, Type::Bug, Type::Rock, Type::Dragon, Type::Steel, Type::Fairy]),
+        Type::Fairy => HashSet::from([Type::Fighting, Type::Bug, Type::Dark]),
+    }
 }
 
-pub trait PokemonTypesRepository {
-    fn fetch_primary_type(&self, number: i32) -> Result<String, PokemonTypesRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_primary_types(&self) -> Result<Vec<String>, PokemonTypesRepositoryError>;
-    fn fetch_secondary_type(&self, number: i32) -> Result<Option<String>, PokemonTypesRepositoryError>;
-    #[allow(dead_code)]
-    fn fetch_all_secondary_types(&self) -> Result<Vec<Option<String>>, PokemonTypesRepositoryError>;
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonDescription {
+    pub text: String,
+}
+
+impl PokemonDescription {
+    pub fn new(text: String) -> Self {
+        PokemonDescription {text}
+    }
+}
+
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum PokemonGenders {
+    Male,
+    Female,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PokemonMetadata {
+    pub height: String,
+    pub weight: String,
+    pub category: String,
+    pub abilities: Vec<String>,
+    pub genders: HashSet<PokemonGenders>,
+}
+
+impl PokemonMetadata {
+    pub fn new(
+        height: String,
+        weight: String,
+        category: String,
+        abilities: Vec<String>,
+        genders: HashSet<PokemonGenders>
+    ) -> Self {
+        PokemonMetadata {
+            height,
+            weight,
+            category,
+            abilities,
+            genders,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonStats {
+    pub hp: u32,
+    pub attack: u32,
+    pub defense: u32,
+    pub special_attack: u32,
+    pub special_defense: u32,
+    pub speed: u32,
+}
+
+impl PokemonStats {
+    pub fn new(hp: u32, attack: u32, defense: u32, special_attack: u32, special_defense: u32, speed: u32) -> Self {
+        PokemonStats {
+            hp,
+            attack,
+            defense,
+            special_attack,
+            special_defense,
+            speed,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonImage {
+    pub image: String,
 }

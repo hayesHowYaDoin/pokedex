@@ -1,10 +1,10 @@
 use ratatui::{
+    Frame,
     prelude::Rect,
-    terminal::Frame,
 };
 
 pub trait TuiComponent {
-    fn render(&mut self, frame: &mut Frame, layout: &Rect);
+    fn render(&self, frame: &mut Frame, layout: &Rect);
 }
 
 pub trait TuiStatefulComponent {

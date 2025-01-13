@@ -2,14 +2,11 @@ use std::path::Path;
 
 use color_eyre::Result;
 
-use crate::core::pokemon::{
-    PokemonNameRepository, 
-    PokemonNameRepositoryError,
-    PokemonNumberRepository,
-    PokemonNumberRepositoryError,
-    PokemonTypesRepository, 
-    PokemonTypesRepositoryError,
+use crate::core::ui::{
+    pages::ListPagePokemon,
+    repository::{ListPagePokemonRepository, ListPagePokemonRepositoryError},
 };
+
 use super::{
     Database,
     DatabaseError,
@@ -26,68 +23,29 @@ impl DatabaseMapper {
     }
 }
 
-impl PokemonNameRepository for DatabaseMapper {
-    fn fetch_name(&self, number: i32) -> Result<String, PokemonNameRepositoryError> {
-        Ok(PokemonTableRepository::fetch(&self.database, number)?.name)
-    }
+impl ListPagePokemonRepository for DatabaseMapper {
+    fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
+        let pokemon = PokemonTableRepository::fetch_all(&self.database)?;
+        let types = TypesTableRepository::fetch_all(&self.database)?;
 
-    fn fetch_all_names(&self) -> Result<Vec<String>, PokemonNameRepositoryError> {
-        Ok(PokemonTableRepository::fetch_all(&self.database)?
-            .into_iter()
-            .map(|pokemon| pokemon.name)
-            .collect())
-    }
-}
+        let list_page_pokemon = pokemon.into_iter()
+            .filter_map(|(id, p)| {
+                let t = types.get(&id)?;
+                Some(ListPagePokemon::new(
+                    id.number,
+                    p.name,
+                    t.primary_type.clone().into(),
+                    t.secondary_type.clone().map(|t| t.into()))
+                )
+            })
+            .collect();
 
-impl PokemonNumberRepository for DatabaseMapper {
-    fn fetch_all_numbers(&self) -> Result<Vec<i32>, PokemonNumberRepositoryError> {
-        Ok(PokemonTableRepository::fetch_all(&self.database)?
-            .into_iter()
-            .map(|pokemon| pokemon.number)
-            .collect())
-    }
-}
-
-impl PokemonTypesRepository for DatabaseMapper {
-    fn fetch_primary_type(&self, number: i32) -> Result<String, PokemonTypesRepositoryError> {
-        let types = TypesTableRepository::fetch(&self.database, number).expect("Failed to fetch types");
-        Ok(types.primary_type)
-    }
-
-    fn fetch_all_primary_types(&self) -> std::result::Result<Vec<String>, PokemonTypesRepositoryError> {
-        Ok(TypesTableRepository::fetch_all(&self.database).expect("Failed to fetch all types")
-            .into_iter()
-            .map(|types| types.primary_type)
-            .collect())
-    }
-
-    fn fetch_secondary_type(&self, number: i32) -> Result<Option<String>, PokemonTypesRepositoryError> {
-        let types = TypesTableRepository::fetch(&self.database, number).expect("Failed to fetch types");
-        Ok(types.secondary_type)
-    }
-
-    fn fetch_all_secondary_types(&self) -> std::result::Result<Vec<Option<String>>, PokemonTypesRepositoryError> {
-        Ok(TypesTableRepository::fetch_all(&self.database).expect("Failed to fetch all types")
-            .into_iter()
-            .map(|types| types.secondary_type)
-            .collect())
+        Ok(list_page_pokemon)
     }
 }
 
-impl From<DatabaseError> for PokemonNameRepositoryError {
-    fn from(err: DatabaseError) -> PokemonNameRepositoryError {
-        PokemonNameRepositoryError(err.to_string())
-    }
-}
-
-impl From<DatabaseError> for PokemonNumberRepositoryError {
-    fn from(err: DatabaseError) -> PokemonNumberRepositoryError {
-        PokemonNumberRepositoryError(err.to_string())
-    }
-}
-
-impl From<DatabaseError> for PokemonTypesRepositoryError {
-    fn from(err: DatabaseError) -> PokemonTypesRepositoryError {
-        PokemonTypesRepositoryError(err.to_string())
+impl From<DatabaseError> for ListPagePokemonRepositoryError {
+    fn from(err: DatabaseError) -> ListPagePokemonRepositoryError {
+        ListPagePokemonRepositoryError(err.to_string())
     }
 }
