@@ -70,8 +70,8 @@ impl App {
                 }
                 else if let TuiPage::List(_) = &self.current_state {
                     let mut tui_page = TuiDetailPage::new(page)?;
-                    tui_page.on_enter();
                     tui_page.render(&mut tui.terminal, &mut tui.picker)?;
+                    tui_page.on_enter();
                     self.current_state = TuiPage::Detail(tui_page);
                 }
             },
