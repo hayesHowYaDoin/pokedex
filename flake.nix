@@ -1,6 +1,6 @@
 {
   description = ''
-    Pokedex!!!
+    A Pokedex CLI application which takes full advantage of modern terminals.
   '';
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
