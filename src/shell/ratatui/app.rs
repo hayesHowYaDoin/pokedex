@@ -66,6 +66,7 @@ impl App {
             PageState::Detail(page) => {
                 if let TuiPage::Detail( detail_page) = &mut self.current_state {
                     detail_page.set_page(page);
+                    detail_page.render(&mut tui.terminal, &mut tui.picker)?;
                 }
                 else if let TuiPage::List(_) = &self.current_state {
                     let mut tui_page = TuiDetailPage::new(page)?;
