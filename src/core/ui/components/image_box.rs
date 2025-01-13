@@ -8,7 +8,7 @@ pub struct ImageBox {
 
 impl ImageBox {
     pub fn new(image: DynamicImage) -> Self {
-        Self {image: image}
+        Self {image}
     }
 
     pub fn image(&self) -> &DynamicImage {
