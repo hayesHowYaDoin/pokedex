@@ -16,6 +16,35 @@ CREATE TABLE IF NOT EXISTS pokemon_types (
     PRIMARY KEY (number)
 );
 
+CREATE TABLE IF NOT EXISTS pokemon_descriptions {
+    number INT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (number)
+}
+
+CREATE TABLE IF NOT EXISTS pokemon_stats {
+    number INT NOT NULL,
+    hp INT NOT NULL,
+    attack INT NOT NULL,
+    defense INT NOT NULL,
+    special_attack INT NOT NULL,
+    special_defense INT NOT NULL,
+    speed INT NOT NULL,
+    PRIMARY KEY (number)
+}
+
+CREATE TABLE IF NOT EXISTS pokemon_attributes {
+    number INT NOT NULL,
+    height_inches INT NOT NULL,
+    weight_pounds INT NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    ability_1 VARCHAR(255) NOT NULL,
+    ability_2 VARCHAR(255),
+    male INT NOT NULL,
+    female INT NOT NULL,
+    PRIMARY KEY (number)
+}
+
 INSERT OR IGNORE INTO pokemon (number, name) VALUES (1, 'Bulbasaur');
 INSERT OR IGNORE INTO pokemon (number, name) VALUES (2, 'Ivysaur');
 INSERT OR IGNORE INTO pokemon (number, name) VALUES (3, 'Venusaur');
@@ -266,14 +295,7 @@ INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUE
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (77, 'Fire', NULL);
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (78, 'Fire', NULL);
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (79, 'Water', 'Psychic');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (80, 'Water', 'Psychic');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (81, 'Electric', 'Steel');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (82, 'Electric', 'Steel');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (83, 'Normal', 'Flying');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (84, 'Normal', 'Flying');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (85, 'Normal', 'Flying');
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (86, 'Water', NULL);
-INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (87, 'Water', 'Ice');
+INSERT OR IGNORE INTO pokemon_types (number, primary_tTypesDTOpe, secondary_type) VALUES (87, 'Water', 'Ice');
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (88, 'Poison', NULL);
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (89, 'Poison', NULL);
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (90, 'Water', NULL);
@@ -338,3 +360,9 @@ INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUE
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (149, 'Dragon', 'Flying');
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (150, 'Psychic', NULL);
 INSERT OR IGNORE INTO pokemon_types (number, primary_type, secondary_type) VALUES (151, 'Psychic', NULL);
+
+INSERT OR IGNORE INTO pokemon_descriptions (number, description) VALUES (1, 'A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.');
+
+INSERT OR IGNORE INTO pokemon_stats (number, hp, attack, defense, special_attack, special_defense, speed) VALUES (1, 45, 49, 49, 65, 65, 45);
+
+INSERT OR IGNORE INTO pokemon_attributes (number, height_inches, weight_pounds, category, ability_1, ability_2, 

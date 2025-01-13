@@ -16,7 +16,7 @@ use crate::shell::ratatui::components::{
     TuiComponent,
     TuiStatefulComponent,
     image_box::TuiImageBox,
-    metadata_box::TuiMetadataBox,
+    attributes_box::TuiAttributesBox,
     sound::SoundPlayer,
     stat_chart::TuiPokemonStatChart,
     text_box::TuiTextBox,
@@ -111,9 +111,9 @@ impl TuiDetailPage {
                 Block::bordered().title("Description"),
             ).render(frame, &inner_right_vertical_layout[0]);
 
-            // Metadata
-            TuiMetadataBox::new(
-                self.page.get_metadata_box().to_owned(),
+            // Attributes
+            TuiAttributesBox::new(
+                self.page.get_attributes_box().to_owned(),
                 Block::bordered()
             ).render(frame, &inner_right_vertical_layout[1]);
 

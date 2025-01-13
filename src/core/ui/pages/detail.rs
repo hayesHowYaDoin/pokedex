@@ -6,7 +6,7 @@ use image::DynamicImage;
 use crate::core::{
     pokemon::{
         PokemonDescription, 
-        PokemonMetadata, 
+        PokemonAttributes, 
         PokemonStats, 
         PokemonTypes, 
         Type,
@@ -15,7 +15,7 @@ use crate::core::{
     },
     ui::components::{
         ImageBox, 
-        MetadataBox, 
+        AttributesBox, 
         PokemonStatChart,
         Sound,
         TextBox,
@@ -29,7 +29,7 @@ pub struct DetailPage {
     pub image: ImageBox,
     pub stat_chart: PokemonStatChart,
     pub description: TextBox,
-    pub metadata: MetadataBox,
+    pub attributes: AttributesBox,
     pub types: TypesBox,
     pub weaknesses: TypesBox,
     pub launch_sound: Sound,
@@ -46,7 +46,7 @@ impl DetailPage {
 
         let description = TextBox::new(&pokemon.description.text);
 
-        let metadata = MetadataBox::new(&pokemon.metadata);
+        let attributes = AttributesBox::new(&pokemon.attributes);
 
         let mut types_vec = vec![pokemon.types.primary];
         if let Some(secondary_type) = pokemon.types.secondary {
@@ -58,7 +58,7 @@ impl DetailPage {
 
         let launch_sound = Sound::new();
 
-        Ok(DetailPage{ title, image, stat_chart, description, metadata, types, weaknesses, launch_sound })
+        Ok(DetailPage{ title, image, stat_chart, description, attributes, types, weaknesses, launch_sound })
     }
 
     pub fn get_title_box(&self) -> &TextBox {
@@ -73,8 +73,8 @@ impl DetailPage {
         &self.description
     }
 
-    pub fn get_metadata_box(&self) -> &MetadataBox {
-        &self.metadata
+    pub fn get_attributes_box(&self) -> &AttributesBox {
+        &self.attributes
     }
 
     pub fn get_stat_chart(&self) -> &PokemonStatChart {
@@ -118,7 +118,7 @@ pub struct DetailPagePokemon {
     pub types: PokemonTypes,
     pub weaknesses: HashSet<Type>,
     pub description: PokemonDescription,
-    pub metadata: PokemonMetadata,
+    pub attributes: PokemonAttributes,
     pub stats: PokemonStats,
 }
 
@@ -129,7 +129,7 @@ impl DetailPagePokemon {
         image: DynamicImage,
         types: PokemonTypes,
         description: PokemonDescription,
-        metadata: PokemonMetadata,
+        attributes: PokemonAttributes,
         stats: PokemonStats
     ) -> Self {
         let mut weaknesses = type_defense_weaknesses(&types.primary);
@@ -143,6 +143,6 @@ impl DetailPagePokemon {
 
         weaknesses.retain(|weakness| !strengths.contains(weakness));
 
-        DetailPagePokemon{ number, name, image, types, weaknesses, description, metadata, stats }
+        DetailPagePokemon{ number, name, image, types, weaknesses, description, attributes, stats }
     }
 }

@@ -168,7 +168,7 @@ pub enum PokemonGenders {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct PokemonMetadata {
+pub struct PokemonAttributes {
     pub height: String,
     pub weight: String,
     pub category: String,
@@ -176,7 +176,7 @@ pub struct PokemonMetadata {
     pub genders: HashSet<PokemonGenders>,
 }
 
-impl PokemonMetadata {
+impl PokemonAttributes {
     pub fn new(
         height: String,
         weight: String,
@@ -184,7 +184,7 @@ impl PokemonMetadata {
         abilities: Vec<String>,
         genders: HashSet<PokemonGenders>
     ) -> Self {
-        PokemonMetadata {
+        PokemonAttributes {
             height,
             weight,
             category,
