@@ -1,53 +1,37 @@
-use crate::core::{
-    pokemon::Pokemon,
-    ui::components::PokemonTableEntry,
-};
+use color_eyre::Result;
+
 use super::{
-    pages::ListPage,
+    pages::{DetailPage, DetailPagePokemon, ListPage, ListPagePokemon},
+    repository::ListPagePokemonRepository,
     Event,
 };
+use crate::core::{pokemon::PokemonGenders, ui::components::PokemonTableEntry};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+// TODO: Remove when no longer needed for testing
+use crate::core::pokemon::{PokemonDescription, PokemonMetadata, PokemonStats, PokemonTypes, Type};
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum PageState {
     List(ListPage),
-    #[allow(dead_code)]
-    Detail,
-    Exit,
+    Detail(DetailPage),
 }
 
-pub struct PageStateMachine {
-    page: PageState,
-}
+pub fn next_state(
+    state: &PageState,
+    event: &Event,
+    repository: &dyn ListPagePokemonRepository,
+) -> Result<PageState> {
+    let next_page = match state {
+        PageState::List(page) => next_list(page, event),
+        PageState::Detail(page) => next_detail(page, event, repository)?,
+    };
 
-impl PageStateMachine {
-    pub fn new(pokemon: &[Pokemon]) -> Self {
-        let pokemon_table_entries: Vec<PokemonTableEntry> = pokemon
-            .iter()
-            .map(|p| p.into())
-            .collect();
-
-        PageStateMachine {
-            page: PageState::List(ListPage::new(&pokemon_table_entries, ""))
-        }
-    }
-
-    pub fn next(&mut self, event: &Event) -> PageState {
-        let next_page = match &self.page {
-            PageState::List(list_page) => next_list(list_page, event),
-            PageState::Detail => PageState::Detail,
-            _ => PageState::Exit,
-        };
-
-        self.page = next_page;
-        self.page.clone()
-    }
+    Ok(next_page)
 }
 
 fn next_list(page: &ListPage, event: &Event) -> PageState {
     match event {
         Event::NewCharacter(c) => {
-            if *c == 'q' { return PageState::Exit; }
-
             let mut next_page = page.clone();
             next_page.push_char(*c);
 
@@ -71,17 +55,60 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
 
             PageState::List(next_page)
         }
-        Event::Select | Event::Noop => PageState::List(page.clone()),
+        Event::Select => {
+            // TODO: Replace hard-coded values with repository fetch
+            let number = 1;
+            let name = "Bulbasaur".to_string();
+            let image = image::ImageReader::open("./test_assets/1.png")
+                .expect("Unable to open image.")
+                .decode()
+                .unwrap()
+                .resize(3000, 3000, image::imageops::FilterType::Nearest);
+            let types = PokemonTypes::new(Type::Grass, Some(Type::Poison));
+            let description = PokemonDescription::new(
+                "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
+            );
+            let metadata = PokemonMetadata::new(
+                "2' 04\"".to_string(),
+                "15.2 lbs".to_string(),
+                "Seed".to_string(),
+                vec!["Overgrow".to_string()],
+                [PokemonGenders::Male, PokemonGenders::Female]
+                    .into_iter()
+                    .collect(),
+            );
+            let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
+
+            let test_pokemon =
+                DetailPagePokemon::new(number, name, image, types, description, metadata, stats);
+
+            PageState::Detail(DetailPage::new(&test_pokemon).expect("Failed to create DetailPage"))
+        }
+        Event::Noop => PageState::List(page.clone()),
     }
 }
 
-impl<'a> From<&'a Pokemon> for PokemonTableEntry {
-    fn from(pokemon: &'a Pokemon) -> Self {
+fn next_detail(
+    page: &DetailPage,
+    event: &Event,
+    repository: &dyn ListPagePokemonRepository,
+) -> Result<PageState> {
+    match event {
+        Event::DeleteCharacter => {
+            let pokemon = repository.fetch_all()?;
+            Ok(PageState::List(ListPage::new(&pokemon, "")))
+        }
+        _ => Ok(PageState::Detail(page.clone())),
+    }
+}
+
+impl From<&ListPagePokemon> for PokemonTableEntry {
+    fn from(pokemon: &ListPagePokemon) -> Self {
         PokemonTableEntry {
             number: pokemon.number,
             name: pokemon.name.clone(),
-            primary_type: pokemon.types.primary.clone(),
-            secondary_type: pokemon.types.secondary.clone(),
+            primary_type: pokemon.primary_type,
+            secondary_type: pokemon.secondary_type,
         }
     }
 }
@@ -92,107 +119,141 @@ mod test {
 
     use cascade::cascade;
 
-    use crate::core::{
-        pokemon::Type,
-        ui::components::PokemonTableEntry,
-    };
     use super::*;
+    use crate::core::{pokemon::Type, ui::pages::ListPagePokemon};
 
-    static POKEMON: LazyLock<Vec<Pokemon>> = LazyLock::new(|| vec![
-        Pokemon::new(1, "".to_string(), Type::Normal, None),
-        Pokemon::new(2, "".to_string(), Type::Normal, None),
-        Pokemon::new(3, "".to_string(), Type::Normal, None),
-        Pokemon::new(4, "".to_string(), Type::Normal, None),
-        Pokemon::new(5, "".to_string(), Type::Normal, None),
-    ]);
+    static LIST_POKEMON: LazyLock<Vec<ListPagePokemon>> = LazyLock::new(|| {
+        vec![
+            ListPagePokemon::new(1, "".to_string(), Type::Normal, None),
+            ListPagePokemon::new(2, "".to_string(), Type::Normal, None),
+            ListPagePokemon::new(3, "".to_string(), Type::Normal, None),
+            ListPagePokemon::new(4, "".to_string(), Type::Normal, None),
+            ListPagePokemon::new(5, "".to_string(), Type::Normal, None),
+        ]
+    });
 
-    #[test]
-    fn test_next_list_new_character_q() {
-        let mut state_machine = PageStateMachine::new(&[]);
-        assert_eq!(state_machine.next(&Event::NewCharacter('q')), PageState::Exit);
+    struct TestRepository();
+
+    impl ListPagePokemonRepository for TestRepository {
+        fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
+            Ok(LIST_POKEMON.clone())
+        }
     }
 
     #[test]
     fn test_next_list_new_character_other() {
-        let mut list_page = ListPage::new(&[], "");
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let mut list_page = ListPage::new(&pokemon, "");
+
+        let next_list_page: PageState = next_state(
+            &PageState::List(list_page.clone()),
+            &Event::NewCharacter('a'),
+            &repository,
+        )
+        .unwrap();
+
         list_page.search_widget.push_char('a');
 
-        let next_list_page = PageStateMachine::new(&[]).next(&Event::NewCharacter('a'));
         assert_eq!(next_list_page, PageState::List(list_page));
     }
 
     #[test]
     fn test_next_list_delete_character() {
-        let mut state_machine = PageStateMachine::new(&POKEMON);
-        let initial_state = state_machine.page.clone();
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let mut list_page = ListPage::new(&pokemon, "a");
 
-        match state_machine.page {
-            PageState::List(ref mut page) => {
-                page.search_widget.push_char('a');
-            }
-            _ => panic!("Expected state machine to be initialize with PageState::List"),
-        }
+        let next_page = next_state(
+            &PageState::List(list_page.clone()),
+            &Event::DeleteCharacter,
+            &repository,
+        )
+        .unwrap();
 
-        let next_state = state_machine.next(&Event::DeleteCharacter);
+        list_page.search_widget.pop_char();
 
-        assert_eq!(next_state, initial_state);
+        assert_eq!(next_page, PageState::List(list_page));
     }
 
     #[test]
     fn test_next_list_down() {
-        let mut state_machine = PageStateMachine::new(&POKEMON);
-        let next_state = state_machine.next(&Event::Down);
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let mut list_page = ListPage::new(&pokemon, "");
 
-        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
-            .iter()
-            .map(|p| p.into())
-            .collect();
+        let next_page = next_state(
+            &PageState::List(list_page.clone()),
+            &Event::Down,
+            &repository,
+        )
+        .unwrap();
 
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
-        expected_next_page.list_widget.down();
+        list_page.list_widget.down();
 
-        assert_eq!(next_state, PageState::List(expected_next_page));
+        assert_eq!(next_page, PageState::List(list_page));
     }
 
     #[test]
     fn test_next_list_up() {
-        let state_machine = PageStateMachine::new(&POKEMON);
-        let next_state: PageStateMachine = cascade! {
-            state_machine;
-            ..next(&Event::Down);
-            ..next(&Event::Down);
-            ..next(&Event::Up);
-        };
-        
-        let pokemon_table_entries: Vec<PokemonTableEntry> = POKEMON
-        .iter()
-        .map(|p| p.into())
-        .collect();
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let mut list_page = ListPage::new(&pokemon, "");
 
-        let mut expected_next_page = ListPage::new(&pokemon_table_entries, "");
-        expected_next_page.list_widget = cascade! {
-            expected_next_page.list_widget;
+        let mut next_page = next_state(
+            &PageState::List(list_page.clone()),
+            &Event::Down,
+            &repository,
+        )
+        .unwrap();
+        next_page = next_state(&next_page, &Event::Down, &repository).unwrap();
+        next_page = next_state(&next_page, &Event::Up, &repository).unwrap();
+
+        list_page.list_widget = cascade! {
+            list_page.list_widget;
             ..down();
             ..down();
             ..up();
         };
 
-        assert_eq!(next_state.page, PageState::List(expected_next_page));
-    }
-
-    #[test]
-    fn test_next_list_select() {
-        let mut state_machine = PageStateMachine::new(&[]);
-        let previous_state = state_machine.page.clone();
-        let next_state = state_machine.next(&Event::Select);
-        assert_eq!(next_state, previous_state);
+        assert_eq!(next_page, PageState::List(list_page));
     }
 
     #[test]
     fn test_next_list_noop() {
-        let mut state_machine = PageStateMachine::new(&[]);
-        let previous_state = state_machine.next(&Event::Up);
-        let next_state = state_machine.next(&Event::Noop);
+        let repository = TestRepository();
+        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+
+        let previous_state = next_state(
+            &PageState::List(ListPage::new(&pokemon, "")),
+            &Event::Up,
+            &repository,
+        ).unwrap();
+        
+        let next_state = next_state(
+            &previous_state,
+            &Event::Up,
+            &repository,
+        ).unwrap();
+
         assert_eq!(next_state, previous_state);
     }
+
+    // TODO: Implement tests for detail page logic.
+    // #[test]
+    // fn test_next_list_select() {
+        // let repository = TestRepository();
+        // let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        // let list_page = ListPage::new(&pokemon, "");
+
+        // let next_page = next_state(
+        //     &PageState::List(list_page),
+        //     &Event::Select,
+        //     &repository
+        // ).unwrap();
+
+        // let expected_next_page = PageState::Detail(DetailPage::new(&DetailPagePokemon::new());
+
+        // assert_eq!(next_page, list_page);
+    // }
 }

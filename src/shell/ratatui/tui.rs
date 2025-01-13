@@ -10,6 +10,7 @@ use crossterm::{
   terminal::{EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::backend::CrosstermBackend as Backend;
+use ratatui_image::picker::Picker;
 use tokio::{
     sync::mpsc::{self, UnboundedReceiver, UnboundedSender},
     task::JoinHandle,
@@ -19,7 +20,7 @@ use futures::{FutureExt, StreamExt};
 
 pub type Terminal = ratatui::Terminal<Backend<std::io::Stderr>>;
 
-const TICK_RATE: Duration = Duration::from_millis(100);
+const TICK_RATE: Duration = Duration::from_millis(500);
 
 pub enum TuiEvent {
     AppTick,
@@ -29,6 +30,7 @@ pub enum TuiEvent {
 
 pub struct Tui {
     pub terminal: Terminal,
+    pub picker: Picker,
     task: JoinHandle<()>,
     cancellation_token: CancellationToken,
     tx: UnboundedSender<TuiEvent>,
@@ -38,11 +40,12 @@ pub struct Tui {
 impl Tui {
     pub fn new() -> Result<Self> {
         let terminal = ratatui::Terminal::new(Backend::new(std::io::stderr()))?;
+        let picker = Picker::from_query_stdio().expect("Unable to font size.");
         let task = tokio::spawn(async {});
         let cancellation_token = CancellationToken::new();
         let (tx, rx) = mpsc::unbounded_channel();
     
-        Ok(Tui{terminal, task, cancellation_token, tx, rx})
+        Ok(Tui{terminal, picker, task, cancellation_token, tx, rx})
     }
 
     pub fn start(&mut self) {

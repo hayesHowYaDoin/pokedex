@@ -1,14 +1,14 @@
 use ratatui::{
     prelude::{Constraint, Rect, Style},
     style::Stylize,
-    terminal::Frame,
+    Frame,
     widgets::{Block, Row, Table, TableState},
 };
 
 use crate::core::ui::components::{PokemonTable, PokemonTableEntry};
 use super::{
     TuiStatefulComponent,
-    super::palette::type_color,
+    super::palette::type_color_medium,
 };
 
 const WIDTHS: [Constraint; 4] = [
@@ -18,27 +18,38 @@ const WIDTHS: [Constraint; 4] = [
     Constraint::Length(10),
 ];
 
-impl TuiStatefulComponent for PokemonTable {
+pub struct TuiPokemonTable<'a> {
+    pokemon_table: PokemonTable,
+    block: Block<'a>,
+}
+
+impl<'a> TuiPokemonTable<'a> {
+    pub fn new(pokemon_table: PokemonTable, block: Block<'a>) -> Self {
+        Self { pokemon_table, block }
+    }
+}
+
+impl TuiStatefulComponent for TuiPokemonTable<'_> {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
-        let table = Table::new(self.get_pokemon().to_owned(), WIDTHS)
+        let table = Table::new(self.pokemon_table.get_pokemon().to_owned(), WIDTHS)
             .column_spacing(1)
             .header(
                 Row::new(vec!["#", "Name", "Type 1", "Type 2"])
                     .style(Style::new().bold())
                     .bottom_margin(1),
             )
-            .block(Block::bordered())
-            .highlight_style(Style::new().reversed())
+            .block(self.block.clone())
+            .row_highlight_style(Style::new().reversed())
             .highlight_symbol(">>");
 
-        let mut table_state = TableState::default().with_selected(self.get_selected_index());
+        let mut table_state = TableState::default().with_selected(self.pokemon_table.get_selected_index());
         frame.render_stateful_widget(table, *layout, &mut table_state);
     }
 }
 
 impl From<PokemonTableEntry> for Row<'_> {
     fn from(entry: PokemonTableEntry) -> Self {
-        let color = type_color(&entry.primary_type);
+        let color = type_color_medium(&entry.primary_type);
         Row::new(vec![
             entry.number.to_string(),
             entry.name,

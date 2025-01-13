@@ -1,32 +1,34 @@
 use color_eyre::eyre::Result;
 
-use crate::core::pokemon::{Pokemon, PokemonNameRepository, PokemonNumberRepository, PokemonTypesRepository};
-use crate::shell::ratatui::{pages::TuiPage, tui::Tui};
+use crate::shell::ratatui::{
+    pages::{TuiDetailPage, TuiListPage},
+    tui::Tui,
+};
 use crate::core::ui::{
     Event,
     PageState,
-    PageStateMachine,
+    next_state,
+    pages::ListPage,
+    repository::ListPagePokemonRepository,
 };
 
+#[derive(Debug)]
+enum TuiPage {
+    List(TuiListPage),
+    Detail(TuiDetailPage),
+}
+
 pub struct App {
-    should_quit: bool,
-    state: PageStateMachine,
+    repository: Box<dyn ListPagePokemonRepository>,
+    current_state: TuiPage,
 }
 
 impl App {
-    pub fn new<R>(repository: R) -> Result<Self> 
-    where R: PokemonNumberRepository + PokemonNameRepository + PokemonTypesRepository {
-        let pokemon = repository.fetch_all_numbers()?
-            .into_iter()
-            .map(|number| {
-                let name = repository.fetch_name(number)?;
-                let primary_type = repository.fetch_primary_type(number)?;
-                let secondary_type = repository.fetch_secondary_type(number)?;
-                Ok(Pokemon::new(number, name, primary_type.into(), secondary_type.map(|t| t.into())))
-                })
-            .collect::<Result<Vec<Pokemon>>>()?;
+    pub fn new(repository: Box<dyn ListPagePokemonRepository>) -> Result<Self> {
+        let pokemon = repository.fetch_all()?;
+        let current_state = TuiPage::List(TuiListPage::new(ListPage::new(&pokemon, "")));
 
-        Ok(App { should_quit: false, state: PageStateMachine::new(&pokemon) })
+        Ok(App {repository, current_state})
     }
 
     pub async fn run(&mut self) -> Result<()> {
@@ -36,25 +38,49 @@ impl App {
 
         loop {
             let event = Event::from(tui.next().await);
-
-            self.update(&event);
-
-            match self.state.next(&event).clone() {
-                PageState::List(mut list_page) => {
-                    list_page.render(&mut tui.terminal)?;
-                }
-                PageState::Detail => {},
-                PageState::Exit => break,
+            if should_quit(&event) {
+                break;
             }
+
+            self.transition(&event, &mut tui)?;
         };
 
         tui.exit()?;
         Ok(())
     }
 
-    fn update(&mut self, event: &Event) {
-        if event == &Event::NewCharacter('q') {
-            self.should_quit = true;
-        }
+    fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self>{
+        let current_state: PageState = match self.current_state {
+            TuiPage::List(ref mut page) => PageState::List(page.page.clone()),
+            TuiPage::Detail(ref mut page) => PageState::Detail(page.page.clone()),
+        };
+        let next_state = next_state(&current_state, event, self.repository.as_ref())?;
+
+        match next_state {
+            PageState::List(page) => {
+                let mut tui_page = TuiListPage::new(page);
+                tui_page.render(&mut tui.terminal, &mut tui.picker)?;
+
+                self.current_state = TuiPage::List(tui_page);
+            }
+            PageState::Detail(page) => {
+                if let TuiPage::Detail( detail_page) = &mut self.current_state {
+                    detail_page.set_page(page);
+                    detail_page.render(&mut tui.terminal, &mut tui.picker)?;
+                }
+                else if let TuiPage::List(_) = &self.current_state {
+                    let mut tui_page = TuiDetailPage::new(page)?;
+                    tui_page.render(&mut tui.terminal, &mut tui.picker)?;
+                    tui_page.on_enter();
+                    self.current_state = TuiPage::Detail(tui_page);
+                }
+            },
+        };
+
+        Ok(self)
     }
+}
+
+fn should_quit(event: &Event) -> bool{
+    event == &Event::NewCharacter('q')
 }

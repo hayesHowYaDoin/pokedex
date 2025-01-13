@@ -1,4 +1,10 @@
 mod component;
 pub use component::*;
-mod input_box;
-mod pokemon_table;
+pub mod image_box;
+pub mod input_box;
+pub mod metadata_box;
+pub mod pokemon_table;
+pub mod sound;
+pub mod stat_chart;
+pub mod text_box;
+pub mod types_box;
