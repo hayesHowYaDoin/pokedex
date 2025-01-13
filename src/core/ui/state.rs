@@ -52,6 +52,7 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
             PageState::List(next_page)
         }
         Event::Select => {
+            // TODO: Replace hard-coded values with repository fetch
             let number = 1;
             let name = "Bulbasaur".to_string();
             let image = image::ImageReader::open("./test_assets/1.png")
