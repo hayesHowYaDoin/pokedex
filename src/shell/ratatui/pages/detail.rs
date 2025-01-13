@@ -53,8 +53,8 @@ static INNER_THIRD_HORIZONTAL: LazyLock<Layout> =
     LazyLock::new(|| Layout::default()
             .direction(Direction::Horizontal)
             .constraints([
-                Constraint::Percentage(25),
-                Constraint::Percentage(75),
+                Constraint::Percentage(30),
+                Constraint::Percentage(70),
             ]));
 
 static INNER_RIGHT_VERTICAL: LazyLock<Layout> =
