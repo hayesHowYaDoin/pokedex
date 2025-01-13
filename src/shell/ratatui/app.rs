@@ -54,7 +54,7 @@ impl App {
             TuiPage::List(ref mut page) => PageState::List(page.page.clone()),
             TuiPage::Detail(ref mut page) => PageState::Detail(page.page.clone()),
         };
-        let next_state = next_state(&current_state, &event, self.repository.as_ref())?;
+        let next_state = next_state(&current_state, event, self.repository.as_ref())?;
 
         match next_state {
             PageState::List(page) => {
