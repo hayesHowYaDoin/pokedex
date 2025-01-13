@@ -19,7 +19,10 @@ RUN apt-get install -y \
     curl \
     git \
     libsqlite3-dev \
-    sqlite3
+    sqlite3 \
+    alsa-utils \
+    libasound2-dev \
+    pkg-config
 
 # [Optional] Install alternate shells
 RUN apt-get install -y zsh fish
