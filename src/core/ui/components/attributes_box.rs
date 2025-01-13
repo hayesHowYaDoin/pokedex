@@ -1,14 +1,14 @@
-use crate::core::pokemon::{PokemonGenders, PokemonMetadata};
+use crate::core::pokemon::{PokemonGenders, PokemonAttributes};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct MetadataBox {
+pub struct AttributesBox {
     text: String,
 }
 
-impl MetadataBox {
-    pub fn new(metadata: &PokemonMetadata) -> Self {
-        let abilities = metadata.abilities.join(", ");
-        let genders = metadata.genders.iter()
+impl AttributesBox {
+    pub fn new(attributes: &PokemonAttributes) -> Self {
+        let abilities = attributes.abilities.join(", ");
+        let genders = attributes.genders.iter()
             .map(|gender| match gender {
                 PokemonGenders::Male => "♂",
                 PokemonGenders::Female => "♀",
@@ -18,14 +18,14 @@ impl MetadataBox {
 
         let text = format!(
             "Height: {}\nWeight: {}\nCategory: {}\nAbilities: {}\nGender: {}",
-            metadata.height,
-            metadata.weight,
-            metadata.category,
+            attributes.height,
+            attributes.weight,
+            attributes.category,
             abilities,
             genders,
         ).to_string();
 
-        MetadataBox{ text }
+        AttributesBox{ text }
     }
 
     pub fn text(&self) -> &str {

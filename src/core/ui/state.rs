@@ -8,7 +8,7 @@ use super::{
 use crate::core::{pokemon::PokemonGenders, ui::components::PokemonTableEntry};
 
 // TODO: Remove when no longer needed for testing
-use crate::core::pokemon::{PokemonDescription, PokemonMetadata, PokemonStats, PokemonTypes, Type};
+use crate::core::pokemon::{PokemonDescription, PokemonAttributes, PokemonStats, PokemonTypes, Type};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum PageState {
@@ -68,7 +68,7 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
             let description = PokemonDescription::new(
                 "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
             );
-            let metadata = PokemonMetadata::new(
+            let attributes = PokemonAttributes::new(
                 "2' 04\"".to_string(),
                 "15.2 lbs".to_string(),
                 "Seed".to_string(),
@@ -80,7 +80,7 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
             let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
 
             let test_pokemon =
-                DetailPagePokemon::new(number, name, image, types, description, metadata, stats);
+                DetailPagePokemon::new(number, name, image, types, description, attributes, stats);
 
             PageState::Detail(DetailPage::new(&test_pokemon).expect("Failed to create DetailPage"))
         }
