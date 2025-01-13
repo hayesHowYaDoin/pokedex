@@ -19,10 +19,6 @@ use crate::shell::ratatui::components::{
     pokemon_table::TuiPokemonTable,
 };
 
-const SEARCH_LAYOUT_IDX: usize = 0;
-const LIST_LAYOUT_IDX: usize = 1;
-const FOOTER_LAYOUT_IDX: usize = 2;
-
 static LAYOUT: LazyLock<Layout> = 
     LazyLock::new(|| Layout::default()
         .direction(Direction::Vertical)
@@ -54,19 +50,19 @@ impl TuiListPage {
                 self.page.search_widget.clone(), 
                 Block::bordered().title("Search"),
             );
-            search.render(frame, &layout[SEARCH_LAYOUT_IDX]);
+            search.render(frame, &layout[0]);
 
             let mut list = TuiPokemonTable::new(
                 self.page.list_widget.clone(), 
                 Block::bordered(),
             );
-            list.render_mut(frame, &layout[LIST_LAYOUT_IDX]);
+            list.render_mut(frame, &layout[1]);
 
             let widget = Paragraph::new(
                 "Press 'enter' for detailed view, 'q' to quit"
             ).fg(Color::DarkGray);
 
-            frame.render_widget(widget, layout[FOOTER_LAYOUT_IDX]
+            frame.render_widget(widget, layout[2]
             );
         })?;
 
