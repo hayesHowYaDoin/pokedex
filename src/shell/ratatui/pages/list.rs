@@ -32,19 +32,32 @@ static LAYOUT: LazyLock<Layout> =
             Constraint::Length(1),
         ]));
 
-impl ListPage {
+#[derive(Clone, Debug, PartialEq)]
+pub struct TuiListPage {
+    pub page: ListPage,
+}
+
+impl TuiListPage {
+    pub fn new(page: ListPage) -> Self {
+        TuiListPage { page }
+    }
+
+    pub fn set_page(&mut self, page: ListPage) {
+        self.page = page;
+    }
+
     pub fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>, _picker: &mut Picker) -> Result<()> {
         terminal.draw(|frame| {
             let layout = LAYOUT.split(frame.area());
 
             let search = TuiInputBox::new(
-                self.search_widget.clone(), 
+                self.page.search_widget.clone(), 
                 Block::bordered().title("Search"),
             );
             search.render(frame, &layout[SEARCH_LAYOUT_IDX]);
 
             let mut list = TuiPokemonTable::new(
-                self.list_widget.clone(), 
+                self.page.list_widget.clone(), 
                 Block::bordered(),
             );
             list.render_mut(frame, &layout[LIST_LAYOUT_IDX]);
