@@ -1,52 +1,57 @@
-use std::collections::HashMap;
-
 use super::database::DatabaseError;
-
-#[derive(Debug, PartialEq, Eq, Hash)]
-pub struct PokemonID {
-    pub number: i32,
-}
-
-impl PokemonID {
-    pub fn new(number: i32) -> Self {
-        PokemonID { number }
-    }
-}
 
 #[derive(Debug)]
 pub struct PokemonDTO {
-    pub name: String,
+    pub id: i32,
+    pub identifier: String,
+    pub species_id: i32,
 }
 
 impl PokemonDTO {
-    pub fn new(name: String) -> Self {
-        PokemonDTO { name }
+    pub fn new(id: i32, identifier: String, species_id: i32) -> Self {
+        PokemonDTO { id, identifier, species_id }
     }
 }
 
 pub trait PokemonTableRepository {
     #[allow(dead_code)]
     fn fetch(&self, number: i32) -> Result<PokemonDTO, DatabaseError>;
-    fn fetch_all(&self) -> Result<HashMap<PokemonID, PokemonDTO>, DatabaseError>;
+    fn fetch_all(&self) -> Result<Vec<PokemonDTO>, DatabaseError>;
 }
 
 #[derive(Debug)]
 pub struct TypesDTO {
-    pub primary_type: String,
-    pub secondary_type: Option<String>,
+    pub id: i32,
+    pub identifier: String,
 }
 
 impl TypesDTO {
-    pub fn new(primary_type: String, secondary_type: Option<String>) -> Self {
-        TypesDTO {
-            primary_type,
-            secondary_type,
-        }
+    pub fn new(id: i32, identifier: String) -> Self {
+        TypesDTO { id, identifier }
     }
 }
 
 pub trait TypesTableRepository {
     #[allow(dead_code)]
-    fn fetch(&self, number: i32) -> Result<TypesDTO, DatabaseError>;
-    fn fetch_all(&self) -> Result<HashMap<PokemonID, TypesDTO>, DatabaseError>;
+    fn fetch(&self, id: i32) -> Result<TypesDTO, DatabaseError>;
+    fn fetch_all(&self) -> Result<Vec<TypesDTO>, DatabaseError>;
+}
+
+#[derive(Debug)]
+pub struct PokemonTypeDTO {
+    pub pokemon_id: i32,
+    pub type_id: i32,
+    pub slot: i32,
+}
+
+impl PokemonTypeDTO {
+    pub fn new(pokemon_id: i32, type_id: i32, slot: i32) -> Self {
+        PokemonTypeDTO { pokemon_id, type_id, slot }
+    }
+}
+
+pub trait PokemonTypeTableRepository {
+    #[allow(dead_code)]
+    fn fetch(&self, pokemon_id: i32) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
+    fn fetch_all(&self) -> Result<Vec<Vec<PokemonTypeDTO>>, DatabaseError>;
 }
