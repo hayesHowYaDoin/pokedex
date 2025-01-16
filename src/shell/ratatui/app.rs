@@ -9,7 +9,7 @@ use crate::core::ui::{
     PageState,
     next_state,
     pages::ListPage,
-    repository::ListPagePokemonRepository,
+    repository::{ListPagePokemonRepository, DetailPagePokemonRepository},
 };
 
 #[derive(Debug)]
@@ -18,13 +18,13 @@ enum TuiPage {
     Detail(TuiDetailPage),
 }
 
-pub struct App {
-    repository: Box<dyn ListPagePokemonRepository>,
+pub struct App<R: ListPagePokemonRepository + DetailPagePokemonRepository> {
+    repository: Box<R>,
     current_state: TuiPage,
 }
 
-impl App {
-    pub fn new(repository: Box<dyn ListPagePokemonRepository>) -> Result<Self> {
+impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
+    pub fn new(repository: Box<R>) -> Result<Self> {
         let pokemon = repository.fetch_all()?;
         let current_state = TuiPage::List(TuiListPage::new(ListPage::new(&pokemon, "")));
 
