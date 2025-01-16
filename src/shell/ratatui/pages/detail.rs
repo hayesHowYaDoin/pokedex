@@ -65,23 +65,10 @@ LazyLock::new(|| Layout::default()
         Constraint::Length(30),
     ]));
 
-#[derive(Debug)]
-pub struct TuiDetailPage {
-    pub page: DetailPage,
-}
-
-impl TuiDetailPage {
-    pub fn new(page: DetailPage) -> Result<Self> {
-        Ok(Self{ page, /*sound_thread*/ })
-    }
-
-    pub fn set_page(&mut self, page: DetailPage) {
-        self.page = page;
-    }
-
+impl DetailPage {
     pub fn on_enter(&mut self) {
         // self.sound_thread.play();
-        let sound = self.page.get_launch_sound().clone();
+        let sound = self.get_launch_sound().clone();
         tokio::spawn(async move {
             play_sound(sound);
         });
@@ -97,43 +84,43 @@ impl TuiDetailPage {
 
             // Title
             TuiTextBox::new(
-                self.page.get_title_box().to_owned(),
+                self.get_title_box().to_owned(),
                 Block::default()
             ).render(frame, &outer_vertical_layout[0]);
 
             // Image
             TuiImageBox::new(
-                self.page.get_image_box(),
+                self.get_image_box(),
                 picker,
             ).render_mut(frame, &inner_first_horizontal_layout[0]);
 
             // Description
             TuiTextBox::new(
-                self.page.get_description_box().to_owned(),
+                self.get_description_box().to_owned(),
                 Block::bordered().title("Description"),
             ).render(frame, &inner_right_vertical_layout[0]);
 
             // Attributes
             TuiAttributesBox::new(
-                self.page.get_attributes_box().to_owned(),
+                self.get_attributes_box().to_owned(),
                 Block::bordered()
             ).render(frame, &inner_right_vertical_layout[1]);
 
             // Stats
             TuiPokemonStatChart::new(
-                self.page.get_stat_chart().to_owned(),
+                self.get_stat_chart().to_owned(),
                 Block::bordered().title("Stats")
             ).render(frame, &inner_second_horizontal_layout[0]);
 
             // Types
             TuiTypesBox::new(
-                self.page.get_types_box().to_owned(),
+                self.get_types_box().to_owned(),
                 Block::bordered().title("Types")
             ).render(frame, &inner_third_horizontal_layout[0]);
 
             // Weaknesses
             TuiTypesBox::new(
-                self.page.get_weaknesses_box().to_owned(),
+                self.get_weaknesses_box().to_owned(),
                 Block::bordered().title("Weaknesses")
             ).render(frame, &inner_third_horizontal_layout[1]);
 

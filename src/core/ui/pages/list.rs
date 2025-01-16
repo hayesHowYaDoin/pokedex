@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use cascade::cascade;
 
 use crate::core::{
-    pokemon::{PokemonTypes, Type},
+    pokemon::PokemonTypes,
     ui::components::{InputBox, PokemonTable, PokemonTableEntry},
 };
 
@@ -15,8 +15,8 @@ pub struct ListPage {
 }
 
 impl ListPage {
-    pub fn new(pokemon: &[ListPagePokemon], query: &str) -> Self {
-        let filtered_pokemon: Vec<PokemonTableEntry> = filter_pokemon(pokemon, query)
+    pub fn new(pokemon: Vec<ListPagePokemon>, query: String) -> Self {
+        let filtered_pokemon: Vec<PokemonTableEntry> = filter_pokemon(&pokemon, &query)
             .into_iter()
             .map(|p| p.into())
             .collect();
@@ -214,14 +214,14 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let list_page = ListPage::new(&[], "");
+        let list_page = ListPage::new(vec![], "".to_string());
         assert_eq!(list_page.search_widget.text(), "");
         assert_eq!(list_page.list_widget.get_selected(), None);
     }
 
     #[test]
     fn test_empty_query() {
-        let list_page = ListPage::new(&POKEMON, "");
+        let list_page = ListPage::new(POKEMON.clone(), "".to_string());
         assert_eq!(
             list_page.list_widget.get_pokemon(),
             &POKEMON
@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_query_name() {
-        let list_page = ListPage::new(&POKEMON, "saur");
+        let list_page = ListPage::new(POKEMON.clone(), "saur".to_string());
         let filtered_pokemon = list_page.list_widget.get_pokemon();
         assert_eq!(filtered_pokemon.len(), 3);
         assert_eq!(filtered_pokemon[0].name, "Bulbasaur");
@@ -244,7 +244,7 @@ mod tests {
 
     #[test]
     fn test_query_name_primary_secondary() {
-        let list_page = ListPage::new(&POKEMON, "F");
+        let list_page = ListPage::new(POKEMON.clone(), "F".to_string());
         let filtered_pokemon = list_page.list_widget.get_pokemon();
         assert_eq!(filtered_pokemon.len(), 5);
         assert_eq!(filtered_pokemon[0].name, "Fearow");

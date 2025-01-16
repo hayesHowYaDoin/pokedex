@@ -7,8 +7,8 @@ pub struct InputBox {
 }
 
 impl InputBox {
-    pub fn new(text: &str) -> Self {
-        Self {text: text.to_string()}
+    pub fn new(text: String) -> Self {
+        Self {text: text}
     }
 
     pub fn push_char(&mut self, c: impl Into<char>) {
@@ -30,7 +30,7 @@ impl InputBox {
 
 impl Default for InputBox {
     fn default() -> Self {
-        Self::new("")
+        Self::new("".to_string())
     }
 
 }
@@ -44,7 +44,7 @@ mod tests {
     #[test]
     fn test_push_char() {
         let input_box = cascade! {
-            InputBox::new("Hello");
+            InputBox::new("Hello".to_string());
             ..push_char('!');
         };
         assert_eq!(input_box.text(), "Hello!");
@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn test_pop_char() {
         let input_box = cascade! {
-            InputBox::new("Hello");
+            InputBox::new("Hello".to_string());
             ..pop_char();
         };
         assert_eq!(input_box.text(), "Hell");
@@ -62,7 +62,7 @@ mod tests {
     #[test]
     fn test_clear() {
         let input_box = cascade! {
-            InputBox::new("Hello");
+            InputBox::new("Hello".to_string());
             ..clear();
         };
         assert_eq!(input_box.text(), "");
@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn test_text() {
-        let input_box = InputBox::new("Hello");
+        let input_box = InputBox::new("Hello".to_string());
         assert_eq!(input_box.text(), "Hello");
     }
 }
