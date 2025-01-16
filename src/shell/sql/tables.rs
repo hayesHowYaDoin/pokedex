@@ -5,7 +5,7 @@ use rusqlite::ToSql;
 use super::database::DatabaseError;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct PokemonID(pub i32);
+pub struct PokemonID(pub u32);
 
 impl ToSql for PokemonID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
@@ -14,7 +14,7 @@ impl ToSql for PokemonID {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TypeID(pub i32);
+pub struct TypeID(pub u32);
 
 impl ToSql for TypeID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
@@ -24,12 +24,12 @@ impl ToSql for TypeID {
 
 #[derive(Debug)]
 pub struct PokemonDTO {
-    pub species_id: i32,
+    pub species_id: u32,
     pub identifier: String,
 }
 
 impl PokemonDTO {
-    pub fn new(species_id: i32, identifier: String) -> Self {
+    pub fn new(species_id: u32, identifier: String) -> Self {
         PokemonDTO { species_id, identifier }
     }
 }
@@ -60,11 +60,11 @@ pub trait TypesTableRepository {
 #[derive(Debug)]
 pub struct PokemonTypeDTO {
     pub id: TypeID,
-    pub slot: i32,
+    pub slot: u32,
 }
 
 impl PokemonTypeDTO {
-    pub fn new(id: TypeID, slot: i32) -> Self {
+    pub fn new(id: TypeID, slot: u32) -> Self {
         PokemonTypeDTO { id, slot }
     }
 }
