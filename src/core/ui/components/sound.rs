@@ -5,6 +5,6 @@ pub struct Sound {
 
 impl Sound {
     pub fn new() -> Self {
-        Sound { source: "./test_assets/sound.wav".to_string() }
+        Sound { source: "./data/assets/1/sound.wav".to_string() }
     }
 }
