@@ -37,7 +37,7 @@ impl Database {
 }
 
 impl PokemonTableRepository for Database {
-    fn fetch(&self, id: PokemonID) -> Result<PokemonDTO, DatabaseError> {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonDTO, DatabaseError> {
         let sql_cmd = "SELECT id, identifier, species_id FROM pokemon WHERE id = ?";
         let mut stmt = self
             .conn
@@ -78,7 +78,7 @@ impl PokemonTableRepository for Database {
 }
 
 impl TypesTableRepository for Database {
-    fn fetch(&self, id: TypeID) -> Result<TypesDTO, DatabaseError> {
+    fn fetch(&self, id: &TypeID) -> Result<TypesDTO, DatabaseError> {
         let type_id_sql_cmd = "SELECT id, identifier FROM types WHERE id = ?";
         let mut stmt = self
             .conn
@@ -117,7 +117,7 @@ impl TypesTableRepository for Database {
 }
 
 impl PokemonTypeTableRepository for Database {
-    fn fetch(&self, pokemon_id: PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError> {
+    fn fetch(&self, pokemon_id: &PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError> {
         let sql_cmd = "SELECT pokemon_id, type_id, slot FROM pokemon_types WHERE pokemon_id = ?";
         let mut stmt = self
             .conn
@@ -169,7 +169,7 @@ impl PokemonTypeTableRepository for Database {
 }
 
 impl PokemonSizeTableRepository for Database {
-    fn fetch(&self, pokemon_id: PokemonID) -> Result<PokemonSizeDTO, DatabaseError> {
+    fn fetch(&self, pokemon_id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError> {
         let sql_cmd = "SELECT id, height_dm, weight_dg FROM pokemon_sizes WHERE id = ?";
         let mut stmt = self
             .conn

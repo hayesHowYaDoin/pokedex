@@ -13,12 +13,24 @@ impl ToSql for PokemonID {
     }
 }
 
+impl Into<u32> for PokemonID {
+    fn into(self) -> u32 {
+        self.0
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TypeID(pub u32);
 
 impl ToSql for TypeID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
         Ok(rusqlite::types::ToSqlOutput::Owned(rusqlite::types::Value::Integer(self.0.into())))
+    }
+}
+
+impl Into<u32> for TypeID {
+    fn into(self) -> u32 {
+        self.0
     }
 }
 
@@ -36,7 +48,7 @@ impl PokemonDTO {
 
 pub trait PokemonTableRepository {
     #[allow(dead_code)]
-    fn fetch(&self, id: PokemonID) -> Result<PokemonDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonDTO, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<PokemonID, PokemonDTO>, DatabaseError>;
 }
 
@@ -53,7 +65,7 @@ impl TypesDTO {
 
 pub trait TypesTableRepository {
     #[allow(dead_code)]
-    fn fetch(&self, id: TypeID) -> Result<TypesDTO, DatabaseError>;
+    fn fetch(&self, id: &TypeID) -> Result<TypesDTO, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<TypeID, TypesDTO>, DatabaseError>;
 }
 
@@ -71,7 +83,7 @@ impl PokemonTypeDTO {
 
 pub trait PokemonTypeTableRepository {
     #[allow(dead_code)]
-    fn fetch(&self, id: PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError>;
 }
 
@@ -87,5 +99,5 @@ impl PokemonSizeDTO {
 }
 
 pub trait PokemonSizeTableRepository {
-    fn fetch(&self, id: PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
 }

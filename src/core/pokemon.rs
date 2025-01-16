@@ -88,7 +88,7 @@ impl From<String> for Type {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PokemonTypes {
     pub primary: Type,
     pub secondary: Option<Type>,

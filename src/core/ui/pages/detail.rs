@@ -94,16 +94,16 @@ impl DetailPage {
     }
 }
 
-fn get_stats_with_labels(stats: &PokemonStats) -> ([i32; 6], [&str; 6]) {
+fn get_stats_with_labels(stats: &PokemonStats) -> ([u32; 6], [&str; 6]) {
     const STAT_LABELS: [&str; 6] = ["HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"];
 
     let raw_stats = [
-        stats.hp as i32,
-        stats.attack as i32,
-        stats.defense as i32,
-        stats.special_attack as i32,
-        stats.special_defense as i32,
-        stats.speed as i32,
+        stats.hp as u32,
+        stats.attack as u32,
+        stats.defense as u32,
+        stats.special_attack as u32,
+        stats.special_defense as u32,
+        stats.speed as u32,
     ];
 
     (raw_stats, STAT_LABELS)
@@ -112,7 +112,7 @@ fn get_stats_with_labels(stats: &PokemonStats) -> ([i32; 6], [&str; 6]) {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct DetailPagePokemon {
-    pub number: i32,
+    pub number: u32,
     pub name: String,
     pub image: DynamicImage,
     pub types: PokemonTypes,
@@ -124,7 +124,7 @@ pub struct DetailPagePokemon {
 
 impl DetailPagePokemon {
     pub fn new(
-        number: i32,
+        number: u32,
         name: String,
         image: DynamicImage,
         types: PokemonTypes,

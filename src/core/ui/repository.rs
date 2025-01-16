@@ -19,5 +19,5 @@ pub trait ListPagePokemonRepository {
 pub struct DetailPagePokemonRepositoryError(pub String);
 
 pub trait DetailPagePokemonRepository {
-    fn fetch(&self, number: i32) -> Result<Vec<ListPagePokemon>>;
+    fn fetch(&self, number: u32) -> Result<DetailPagePokemon>;
 }
