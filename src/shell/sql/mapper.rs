@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{any::Any, path::Path};
 
 use color_eyre::Result;
 
@@ -11,7 +11,10 @@ use crate::core::ui::{
 };
 
 use super::{
-    tables::{PokemonTableRepository, PokemonTypeTableRepository, TypesDTO, TypesTableRepository},
+    tables::{
+        PokemonDTO, PokemonID, PokemonTableRepository, PokemonTypeTableRepository, TypesDTO,
+        TypesTableRepository,
+    },
     Database, DatabaseError,
 };
 
@@ -35,16 +38,15 @@ impl ListPagePokemonRepository for DatabaseMapper {
 
         let list_page_pokemon = pokemon
             .into_iter()
-            .filter_map(|p| {
+            .filter_map(|(id, p)| {
                 let number = p.species_id;
                 let name = capitalize(&p.identifier);
 
-                let type_ids = pokemon_types.get(p.id as usize)?;
+                let type_ids = pokemon_types.get(&id)?;
                 let pokemon_types: Vec<String> = type_ids
                     .iter()
                     .filter_map(|pt| {
-                        let type_idx = types.binary_search_by(|t| t.id.cmp(&pt.type_id)).ok()?;
-                        Some(capitalize(&types.get(type_idx)?.identifier).into())
+                        Some(capitalize(&types.get(&pt.id)?.identifier.clone()))
                     })
                     .collect();
 
