@@ -4,8 +4,8 @@ use rusqlite::Connection;
 use thiserror::Error;
 
 use super::tables::{
-    PokemonDTO, PokemonID, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository,
-    TypeID, TypesDTO, TypesTableRepository,
+    PokemonDTO, PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonTableRepository,
+    PokemonTypeDTO, PokemonTypeTableRepository, TypeID, TypesDTO, TypesTableRepository,
 };
 
 pub struct Database {
@@ -46,7 +46,7 @@ impl PokemonTableRepository for Database {
         let pokemon = stmt
             .query_row([id], |row| {
                 let identifier: String = row.get(1)?;
-                let species_id: i32 = row.get(2)?;
+                let species_id: u32 = row.get(2)?;
 
                 Ok(PokemonDTO::new(species_id, identifier))
             })
@@ -63,9 +63,9 @@ impl PokemonTableRepository for Database {
             .expect("Failed to prepare statement");
         let pokemon = stmt
             .query_map([], |row| {
-                let id: i32 = row.get(0)?;
+                let id: u32 = row.get(0)?;
                 let identifier: String = row.get(1)?;
-                let species_id: i32 = row.get(2)?;
+                let species_id: u32 = row.get(2)?;
 
                 Ok((PokemonID(id), PokemonDTO::new(species_id, identifier)))
             })
@@ -103,7 +103,7 @@ impl TypesTableRepository for Database {
             .expect("Failed to prepare statement");
         let types = stmt
             .query_map([], |row| {
-                let id: i32 = row.get(0)?;
+                let id: u32 = row.get(0)?;
                 let identifier: String = row.get(1)?;
 
                 Ok((TypeID(id), TypesDTO::new(identifier)))
@@ -125,8 +125,8 @@ impl PokemonTypeTableRepository for Database {
             .expect("Failed to prepare statement");
         let pokemon_types = stmt
             .query_map([pokemon_id], |row| {
-                let type_id: i32 = row.get(1)?;
-                let slot: i32 = row.get(2)?;
+                let type_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(2)?;
 
                 Ok(PokemonTypeDTO::new(TypeID(type_id), slot))
             })
@@ -146,19 +146,44 @@ impl PokemonTypeTableRepository for Database {
 
         let pokemon_types = stmt
             .query_map([], |row| {
-                let pokemon_id: i32 = row.get(0)?;
-                let type_id: i32 = row.get(1)?;
-                let slot: i32 = row.get(2)?;
+                let pokemon_id: u32 = row.get(0)?;
+                let type_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(2)?;
 
-                Ok((PokemonID(pokemon_id), PokemonTypeDTO::new(TypeID(type_id), slot)))
+                Ok((
+                    PokemonID(pokemon_id),
+                    PokemonTypeDTO::new(TypeID(type_id), slot),
+                ))
             })
             .expect("Failed to execute query map")
             .filter_map(|t| t.ok())
             .fold(HashMap::new(), |mut acc, (pokemon_id, pokemon_type)| {
-                acc.entry(pokemon_id).or_insert_with(Vec::new).push(pokemon_type);
-                acc  
+                acc.entry(pokemon_id)
+                    .or_insert_with(Vec::new)
+                    .push(pokemon_type);
+                acc
             });
 
         Ok(pokemon_types)
+    }
+}
+
+impl PokemonSizeTableRepository for Database {
+    fn fetch(&self, pokemon_id: PokemonID) -> Result<PokemonSizeDTO, DatabaseError> {
+        let sql_cmd = "SELECT id, height_dm, weight_dg FROM pokemon_sizes WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon = stmt
+            .query_row([pokemon_id], |row| {
+                let height_dm: u32 = row.get(1)?;
+                let weight_dg: u32 = row.get(2)?;
+
+                Ok(PokemonSizeDTO::new(height_dm, weight_dg))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon)
     }
 }
