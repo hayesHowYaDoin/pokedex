@@ -72,7 +72,7 @@ fn next_detail(
     match event {
         Event::DeleteCharacter => {
             let pokemon = repository.fetch_all()?;
-            Ok(PageState::List(ListPage::new(&pokemon, "")))
+            Ok(PageState::List(ListPage::new(pokemon, "".to_string())))
         }
         _ => Ok(PageState::Detail(page.clone())),
     }
@@ -152,7 +152,7 @@ mod test {
     fn test_next_list_new_character_other() {
         let repository = TestRepository();
         let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
-        let mut list_page = ListPage::new(&pokemon, "");
+        let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let next_list_page: PageState = next_state(
             &PageState::List(list_page.clone()),
@@ -170,7 +170,7 @@ mod test {
     fn test_next_list_delete_character() {
         let repository = TestRepository();
         let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
-        let mut list_page = ListPage::new(&pokemon, "a");
+        let mut list_page = ListPage::new(pokemon, "a".to_string());
 
         let next_page = next_state(
             &PageState::List(list_page.clone()),
@@ -188,7 +188,7 @@ mod test {
     fn test_next_list_down() {
         let repository = TestRepository();
         let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
-        let mut list_page = ListPage::new(&pokemon, "");
+        let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let next_page = next_state(
             &PageState::List(list_page.clone()),
@@ -206,7 +206,7 @@ mod test {
     fn test_next_list_up() {
         let repository = TestRepository();
         let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
-        let mut list_page = ListPage::new(&pokemon, "");
+        let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let mut next_page = next_state(
             &PageState::List(list_page.clone()),
@@ -233,7 +233,7 @@ mod test {
         let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
 
         let previous_state = next_state(
-            &PageState::List(ListPage::new(&pokemon, "")),
+            &PageState::List(ListPage::new(pokemon, "".to_string())),
             &Event::Up,
             &repository,
         )
