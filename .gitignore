@@ -21,6 +21,9 @@ Cargo.lock
 # Sqlite
 *.db
 
+# Assets
+data/assets/
+
 .cache
 .dotnet
 .bash_history
