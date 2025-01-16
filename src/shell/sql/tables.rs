@@ -74,3 +74,18 @@ pub trait PokemonTypeTableRepository {
     fn fetch(&self, id: PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError>;
 }
+
+pub struct PokemonSizeDTO {
+    pub height_dm: u32,
+    pub weight_hg: u32,
+}
+
+impl PokemonSizeDTO {
+    pub fn new(height_dm: u32, weight_hg: u32) -> Self {
+        PokemonSizeDTO { height_dm, weight_hg }
+    }
+}
+
+pub trait PokemonSizeTableRepository {
+    fn fetch(&self, id: PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
+}
