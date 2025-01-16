@@ -4,7 +4,7 @@ use rusqlite::ToSql;
 
 use super::database::DatabaseError;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PokemonID(pub u32);
 
 impl ToSql for PokemonID {
@@ -19,7 +19,7 @@ impl Into<u32> for PokemonID {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct TypeID(pub u32);
 
 impl ToSql for TypeID {

@@ -3,7 +3,7 @@ use std::path::Path;
 use color_eyre::Result;
 
 use crate::core::{
-    pokemon::{PokemonAttributes, PokemonDescription, PokemonGenders, PokemonStats, PokemonTypes},
+    pokemon::{Pokemon, PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats, PokemonTypes},
     ui::{
         pages::{DetailPagePokemon, ListPagePokemon},
         repository::{
@@ -88,6 +88,17 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let types = TypesTableRepository::fetch_all(&self.database)?;
         let pokemon_size = PokemonSizeTableRepository::fetch(&self.database, &id)?;
 
+        let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id));
+        let image = image::ImageReader::open(image_path)
+            .expect("Unable to open image.")
+            .decode()
+            .unwrap()
+            .resize(3000, 3000, image::imageops::FilterType::Nearest);
+
+        let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(id)))
+            .expect("Unable to locate cry resource.");
+        let cry = PokemonCry::new(cry_bytes);
+
         let pokemon_types: Vec<String> = pokemon_types
             .iter()
             .filter_map(|pt| Some(capitalize(&types.get(&pt.id)?.identifier.clone())))
@@ -100,12 +111,6 @@ impl DetailPagePokemonRepository for DatabaseMapper {
             )
             .into());
         }
-
-        let image = image::ImageReader::open(format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id)))
-            .expect("Unable to open image.")
-            .decode()
-            .unwrap()
-            .resize(3000, 3000, image::imageops::FilterType::Nearest);
 
         let description = PokemonDescription::new(
             "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
@@ -136,6 +141,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
             description,
             attributes,
             stats,
+            cry,
         );
 
         Ok(detail_page_pokemon)
