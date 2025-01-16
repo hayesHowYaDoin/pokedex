@@ -59,7 +59,7 @@ fn next_list(page: &ListPage, event: &Event) -> PageState {
             // TODO: Replace hard-coded values with repository fetch
             let number = 1;
             let name = "Bulbasaur".to_string();
-            let image = image::ImageReader::open("./test_assets/1.png")
+            let image = image::ImageReader::open("./data/assets/1/bw_front.png")
                 .expect("Unable to open image.")
                 .decode()
                 .unwrap()
