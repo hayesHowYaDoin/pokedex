@@ -6,7 +6,7 @@ pub struct AttributesBox {
 }
 
 impl AttributesBox {
-    pub fn new(attributes: &PokemonAttributes) -> Self {
+    pub fn new(attributes: PokemonAttributes) -> Self {
         let abilities = attributes.abilities.join(", ");
         let genders = attributes.genders.iter()
             .map(|gender| match gender {

@@ -58,7 +58,7 @@ fn next_list(
         Event::Select => {
             let id = page.list_widget.get_selected().map_or(0, |p| p.number);
             let pokemon = repository.fetch(id).expect("Failed to create DetailPage");
-            Ok(PageState::Detail(DetailPage::new(&pokemon)?))
+            Ok(PageState::Detail(DetailPage::new(pokemon)?))
         }
         Event::Noop => Ok(PageState::List(page.clone())),
     }
@@ -101,7 +101,7 @@ mod test {
 
     use super::*;
     use crate::core::{
-        pokemon::{PokemonAttributes, PokemonDescription, PokemonStats, PokemonTypes, Type},
+        pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonStats, PokemonTypes, Type},
         ui::pages::{DetailPagePokemon, ListPagePokemon},
     };
 
@@ -130,6 +130,7 @@ mod test {
                 HashSet::new(),
             ),
             PokemonStats::new(0, 0, 0, 0, 0, 0),
+            PokemonCry::new(vec![]),
         )
     });
 

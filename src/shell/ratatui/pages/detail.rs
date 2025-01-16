@@ -17,7 +17,7 @@ use crate::shell::ratatui::components::{
     TuiStatefulComponent,
     image_box::TuiImageBox,
     attributes_box::TuiAttributesBox,
-    sound::SoundPlayer,
+    sound::play_sound,
     stat_chart::TuiPokemonStatChart,
     text_box::TuiTextBox,
     types_box::TuiTypesBox,
@@ -68,13 +68,11 @@ LazyLock::new(|| Layout::default()
 #[derive(Debug)]
 pub struct TuiDetailPage {
     pub page: DetailPage,
-    pub sound_thread: SoundPlayer,
 }
 
 impl TuiDetailPage {
     pub fn new(page: DetailPage) -> Result<Self> {
-        let sound_thread = SoundPlayer::new(page.get_launch_sound().clone())?;
-        Ok(Self{ page, sound_thread })
+        Ok(Self{ page, /*sound_thread*/ })
     }
 
     pub fn set_page(&mut self, page: DetailPage) {
@@ -82,7 +80,11 @@ impl TuiDetailPage {
     }
 
     pub fn on_enter(&mut self) {
-        self.sound_thread.play();
+        // self.sound_thread.play();
+        let sound = self.page.get_launch_sound().clone();
+        tokio::spawn(async move {
+            play_sound(sound);
+        });
     }
 
     pub fn render<B: Backend>(&mut self, terminal: &mut Terminal<B>, picker: &mut Picker) -> Result<()> {
