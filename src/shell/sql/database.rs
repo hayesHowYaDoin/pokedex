@@ -1,6 +1,5 @@
 use std::{collections::HashMap, path::Path};
 
-use itertools::Itertools;
 use rusqlite::Connection;
 use thiserror::Error;
 
