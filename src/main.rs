@@ -10,7 +10,7 @@ use crate::shell::sql::DatabaseMapper;
 use crate::shell::ratatui::app::App;
 
 async fn tokio_main() -> Result<()> {
-    let db = DatabaseMapper::new("tools/sqlite3/pokedex.db")
+    let db = DatabaseMapper::new("tools/data/test.sqlite")
         .expect("Failed to create database connection");
 
     let mut app = App::new(Box::new(db)).expect("Failed to create application");
