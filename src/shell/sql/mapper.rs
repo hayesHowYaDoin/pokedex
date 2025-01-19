@@ -3,7 +3,7 @@ use std::path::Path;
 use color_eyre::Result;
 
 use crate::core::{
-    pokemon::{Pokemon, PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats, PokemonTypes},
+    pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats, PokemonTypes},
     ui::{
         pages::{DetailPagePokemon, ListPagePokemon},
         repository::{
