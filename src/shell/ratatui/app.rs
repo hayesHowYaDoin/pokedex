@@ -1,13 +1,12 @@
 use color_eyre::eyre::Result;
 
-use crate::shell::ratatui::tui::Tui;
 use crate::core::ui::{
-    Event,
-    PageState,
     next_state,
     pages::ListPage,
-    repository::{ListPagePokemonRepository, DetailPagePokemonRepository},
+    repository::{DetailPagePokemonRepository, ListPagePokemonRepository},
+    Event, PageState,
 };
+use crate::shell::ratatui::tui::Tui;
 
 pub struct App<R: ListPagePokemonRepository + DetailPagePokemonRepository> {
     repository: Box<R>,
@@ -19,7 +18,10 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
         let pokemon = repository.fetch_all()?;
         let current_state = PageState::List(ListPage::new(pokemon, "".to_string()));
 
-        Ok(App {repository, current_state})
+        Ok(App {
+            repository,
+            current_state,
+        })
     }
 
     pub async fn run(&mut self) -> Result<()> {
@@ -34,13 +36,13 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
             }
 
             self.transition(&event, &mut tui)?;
-        };
+        }
 
         tui.exit()?;
         Ok(())
     }
 
-    fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self>{
+    fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self> {
         let mut next_state = next_state(&self.current_state, event, self.repository.as_ref())?;
 
         match next_state {
@@ -62,6 +64,6 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
     }
 }
 
-fn should_quit(event: &Event) -> bool{
+fn should_quit(event: &Event) -> bool {
     event == &Event::NewCharacter('q')
 }
