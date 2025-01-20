@@ -34,6 +34,21 @@ impl Into<u32> for TypeID {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct StatID(pub u32);
+
+impl ToSql for StatID {
+    fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
+        Ok(rusqlite::types::ToSqlOutput::Owned(rusqlite::types::Value::Integer(self.0.into())))
+    }
+}
+
+impl Into<u32> for StatID {
+    fn into(self) -> u32 {
+        self.0
+    }
+}
+
 #[derive(Debug)]
 pub struct PokemonDTO {
     pub species_id: u32,
@@ -100,4 +115,33 @@ impl PokemonSizeDTO {
 
 pub trait PokemonSizeTableRepository {
     fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
+}
+
+pub struct StatNamesDTO {
+    pub name: String,
+}
+
+impl StatNamesDTO {
+    pub fn new(name: String) -> StatNamesDTO {
+        StatNamesDTO{ name }
+    }
+}
+
+pub trait StatNamesRepository {
+    fn fetch_all(&self) -> Result<HashMap<StatID, StatNamesDTO>, DatabaseError>;
+}
+
+pub struct PokemonStatsDTO {
+    pub base_stat: u32,
+    pub effort: u32,
+}
+
+impl PokemonStatsDTO {
+    pub fn new(base_stat: u32, effort: u32) -> PokemonStatsDTO {
+        PokemonStatsDTO{ base_stat, effort }
+    }
+}
+
+pub trait PokemonStatsRepository {
+    fn fetch(&self, pokemon_id: &PokemonID) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
 }

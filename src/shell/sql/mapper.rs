@@ -1,22 +1,24 @@
+use std::collections::HashMap;
 use std::path::Path;
 
 use color_eyre::Result;
 
 use crate::core::{
-    pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats, PokemonTypes},
+    pokemon::{
+        PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats,
+        PokemonTypes,
+    },
     ui::{
         pages::{DetailPagePokemon, ListPagePokemon},
         repository::{
-            DetailPagePokemonRepository, DetailPagePokemonRepositoryError,
-            ListPagePokemonRepository, ListPagePokemonRepositoryError,
+            DetailPagePokemonRepository, ListPagePokemonRepository, ListPagePokemonRepositoryError,
         },
     },
 };
 
 use super::{
     tables::{
-        PokemonID, PokemonSizeTableRepository, PokemonTableRepository,
-        PokemonTypeTableRepository, TypesTableRepository,
+        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID, TypesDTO, TypesTableRepository
     },
     Database, DatabaseError,
 };
@@ -85,63 +87,19 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let id = PokemonID(number);
         let pokemon = PokemonTableRepository::fetch(&self.database, &id)?;
         let pokemon_types = PokemonTypeTableRepository::fetch(&self.database, &id)?;
-        let types = TypesTableRepository::fetch_all(&self.database)?;
         let pokemon_size = PokemonSizeTableRepository::fetch(&self.database, &id)?;
-
-        let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id));
-        let image = image::ImageReader::open(image_path)
-            .expect("Unable to open image.")
-            .decode()
-            .unwrap()
-            .resize(3000, 3000, image::imageops::FilterType::Nearest);
-
-        let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(id)))
-            .expect("Unable to locate cry resource.");
-        let cry = PokemonCry::new(cry_bytes);
-
-        let pokemon_types: Vec<String> = pokemon_types
-            .iter()
-            .filter_map(|pt| Some(capitalize(&types.get(&pt.id)?.identifier.clone())))
-            .collect();
-
-        if (pokemon_types.len() != 1 && pokemon_types.len() != 2) || pokemon_types.get(0).is_none()
-        {
-            return Err(DetailPagePokemonRepositoryError(
-                "Pokemon has invalid number of types.".to_string(),
-            )
-            .into());
-        }
-
-        let description = PokemonDescription::new(
-            "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
-        );
-
-        let attributes = PokemonAttributes::new(
-            pokemon_size.height_dm.to_string(),
-            pokemon_size.weight_hg.to_string(),
-            "Seed".to_string(),
-            vec!["Overgrow".to_string()],
-            [PokemonGenders::Male, PokemonGenders::Female]
-                .into_iter()
-                .collect(),
-        );
-
-        let stats = PokemonStats::new(45, 49, 49, 65, 65, 45);
+        let pokemon_stats_dto = PokemonStatsRepository::fetch(&self.database, &id)?;
+        let types = TypesTableRepository::fetch_all(&self.database)?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
             capitalize(&pokemon.identifier),
-            image,
-            PokemonTypes::new(
-                pokemon_types.get(0).unwrap().to_owned().into(),
-                pokemon_types
-                    .get(1)
-                    .map_or(None, |t| Some(t.to_owned().into())),
-            ),
-            description,
-            attributes,
-            stats,
-            cry,
+            build_image(&id),
+            build_types(&pokemon_types, &types)?,
+            build_description(),
+            build_attributes(&pokemon_size),
+            build_stats(&pokemon_stats_dto),
+            build_cry(&id),
         );
 
         Ok(detail_page_pokemon)
@@ -154,4 +112,73 @@ fn capitalize(s: &str) -> String {
         None => String::new(),
         Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
     }
+}
+
+fn build_image(id: &PokemonID) -> image::DynamicImage {
+    let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(*id));
+    image::ImageReader::open(image_path)
+        .expect("Unable to open image.")
+        .decode()
+        .unwrap()
+        .resize(3000, 3000, image::imageops::FilterType::Nearest)
+}
+
+fn build_cry(id: &PokemonID) -> PokemonCry {
+    let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(*id)))
+        .expect("Unable to locate cry resource.");
+    PokemonCry::new(cry_bytes)
+}
+
+fn build_stats(pokemon_stats_dto: &HashMap<StatID, PokemonStatsDTO>) -> PokemonStats {
+    PokemonStats::new(
+        pokemon_stats_dto.get(&StatID(1)).map_or(0, |s| s.base_stat),
+        pokemon_stats_dto.get(&StatID(2)).map_or(0, |s| s.base_stat),
+        pokemon_stats_dto.get(&StatID(3)).map_or(0, |s| s.base_stat),
+        pokemon_stats_dto.get(&StatID(4)).map_or(0, |s| s.base_stat),
+        pokemon_stats_dto.get(&StatID(5)).map_or(0, |s| s.base_stat),
+        pokemon_stats_dto.get(&StatID(6)).map_or(0, |s| s.base_stat),
+    )
+}
+
+fn build_types(
+    pokemon_types: &Vec<PokemonTypeDTO>,
+    types: &HashMap<TypeID, TypesDTO>,
+) -> Result<PokemonTypes, DatabaseError> {
+    let pokemon_types_names: Vec<String> = pokemon_types
+        .iter()
+        .filter_map(|pt| Some(capitalize(&types.get(&pt.id)?.identifier.clone())))
+        .collect();
+
+    if (pokemon_types_names.len() != 1 && pokemon_types_names.len() != 2)
+        || pokemon_types_names.get(0).is_none()
+    {
+        return Err(DatabaseError::FetchError(
+            "Pokemon has invalid number of types.".to_string(),
+        ));
+    }
+
+    Ok(PokemonTypes::new(
+        pokemon_types_names.get(0).unwrap().to_owned().into(),
+        pokemon_types_names
+            .get(1)
+            .map_or(None, |t| Some(t.to_owned().into())),
+    ))
+}
+
+fn build_description() -> PokemonDescription {
+    PokemonDescription::new(
+        "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
+    )
+}
+
+fn build_attributes(pokemon_size: &PokemonSizeDTO) -> PokemonAttributes {
+    PokemonAttributes::new(
+        pokemon_size.height_dm.to_string(),
+        pokemon_size.weight_hg.to_string(),
+        "Seed".to_string(),
+        vec!["Overgrow".to_string()],
+        [PokemonGenders::Male, PokemonGenders::Female]
+            .into_iter()
+            .collect(),
+    )
 }

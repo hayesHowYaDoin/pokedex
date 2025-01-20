@@ -67,7 +67,6 @@ LazyLock::new(|| Layout::default()
 
 impl DetailPage {
     pub fn on_enter(&mut self) {
-        // self.sound_thread.play();
         let sound = self.get_launch_sound().clone();
         tokio::spawn(async move {
             play_sound(sound);
