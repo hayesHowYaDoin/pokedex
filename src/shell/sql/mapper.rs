@@ -120,7 +120,6 @@ fn build_image(id: &PokemonID) -> image::DynamicImage {
         .expect("Unable to open image.")
         .decode()
         .unwrap()
-        .resize(3000, 3000, image::imageops::FilterType::Nearest)
 }
 
 fn build_cry(id: &PokemonID) -> PokemonCry {
