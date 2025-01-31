@@ -145,3 +145,17 @@ impl PokemonStatsDTO {
 pub trait PokemonStatsRepository {
     fn fetch(&self, pokemon_id: &PokemonID) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
 }
+
+pub struct PokemonDescriptionDTO {
+    pub text: String,
+}
+
+impl PokemonDescriptionDTO {
+    pub fn new(text: String) -> PokemonDescriptionDTO {
+        PokemonDescriptionDTO{ text }
+    }
+}
+
+pub trait PokemonDescriptionsRepository {
+    fn fetch(&self, pokemon_id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError>;
+}

@@ -18,7 +18,10 @@ use crate::core::{
 
 use super::{
     tables::{
-        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID, TypesDTO, TypesTableRepository
+        PokemonDescriptionDTO, PokemonDescriptionsRepository, PokemonID, PokemonSizeDTO,
+        PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository,
+        PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID,
+        TypesDTO, TypesTableRepository,
     },
     Database, DatabaseError,
 };
@@ -90,16 +93,17 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let pokemon_size = PokemonSizeTableRepository::fetch(&self.database, &id)?;
         let pokemon_stats_dto = PokemonStatsRepository::fetch(&self.database, &id)?;
         let types = TypesTableRepository::fetch_all(&self.database)?;
+        let pokemon_description = PokemonDescriptionsRepository::fetch(&self.database, &id)?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
             capitalize(&pokemon.identifier),
-            build_image(&id),
-            build_types(&pokemon_types, &types)?,
-            build_description(),
-            build_attributes(&pokemon_size),
-            build_stats(&pokemon_stats_dto),
-            build_cry(&id),
+            build_image(id),
+            build_types(pokemon_types, types)?,
+            build_description(pokemon_description),
+            build_attributes(pokemon_size),
+            build_stats(pokemon_stats_dto),
+            build_cry(id),
         );
 
         Ok(detail_page_pokemon)
@@ -114,21 +118,21 @@ fn capitalize(s: &str) -> String {
     }
 }
 
-fn build_image(id: &PokemonID) -> image::DynamicImage {
-    let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(*id));
+fn build_image(id: PokemonID) -> image::DynamicImage {
+    let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id));
     image::ImageReader::open(image_path)
         .expect("Unable to open image.")
         .decode()
         .unwrap()
 }
 
-fn build_cry(id: &PokemonID) -> PokemonCry {
-    let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(*id)))
+fn build_cry(id: PokemonID) -> PokemonCry {
+    let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(id)))
         .expect("Unable to locate cry resource.");
     PokemonCry::new(cry_bytes)
 }
 
-fn build_stats(pokemon_stats_dto: &HashMap<StatID, PokemonStatsDTO>) -> PokemonStats {
+fn build_stats(pokemon_stats_dto: HashMap<StatID, PokemonStatsDTO>) -> PokemonStats {
     PokemonStats::new(
         pokemon_stats_dto.get(&StatID(1)).map_or(0, |s| s.base_stat),
         pokemon_stats_dto.get(&StatID(2)).map_or(0, |s| s.base_stat),
@@ -140,8 +144,8 @@ fn build_stats(pokemon_stats_dto: &HashMap<StatID, PokemonStatsDTO>) -> PokemonS
 }
 
 fn build_types(
-    pokemon_types: &Vec<PokemonTypeDTO>,
-    types: &HashMap<TypeID, TypesDTO>,
+    pokemon_types: Vec<PokemonTypeDTO>,
+    types: HashMap<TypeID, TypesDTO>,
 ) -> Result<PokemonTypes, DatabaseError> {
     let pokemon_types_names: Vec<String> = pokemon_types
         .iter()
@@ -164,13 +168,11 @@ fn build_types(
     ))
 }
 
-fn build_description() -> PokemonDescription {
-    PokemonDescription::new(
-        "A strange seed was planted on its back at birth. The plant sprouts and grows with this POKéMON.".to_string()
-    )
+fn build_description(description: PokemonDescriptionDTO) -> PokemonDescription {
+    PokemonDescription::new(description.text.replace("\n", " ").replace("", " "))
 }
 
-fn build_attributes(pokemon_size: &PokemonSizeDTO) -> PokemonAttributes {
+fn build_attributes(pokemon_size: PokemonSizeDTO) -> PokemonAttributes {
     PokemonAttributes::new(
         pokemon_size.height_dm.to_string(),
         pokemon_size.weight_hg.to_string(),
