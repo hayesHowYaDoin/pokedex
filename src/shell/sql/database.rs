@@ -4,9 +4,10 @@ use rusqlite::Connection;
 use thiserror::Error;
 
 use super::tables::{
-    PokemonDTO, PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO,
-    PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository,
-    StatID, StatNamesDTO, StatNamesRepository, TypeID, TypesDTO, TypesTableRepository,
+    PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository, PokemonID, PokemonSizeDTO,
+    PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository,
+    PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID,
+    TypesDTO, TypesTableRepository,
 };
 
 pub struct Database {
@@ -232,5 +233,26 @@ impl PokemonStatsRepository for Database {
             .collect();
 
         Ok(pokemon_types)
+    }
+}
+
+impl PokemonDescriptionsRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, version_id, language_id, flavor_text \
+                   FROM pokemon_descriptions WHERE pokemon_id = ? AND \
+                   version_id = 5 AND language_id = 9";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_description = stmt
+            .query_row([id], |row| {
+                let description: String = row.get(3)?;
+
+                Ok(PokemonDescriptionDTO::new(description))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_description)
     }
 }

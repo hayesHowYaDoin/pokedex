@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Populates the assets directory with images and cries for each pokemon
+# Assets sourced from https://veekun.com
+
 if [ -z "$1" ]; then
     CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     ASSETS_PATH="${CURRENT_PATH}/assets"
