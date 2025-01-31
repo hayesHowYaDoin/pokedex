@@ -240,7 +240,7 @@ impl PokemonDescriptionsRepository for Database {
     fn fetch(&self, id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError> {
         let sql_cmd = "SELECT pokemon_id, version_id, language_id, flavor_text \
                    FROM pokemon_descriptions WHERE pokemon_id = ? AND \
-                   version_id = 5 AND language_id = 9";
+                   version_id = 17 AND language_id = 9";
         let mut stmt = self
             .conn
             .prepare(sql_cmd)
