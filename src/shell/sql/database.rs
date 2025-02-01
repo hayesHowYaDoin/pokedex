@@ -4,10 +4,11 @@ use rusqlite::Connection;
 use thiserror::Error;
 
 use super::tables::{
-    PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository, PokemonID, PokemonSizeDTO,
-    PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository,
-    PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID,
-    TypesDTO, TypesTableRepository,
+    AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
+    PokemonAbilitiesRepository, PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository,
+    PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository,
+    PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO,
+    StatNamesRepository, TypeID, TypesDTO, TypesTableRepository,
 };
 
 pub struct Database {
@@ -239,8 +240,8 @@ impl PokemonStatsRepository for Database {
 impl PokemonDescriptionsRepository for Database {
     fn fetch(&self, id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError> {
         let sql_cmd = "SELECT pokemon_id, version_id, language_id, flavor_text \
-                   FROM pokemon_descriptions WHERE pokemon_id = ? AND \
-                   version_id = 17 AND language_id = 9";
+            FROM pokemon_descriptions WHERE pokemon_id = ? AND \
+            version_id = 17 AND language_id = 9";
         let mut stmt = self
             .conn
             .prepare(sql_cmd)
@@ -254,5 +255,53 @@ impl PokemonDescriptionsRepository for Database {
             .expect("Failed to execute query row");
 
         Ok(pokemon_description)
+    }
+}
+
+impl AbilitiesRepository for Database {
+    fn fetch_all(&self) -> Result<HashMap<AbilityID, AbilityDTO>, DatabaseError> {
+        let sql_cmd = "SELECT id, identifier, generation_id, is_main_series FROM abilities";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let stat = stmt
+            .query_map([], |row| {
+                let id: u32 = row.get(0)?;
+                let identifier: String = row.get(1)?;
+
+                Ok((AbilityID(id), AbilityDTO::new(identifier)))
+            })
+            .expect("Failed to execute query row")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(stat)
+    }
+}
+
+impl PokemonAbilitiesRepository for Database {
+    fn fetch(
+        &self,
+        id: &PokemonID,
+    ) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, ability_id, is_hidden, slot FROM pokemon_abilities \
+            WHERE pokemon_id = ? AND is_hidden = 0";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_abilities = stmt
+            .query_map([id], |row| {
+                let ability_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(3)?;
+
+                Ok((AbilitySlot(slot), PokemonAbilitiesDTO::new(AbilityID(ability_id))))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(pokemon_abilities)
     }
 }

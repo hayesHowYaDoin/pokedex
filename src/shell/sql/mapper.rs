@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use color_eyre::Result;
+use color_eyre::{Result, eyre};
 
 use crate::core::{
     pokemon::{
@@ -18,10 +18,11 @@ use crate::core::{
 
 use super::{
     tables::{
-        PokemonDescriptionDTO, PokemonDescriptionsRepository, PokemonID, PokemonSizeDTO,
-        PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository,
-        PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID,
-        TypesDTO, TypesTableRepository,
+        AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
+        PokemonAbilitiesRepository, PokemonDescriptionDTO, PokemonDescriptionsRepository,
+        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO,
+        PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository,
+        StatID, TypeID, TypesDTO, TypesTableRepository,
     },
     Database, DatabaseError,
 };
@@ -94,6 +95,8 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let pokemon_stats_dto = PokemonStatsRepository::fetch(&self.database, &id)?;
         let types = TypesTableRepository::fetch_all(&self.database)?;
         let pokemon_description = PokemonDescriptionsRepository::fetch(&self.database, &id)?;
+        let abilities = AbilitiesRepository::fetch_all(&self.database)?;
+        let pokemon_abilities = PokemonAbilitiesRepository::fetch(&self.database, &id)?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
@@ -101,7 +104,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
             build_image(id),
             build_types(pokemon_types, types)?,
             build_description(pokemon_description),
-            build_attributes(pokemon_size),
+            build_attributes(pokemon_size, abilities, pokemon_abilities)?,
             build_stats(pokemon_stats_dto),
             build_cry(id),
         );
@@ -172,14 +175,35 @@ fn build_description(description: PokemonDescriptionDTO) -> PokemonDescription {
     PokemonDescription::new(description.text.replace("\n", " ").replace("", " "))
 }
 
-fn build_attributes(pokemon_size: PokemonSizeDTO) -> PokemonAttributes {
-    PokemonAttributes::new(
+fn build_attributes(
+    pokemon_size: PokemonSizeDTO,
+    abilities: HashMap<AbilityID, AbilityDTO>,
+    pokemon_abilities: HashMap<AbilitySlot, PokemonAbilitiesDTO>,
+) -> Result<PokemonAttributes> {
+    if !pokemon_abilities.contains_key(&AbilitySlot(1)) {
+        return Err(eyre::eyre!("Failed to build attributes: no ability in first slot".to_string()));
+    }
+
+    let abilities_vec: Vec<_> = vec![
+        pokemon_abilities.get(&AbilitySlot(0)),
+        pokemon_abilities.get(&AbilitySlot(1)),
+    ]
+    .iter()
+    .filter_map(|a| a.and_then(|a| abilities.get(&a.id)))
+    .map(|a| capitalize(&a.identifier))
+    .collect();
+
+    if !abilities_vec.len() == 0 {
+        return Err(eyre::eyre!("Failed to build attributes: no abilities found".to_string()));
+    }
+
+    Ok(PokemonAttributes::new(
         pokemon_size.height_dm.to_string(),
         pokemon_size.weight_hg.to_string(),
         "Seed".to_string(),
-        vec!["Overgrow".to_string()],
+        abilities_vec,
         [PokemonGenders::Male, PokemonGenders::Female]
             .into_iter()
             .collect(),
-    )
+    ))
 }
