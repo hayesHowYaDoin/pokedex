@@ -9,7 +9,9 @@ pub struct PokemonID(pub u32);
 
 impl ToSql for PokemonID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(rusqlite::types::Value::Integer(self.0.into())))
+        Ok(rusqlite::types::ToSqlOutput::Owned(
+            rusqlite::types::Value::Integer(self.0.into()),
+        ))
     }
 }
 
@@ -24,7 +26,9 @@ pub struct TypeID(pub u32);
 
 impl ToSql for TypeID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(rusqlite::types::Value::Integer(self.0.into())))
+        Ok(rusqlite::types::ToSqlOutput::Owned(
+            rusqlite::types::Value::Integer(self.0.into()),
+        ))
     }
 }
 
@@ -39,7 +43,9 @@ pub struct StatID(pub u32);
 
 impl ToSql for StatID {
     fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(rusqlite::types::Value::Integer(self.0.into())))
+        Ok(rusqlite::types::ToSqlOutput::Owned(
+            rusqlite::types::Value::Integer(self.0.into()),
+        ))
     }
 }
 
@@ -57,7 +63,10 @@ pub struct PokemonDTO {
 
 impl PokemonDTO {
     pub fn new(species_id: u32, identifier: String) -> Self {
-        PokemonDTO { species_id, identifier }
+        PokemonDTO {
+            species_id,
+            identifier,
+        }
     }
 }
 
@@ -102,6 +111,7 @@ pub trait PokemonTypeTableRepository {
     fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError>;
 }
 
+#[derive(Debug)]
 pub struct PokemonSizeDTO {
     pub height_dm: u32,
     pub weight_hg: u32,
@@ -109,7 +119,10 @@ pub struct PokemonSizeDTO {
 
 impl PokemonSizeDTO {
     pub fn new(height_dm: u32, weight_hg: u32) -> Self {
-        PokemonSizeDTO { height_dm, weight_hg }
+        PokemonSizeDTO {
+            height_dm,
+            weight_hg,
+        }
     }
 }
 
@@ -117,13 +130,14 @@ pub trait PokemonSizeTableRepository {
     fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
 }
 
+#[derive(Debug)]
 pub struct StatNamesDTO {
     pub name: String,
 }
 
 impl StatNamesDTO {
     pub fn new(name: String) -> StatNamesDTO {
-        StatNamesDTO{ name }
+        StatNamesDTO { name }
     }
 }
 
@@ -131,6 +145,7 @@ pub trait StatNamesRepository {
     fn fetch_all(&self) -> Result<HashMap<StatID, StatNamesDTO>, DatabaseError>;
 }
 
+#[derive(Debug)]
 pub struct PokemonStatsDTO {
     pub base_stat: u32,
     pub effort: u32,
@@ -138,24 +153,64 @@ pub struct PokemonStatsDTO {
 
 impl PokemonStatsDTO {
     pub fn new(base_stat: u32, effort: u32) -> PokemonStatsDTO {
-        PokemonStatsDTO{ base_stat, effort }
+        PokemonStatsDTO { base_stat, effort }
     }
 }
 
 pub trait PokemonStatsRepository {
-    fn fetch(&self, pokemon_id: &PokemonID) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
+    fn fetch(
+        &self,
+        pokemon_id: &PokemonID,
+    ) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
 }
 
+#[derive(Debug)]
 pub struct PokemonDescriptionDTO {
     pub text: String,
 }
 
 impl PokemonDescriptionDTO {
     pub fn new(text: String) -> PokemonDescriptionDTO {
-        PokemonDescriptionDTO{ text }
+        PokemonDescriptionDTO { text }
     }
 }
 
 pub trait PokemonDescriptionsRepository {
     fn fetch(&self, pokemon_id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError>;
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct AbilityID(pub u32);
+
+#[derive(Debug)]
+pub struct AbilityDTO {
+    pub identifier: String,
+}
+
+impl AbilityDTO {
+    pub fn new(identifier: String) -> AbilityDTO {
+        AbilityDTO { identifier }
+    }
+}
+
+pub trait AbilitiesRepository {
+    fn fetch_all(&self) -> Result<HashMap<AbilityID, AbilityDTO>, DatabaseError>;
+}
+
+#[derive(Debug)]
+pub struct PokemonAbilitiesDTO {
+    pub id: AbilityID,
+}
+
+impl PokemonAbilitiesDTO {
+    pub fn new(id: AbilityID) -> PokemonAbilitiesDTO {
+        PokemonAbilitiesDTO {id}
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct AbilitySlot(pub u32);
+
+pub trait PokemonAbilitiesRepository {
+    fn fetch(&self, id: &PokemonID) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
 }
