@@ -1,10 +1,17 @@
-use std::path::Path;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::Path};
 
-use thiserror::Error;
 use rusqlite::Connection;
+use thiserror::Error;
 
-use super::tables::{PokemonDTO, PokemonID, PokemonTableRepository, TypesDTO, TypesTableRepository};
+use super::tables::{
+    AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
+    PokemonAbilitiesRepository, PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository,
+    PokemonGenderDTO, PokemonGenderRepository, PokemonID, PokemonSizeDTO,
+    PokemonSizeTableRepository, PokemonSpeciesNamesDTO, PokemonSpeciesNamesRepository,
+    PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO,
+    PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID, TypesDTO,
+    TypesTableRepository,
+};
 
 pub struct Database {
     conn: Connection,
@@ -35,59 +42,311 @@ impl Database {
 }
 
 impl PokemonTableRepository for Database {
-    fn fetch(&self, number: i32) -> Result<PokemonDTO, DatabaseError> {
-        let sql_cmd = "SELECT number, name FROM pokemon WHERE number = ?";
-        let mut stmt = self.conn.prepare(sql_cmd).expect("Failed to prepare statement");
-        let pokemon = stmt.query_row([number], |row| {
-            Ok(PokemonDTO::new(row.get(1).expect("Failed to get name")))
-        }).expect("Failed to execute query row");
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonDTO, DatabaseError> {
+        let sql_cmd = "SELECT id, identifier, species_id FROM pokemon WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon = stmt
+            .query_row([id], |row| {
+                let identifier: String = row.get(1)?;
+                let species_id: u32 = row.get(2)?;
+
+                Ok(PokemonDTO::new(species_id, identifier))
+            })
+            .expect("Failed to execute query row");
 
         Ok(pokemon)
     }
 
     fn fetch_all(&self) -> Result<HashMap<PokemonID, PokemonDTO>, DatabaseError> {
-        let sql_cmd = "SELECT number, name FROM pokemon";
-        let mut stmt = self.conn.prepare(sql_cmd).expect("Failed to prepare statement");
-        let pokemon = stmt.query_map([], |row| {
-            let id = PokemonID::new(row.get(0).expect("Failed to get number"));
-            let pokemon = PokemonDTO::new(row.get(1).expect("Failed to get name"));
-            Ok((id, pokemon))
-        }).expect("Failed to execute query map")
-        .filter_map(|t| t.ok())
-        .collect();
+        let sql_cmd = "SELECT id, identifier, species_id FROM pokemon";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon = stmt
+            .query_map([], |row| {
+                let id: u32 = row.get(0)?;
+                let identifier: String = row.get(1)?;
+                let species_id: u32 = row.get(2)?;
+
+                Ok((PokemonID(id), PokemonDTO::new(species_id, identifier)))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .collect();
 
         Ok(pokemon)
     }
 }
 
 impl TypesTableRepository for Database {
-    fn fetch(&self, number: i32) -> Result<TypesDTO, DatabaseError> {
-        let sql_cmd = "SELECT number, primary_type, secondary_type FROM pokemon_types WHERE number = ?";
-        let mut stmt = self.conn.prepare(sql_cmd).expect("Failed to prepare statement");
-        let types = stmt.query_row([number], |row| {
-            Ok(TypesDTO::new(
-                row.get(1).expect("Failed to get primary type"),
-                row.get(2).expect("Failed to get secondary type")
-            ))
-        }).expect("Failed to execute query row");
+    fn fetch(&self, id: &TypeID) -> Result<TypesDTO, DatabaseError> {
+        let type_id_sql_cmd = "SELECT id, identifier FROM types WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(type_id_sql_cmd)
+            .expect("Failed to prepare statement");
+        let type_ = stmt
+            .query_row([id], |row| {
+                let identifier: String = row.get(1)?;
 
-        Ok(types)
+                Ok(TypesDTO::new(identifier))
+            })
+            .expect("Failed to execute query map");
+
+        Ok(type_)
     }
 
-    fn fetch_all(&self) -> Result<HashMap<PokemonID, TypesDTO>, DatabaseError> {
-        let sql_cmd = "SELECT number, primary_type, secondary_type FROM pokemon_types";
-        let mut stmt = self.conn.prepare(sql_cmd).expect("Failed to prepare statement");
-        let types = stmt.query_map([], |row| {
-                let id = PokemonID::new(row.get(0).expect("Failed to get number"));
-                let types = TypesDTO::new(
-                    row.get(1).expect("Failed to get primary type"),
-                    row.get(2).expect("Failed to get secondary type")
-                );
-                Ok((id, types))
-            }).expect("Failed to execute query map")
+    fn fetch_all(&self) -> Result<HashMap<TypeID, TypesDTO>, DatabaseError> {
+        let sql_cmd = "SELECT id, identifier FROM types";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let types = stmt
+            .query_map([], |row| {
+                let id: u32 = row.get(0)?;
+                let identifier: String = row.get(1)?;
+
+                Ok((TypeID(id), TypesDTO::new(identifier)))
+            })
+            .expect("Failed to execute query map")
             .filter_map(|t| t.ok())
             .collect();
 
         Ok(types)
+    }
+}
+
+impl PokemonTypeTableRepository for Database {
+    fn fetch(&self, pokemon_id: &PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, type_id, slot FROM pokemon_types WHERE pokemon_id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_types = stmt
+            .query_map([pokemon_id], |row| {
+                let type_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(2)?;
+
+                Ok(PokemonTypeDTO::new(TypeID(type_id), slot))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(pokemon_types)
+    }
+
+    fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, type_id, slot FROM pokemon_types";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+
+        let pokemon_types = stmt
+            .query_map([], |row| {
+                let pokemon_id: u32 = row.get(0)?;
+                let type_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(2)?;
+
+                Ok((
+                    PokemonID(pokemon_id),
+                    PokemonTypeDTO::new(TypeID(type_id), slot),
+                ))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .fold(HashMap::new(), |mut acc, (pokemon_id, pokemon_type)| {
+                acc.entry(pokemon_id)
+                    .or_insert_with(Vec::new)
+                    .push(pokemon_type);
+                acc
+            });
+
+        Ok(pokemon_types)
+    }
+}
+
+impl PokemonSizeTableRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError> {
+        let sql_cmd = "SELECT id, height_dm, weight_dg FROM pokemon_sizes WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_size = stmt
+            .query_row([id], |row| {
+                let height_dm: u32 = row.get(1)?;
+                let weight_dg: u32 = row.get(2)?;
+
+                Ok(PokemonSizeDTO::new(height_dm, weight_dg))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_size)
+    }
+}
+
+impl StatNamesRepository for Database {
+    fn fetch_all(&self) -> Result<HashMap<StatID, StatNamesDTO>, DatabaseError> {
+        let sql_cmd = "SELECT stat_id, name FROM stats";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let stat = stmt
+            .query_map([], |row| {
+                let id: u32 = row.get(0)?;
+                let name: String = row.get(1)?;
+
+                Ok((StatID(id), StatNamesDTO::new(name)))
+            })
+            .expect("Failed to execute query row")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(stat)
+    }
+}
+
+impl PokemonStatsRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError> {
+        let sql_cmd =
+            "SELECT pokemon_id, stat_id, base_stat, effort FROM pokemon_stats WHERE pokemon_id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_types = stmt
+            .query_map([id], |row| {
+                let stat_id: u32 = row.get(1)?;
+                let base_stat: u32 = row.get(2)?;
+                let effort: u32 = row.get(3)?;
+
+                Ok((StatID(stat_id), PokemonStatsDTO::new(base_stat, effort)))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(pokemon_types)
+    }
+}
+
+impl PokemonDescriptionsRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, version_id, language_id, flavor_text \
+            FROM pokemon_descriptions WHERE pokemon_id = ? AND \
+            version_id = 17 AND language_id = 9";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_description = stmt
+            .query_row([id], |row| {
+                let description: String = row.get(3)?;
+
+                Ok(PokemonDescriptionDTO::new(description))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_description)
+    }
+}
+
+impl AbilitiesRepository for Database {
+    fn fetch_all(&self) -> Result<HashMap<AbilityID, AbilityDTO>, DatabaseError> {
+        let sql_cmd = "SELECT id, identifier, generation_id, is_main_series FROM abilities";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let stat = stmt
+            .query_map([], |row| {
+                let id: u32 = row.get(0)?;
+                let identifier: String = row.get(1)?;
+
+                Ok((AbilityID(id), AbilityDTO::new(identifier)))
+            })
+            .expect("Failed to execute query row")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(stat)
+    }
+}
+
+impl PokemonAbilitiesRepository for Database {
+    fn fetch(
+        &self,
+        id: &PokemonID,
+    ) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError> {
+        let sql_cmd = "SELECT pokemon_id, ability_id, is_hidden, slot FROM pokemon_abilities \
+            WHERE pokemon_id = ? AND is_hidden = 0";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_abilities = stmt
+            .query_map([id], |row| {
+                let ability_id: u32 = row.get(1)?;
+                let slot: u32 = row.get(3)?;
+
+                Ok((
+                    AbilitySlot(slot),
+                    PokemonAbilitiesDTO::new(AbilityID(ability_id)),
+                ))
+            })
+            .expect("Failed to execute query map")
+            .filter_map(|t| t.ok())
+            .collect();
+
+        Ok(pokemon_abilities)
+    }
+}
+
+impl PokemonSpeciesNamesRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError> {
+        let sql_cmd =
+            "SELECT pokemon_species_id, local_language_id, genus FROM pokemon_species_names \
+            WHERE pokemon_species_id = ? AND local_language_id = 9";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_species_names = stmt
+            .query_row([id], |row| {
+                let genus: String = row.get(2)?;
+
+                Ok(PokemonSpeciesNamesDTO::new(genus))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_species_names)
+    }
+}
+
+impl PokemonGenderRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError> {
+        let sql_cmd = "SELECT id, gender_rate FROM pokemon_genders WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_gender = stmt
+            .query_row([id], |row| {
+                let rate: i32 = row.get(1)?;
+
+                Ok(PokemonGenderDTO::new(rate))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_gender)
     }
 }

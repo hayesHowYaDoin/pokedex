@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use cascade::cascade;
 
 use crate::core::{
-    pokemon::Type,
+    pokemon::PokemonTypes,
     ui::components::{InputBox, PokemonTable, PokemonTableEntry},
 };
 
@@ -15,8 +15,8 @@ pub struct ListPage {
 }
 
 impl ListPage {
-    pub fn new(pokemon: &[ListPagePokemon], query: &str) -> Self {
-        let filtered_pokemon: Vec<PokemonTableEntry> = filter_pokemon(pokemon, query)
+    pub fn new(pokemon: Vec<ListPagePokemon>, query: String) -> Self {
+        let filtered_pokemon: Vec<PokemonTableEntry> = filter_pokemon(&pokemon, &query)
             .into_iter()
             .map(|p| p.into())
             .collect();
@@ -44,10 +44,11 @@ impl ListPage {
     }
 
     fn update_table_pokemon(&mut self) {
-        let filtered_pokemon: Vec<PokemonTableEntry> = filter_pokemon(&self.pokemon, self.search_widget.text())
-            .into_iter()
-            .map(|p| p.into())
-            .collect();
+        let filtered_pokemon: Vec<PokemonTableEntry> =
+            filter_pokemon(&self.pokemon, self.search_widget.text())
+                .into_iter()
+                .map(|p| p.into())
+                .collect();
 
         self.list_widget.set_pokemon(&filtered_pokemon);
     }
@@ -65,17 +66,20 @@ fn filter_pokemon(pokemon: &[ListPagePokemon], query: &str) -> Vec<ListPagePokem
 
     let query = query.to_lowercase();
 
-    let filtered_by_name: Vec<_> = pokemon.iter()
+    let filtered_by_name: Vec<_> = pokemon
+        .iter()
         .filter(|p| filter_pokemon_by_name(p, &query))
         .cloned()
         .collect();
 
-    let filtered_by_primary_type: Vec<_> = pokemon.iter()
+    let filtered_by_primary_type: Vec<_> = pokemon
+        .iter()
         .filter(|p| filter_pokemon_by_primary_type(p, &query))
         .cloned()
         .collect();
 
-    let filtered_by_secondary_type: Vec<_> = pokemon.iter()
+    let filtered_by_secondary_type: Vec<_> = pokemon
+        .iter()
         .filter(|p| filter_pokemon_by_secondary_type(p, &query))
         .cloned()
         .collect();
@@ -85,13 +89,18 @@ fn filter_pokemon(pokemon: &[ListPagePokemon], query: &str) -> Vec<ListPagePokem
     result.extend(filtered_by_primary_type);
     result.extend(filtered_by_secondary_type);
 
-    result.into_iter()
-        .fold((Vec::new(), HashSet::new()), |(mut result, mut seen), item| {
-            if seen.insert(item.clone()) {
-                result.push(item);
-            }
-            (result, seen)
-        }).0
+    result
+        .into_iter()
+        .fold(
+            (Vec::new(), HashSet::new()),
+            |(mut result, mut seen), item| {
+                if seen.insert(item.clone()) {
+                    result.push(item);
+                }
+                (result, seen)
+            },
+        )
+        .0
 }
 
 fn filter_pokemon_by_name(pokemon: &ListPagePokemon, query: &str) -> bool {
@@ -103,33 +112,39 @@ fn filter_pokemon_by_name(pokemon: &ListPagePokemon, query: &str) -> bool {
 
 fn filter_pokemon_by_primary_type(pokemon: &ListPagePokemon, query: &str) -> bool {
     let query = query.to_lowercase();
-    let primary = pokemon.primary_type.to_string().to_lowercase();
+    let primary = pokemon.types.primary.to_string().to_lowercase();
 
     primary.contains(&query)
 }
 
 fn filter_pokemon_by_secondary_type(pokemon: &ListPagePokemon, query: &str) -> bool {
     let query = query.to_lowercase();
-    let secondary = pokemon.secondary_type.as_ref().map(|t| t.to_string().to_lowercase());
+    let secondary = pokemon
+        .types
+        .secondary
+        .as_ref()
+        .map(|t| t.to_string().to_lowercase());
 
     secondary.is_some_and(|t| t.contains(&query))
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ListPagePokemon {
-    pub number: i32,
+    pub number: u32,
     pub name: String,
-    pub primary_type: Type,
-    pub secondary_type: Option<Type>,
+    pub types: PokemonTypes,
 }
 
 impl ListPagePokemon {
-    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
+    pub fn new(
+        number: u32,
+        name: String,
+        types: PokemonTypes,
+    ) -> Self {
         ListPagePokemon {
             number,
             name,
-            primary_type,
-            secondary_type,
+            types,
         }
     }
 }
@@ -139,8 +154,8 @@ impl From<ListPagePokemon> for PokemonTableEntry {
         PokemonTableEntry {
             number: pokemon.number,
             name: pokemon.name,
-            primary_type: pokemon.primary_type,
-            secondary_type: pokemon.secondary_type,
+            primary_type: pokemon.types.primary,
+            secondary_type: pokemon.types.secondary,
         }
     }
 }
@@ -149,36 +164,77 @@ impl From<ListPagePokemon> for PokemonTableEntry {
 mod tests {
     use std::sync::LazyLock;
 
-    use crate::core::pokemon::Type;
     use super::*;
+    use crate::core::pokemon::Type;
 
-    static POKEMON: LazyLock<Vec<ListPagePokemon>> = LazyLock::new(|| vec![
-        ListPagePokemon {number: 1, name: "Bulbasaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
-        ListPagePokemon {number: 2, name: "Ivysaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
-        ListPagePokemon {number: 3, name: "Venusaur".to_string(), primary_type: Type::Grass, secondary_type: Some(Type::Poison)},
-        ListPagePokemon {number: 4, name: "Charmander".to_string(), primary_type: Type::Fire, secondary_type: None},
-        ListPagePokemon {number: 5, name: "Charmeleon".to_string(), primary_type: Type::Fire, secondary_type: None},
-        ListPagePokemon {number: 6, name: "Charizard".to_string(), primary_type: Type::Fire, secondary_type: Some(Type::Flying)},
-        ListPagePokemon {number: 16, name: "Pidgey".to_string(), primary_type: Type::Normal, secondary_type: Some(Type::Flying)},
-        ListPagePokemon {number: 22, name: "Fearow".to_string(), primary_type: Type::Normal, secondary_type: Some(Type::Flying)},
-    ]);
-    
+    static POKEMON: LazyLock<Vec<ListPagePokemon>> = LazyLock::new(|| {
+        vec![
+            ListPagePokemon {
+                number: 1,
+                name: "Bulbasaur".to_string(),
+                types: PokemonTypes::new(Type::Grass, Some(Type::Poison)),
+            },
+            ListPagePokemon {
+                number: 2,
+                name: "Ivysaur".to_string(),
+                types: PokemonTypes::new(Type::Grass, Some(Type::Poison)),
+            },
+            ListPagePokemon {
+                number: 3,
+                name: "Venusaur".to_string(),
+                types: PokemonTypes::new(Type::Grass, Some(Type::Poison)),
+            },
+            ListPagePokemon {
+                number: 4,
+                name: "Charmander".to_string(),
+                types: PokemonTypes::new(Type::Fire, None),
+            },
+            ListPagePokemon {
+                number: 5,
+                name: "Charmeleon".to_string(),
+                types: PokemonTypes::new(Type::Fire, None),
+            },
+            ListPagePokemon {
+                number: 6,
+                name: "Charizard".to_string(),
+                types: PokemonTypes::new(Type::Fire, Some(Type::Flying)),
+            },
+            ListPagePokemon {
+                number: 16,
+                name: "Pidgey".to_string(),
+                types: PokemonTypes::new(Type::Normal, Some(Type::Flying)),
+            },
+            ListPagePokemon {
+                number: 22,
+                name: "Fearow".to_string(),
+                types: PokemonTypes::new(Type::Normal, Some(Type::Flying)),
+            },
+        ]
+    });
+
     #[test]
     fn test_new() {
-        let list_page = ListPage::new(&[], "");
+        let list_page = ListPage::new(vec![], "".to_string());
         assert_eq!(list_page.search_widget.text(), "");
         assert_eq!(list_page.list_widget.get_selected(), None);
     }
 
     #[test]
     fn test_empty_query() {
-        let list_page = ListPage::new(&POKEMON, "");
-        assert_eq!(list_page.list_widget.get_pokemon(), &POKEMON.clone().into_iter().map(|p| p.into()).collect::<Vec<_>>());
+        let list_page = ListPage::new(POKEMON.clone(), "".to_string());
+        assert_eq!(
+            list_page.list_widget.get_pokemon(),
+            &POKEMON
+                .clone()
+                .into_iter()
+                .map(|p| p.into())
+                .collect::<Vec<_>>()
+        );
     }
 
     #[test]
     fn test_query_name() {
-        let list_page = ListPage::new(&POKEMON, "saur");
+        let list_page = ListPage::new(POKEMON.clone(), "saur".to_string());
         let filtered_pokemon = list_page.list_widget.get_pokemon();
         assert_eq!(filtered_pokemon.len(), 3);
         assert_eq!(filtered_pokemon[0].name, "Bulbasaur");
@@ -188,7 +244,7 @@ mod tests {
 
     #[test]
     fn test_query_name_primary_secondary() {
-        let list_page = ListPage::new(&POKEMON, "F");
+        let list_page = ListPage::new(POKEMON.clone(), "F".to_string());
         let filtered_pokemon = list_page.list_widget.get_pokemon();
         assert_eq!(filtered_pokemon.len(), 5);
         assert_eq!(filtered_pokemon[0].name, "Fearow");

@@ -5,22 +5,10 @@ use image::DynamicImage;
 
 use crate::core::{
     pokemon::{
-        PokemonDescription, 
-        PokemonMetadata, 
-        PokemonStats, 
-        PokemonTypes, 
-        Type,
-        type_defense_strengths, 
-        type_defense_weaknesses,
+        type_defense_strengths, type_defense_weaknesses, PokemonAttributes, PokemonCry,
+        PokemonDescription, PokemonStats, PokemonTypes, Type,
     },
-    ui::components::{
-        ImageBox, 
-        MetadataBox, 
-        PokemonStatChart,
-        Sound,
-        TextBox,
-        TypesBox,
-    },
+    ui::components::{AttributesBox, ImageBox, PokemonStatChart, Sound, TextBox, TypesBox},
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -29,24 +17,24 @@ pub struct DetailPage {
     pub image: ImageBox,
     pub stat_chart: PokemonStatChart,
     pub description: TextBox,
-    pub metadata: MetadataBox,
+    pub attributes: AttributesBox,
     pub types: TypesBox,
     pub weaknesses: TypesBox,
     pub launch_sound: Sound,
 }
 
 impl DetailPage {
-    pub fn new(pokemon: &DetailPagePokemon) -> Result<Self> {
-        let title = TextBox::new(&format!("#{} | {}", pokemon.number, pokemon.name));
+    pub fn new(pokemon: DetailPagePokemon) -> Result<Self> {
+        let title = TextBox::new(format!("#{} | {}", pokemon.number, pokemon.name));
 
-        let image = ImageBox::new(pokemon.image.clone());
+        let image = ImageBox::new(pokemon.image);
 
         let (stats, labels) = get_stats_with_labels(&pokemon.stats);
         let stat_chart = PokemonStatChart::new(&stats, &labels)?;
 
-        let description = TextBox::new(&pokemon.description.text);
+        let description = TextBox::new(pokemon.description.text);
 
-        let metadata = MetadataBox::new(&pokemon.metadata);
+        let attributes = AttributesBox::new(pokemon.attributes);
 
         let mut types_vec = vec![pokemon.types.primary];
         if let Some(secondary_type) = pokemon.types.secondary {
@@ -54,11 +42,20 @@ impl DetailPage {
         }
         let types = TypesBox::new(types_vec);
 
-        let weaknesses = TypesBox::new(pokemon.weaknesses.clone());
+        let weaknesses = TypesBox::new(pokemon.weaknesses);
 
-        let launch_sound = Sound::new();
+        let launch_sound = Sound::new(pokemon.cry.cry);
 
-        Ok(DetailPage{ title, image, stat_chart, description, metadata, types, weaknesses, launch_sound })
+        Ok(DetailPage {
+            title,
+            image,
+            stat_chart,
+            description,
+            attributes,
+            types,
+            weaknesses,
+            launch_sound,
+        })
     }
 
     pub fn get_title_box(&self) -> &TextBox {
@@ -73,8 +70,8 @@ impl DetailPage {
         &self.description
     }
 
-    pub fn get_metadata_box(&self) -> &MetadataBox {
-        &self.metadata
+    pub fn get_attributes_box(&self) -> &AttributesBox {
+        &self.attributes
     }
 
     pub fn get_stat_chart(&self) -> &PokemonStatChart {
@@ -94,43 +91,44 @@ impl DetailPage {
     }
 }
 
-fn get_stats_with_labels(stats: &PokemonStats) -> ([i32; 6], [&str; 6]) {
+fn get_stats_with_labels(stats: &PokemonStats) -> ([u32; 6], [&str; 6]) {
     const STAT_LABELS: [&str; 6] = ["HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"];
 
     let raw_stats = [
-        stats.hp as i32,
-        stats.attack as i32,
-        stats.defense as i32,
-        stats.special_attack as i32,
-        stats.special_defense as i32,
-        stats.speed as i32,
+        stats.hp as u32,
+        stats.attack as u32,
+        stats.defense as u32,
+        stats.special_attack as u32,
+        stats.special_defense as u32,
+        stats.speed as u32,
     ];
 
     (raw_stats, STAT_LABELS)
 }
 
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct DetailPagePokemon {
-    pub number: i32,
+    pub number: u32,
     pub name: String,
     pub image: DynamicImage,
     pub types: PokemonTypes,
     pub weaknesses: HashSet<Type>,
     pub description: PokemonDescription,
-    pub metadata: PokemonMetadata,
+    pub attributes: PokemonAttributes,
     pub stats: PokemonStats,
+    pub cry: PokemonCry,
 }
 
 impl DetailPagePokemon {
     pub fn new(
-        number: i32,
+        number: u32,
         name: String,
         image: DynamicImage,
         types: PokemonTypes,
         description: PokemonDescription,
-        metadata: PokemonMetadata,
-        stats: PokemonStats
+        attributes: PokemonAttributes,
+        stats: PokemonStats,
+        cry: PokemonCry,
     ) -> Self {
         let mut weaknesses = type_defense_weaknesses(&types.primary);
         if types.secondary.is_some() {
@@ -143,6 +141,16 @@ impl DetailPagePokemon {
 
         weaknesses.retain(|weakness| !strengths.contains(weakness));
 
-        DetailPagePokemon{ number, name, image, types, weaknesses, description, metadata, stats }
+        DetailPagePokemon {
+            number,
+            name,
+            image,
+            types,
+            weaknesses,
+            description,
+            attributes,
+            stats,
+            cry,
+        }
     }
 }

@@ -1,3 +1,5 @@
+use color_eyre::{Result, eyre};
+
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -88,7 +90,7 @@ impl From<String> for Type {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PokemonTypes {
     pub primary: Type,
     pub secondary: Option<Type>,
@@ -160,33 +162,42 @@ impl PokemonDescription {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PokemonGenderRates {
+    pub male: f32,
+    pub female: f32,
+}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum PokemonGenders {
-    Male,
-    Female,
+impl PokemonGenderRates {
+    pub fn new(male: f32, female: f32) -> Result<Self> {
+        if male + female != 1.0 {
+            return Err(eyre::eyre!("Male and female rates must sum to 1.0"));
+        }
+
+        Ok(PokemonGenderRates{male, female})
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct PokemonMetadata {
-    pub height: String,
-    pub weight: String,
+pub struct PokemonAttributes {
+    pub height_m: String,
+    pub weight_kg: String,
     pub category: String,
     pub abilities: Vec<String>,
-    pub genders: HashSet<PokemonGenders>,
+    pub genders: Option<PokemonGenderRates>,
 }
 
-impl PokemonMetadata {
+impl PokemonAttributes {
     pub fn new(
         height: String,
         weight: String,
         category: String,
         abilities: Vec<String>,
-        genders: HashSet<PokemonGenders>
+        genders: Option<PokemonGenderRates>,
     ) -> Self {
-        PokemonMetadata {
-            height,
-            weight,
+        PokemonAttributes {
+            height_m: height,
+            weight_kg: weight,
             category,
             abilities,
             genders,
@@ -220,4 +231,21 @@ impl PokemonStats {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PokemonImage {
     pub image: String,
+}
+
+impl PokemonImage {
+    pub fn new(image: String) -> Self {
+        PokemonImage {image}
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PokemonCry {
+    pub cry: Vec<u8>,
+}
+
+impl PokemonCry {
+    pub fn new(cry: Vec<u8>) -> Self {
+        PokemonCry {cry}
+    }
 }

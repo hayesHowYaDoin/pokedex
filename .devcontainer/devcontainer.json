@@ -26,7 +26,7 @@
 
     "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/workspace && sudo chmod -R 755 /home/vscode/workspace",
 
-    "postStartCommand": "sudo sqlite3 ~/workspace/tools/sqlite3/pokedex.db < ~/workspace/tools/sqlite3/pokedex.sql",
+    "postStartCommand": "./data/download.sh",
 
     "remoteEnv": {
         "DISPLAY": "${localEnv:DISPLAY}"

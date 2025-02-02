@@ -54,14 +54,14 @@ impl SubAssign<u32> for RowIndex {
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct PokemonTableEntry {
-    pub number: i32,
+    pub number: u32,
     pub name: String,
     pub primary_type: Type,
     pub secondary_type: Option<Type>,
 }
 
 impl PokemonTableEntry {
-    pub fn new(number: i32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
+    pub fn new(number: u32, name: String, primary_type: Type, secondary_type: Option<Type>) -> Self {
         PokemonTableEntry {number, name, primary_type, secondary_type}
     }
 }
