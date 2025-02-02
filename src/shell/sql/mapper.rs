@@ -13,6 +13,7 @@ use crate::core::{
         repository::{
             DetailPagePokemonRepository, ListPagePokemonRepository, ListPagePokemonRepositoryError,
         },
+        string::{capitalize, capitalize_words},
     },
 };
 
@@ -120,21 +121,6 @@ impl DetailPagePokemonRepository for DatabaseMapper {
 
         Ok(detail_page_pokemon)
     }
-}
-
-fn capitalize(s: &str) -> String {
-    let mut c = s.chars();
-    match c.next() {
-        None => String::new(),
-        Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-    }
-}
-
-fn capitalize_words(s: &str) -> String {
-    s.split_whitespace()
-        .map(|w| capitalize(w))
-        .collect::<Vec<String>>()
-        .join(" ")
 }
 
 fn build_image(id: PokemonID) -> image::DynamicImage {
