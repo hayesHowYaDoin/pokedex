@@ -1,6 +1,5 @@
 use std::default::Default;
 
-
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InputBox {
     text: String,
@@ -8,7 +7,7 @@ pub struct InputBox {
 
 impl InputBox {
     pub fn new(text: String) -> Self {
-        Self {text}
+        Self { text }
     }
 
     pub fn push_char(&mut self, c: impl Into<char>) {
@@ -32,7 +31,6 @@ impl Default for InputBox {
     fn default() -> Self {
         Self::new("".to_string())
     }
-
 }
 
 #[cfg(test)]

@@ -3,34 +3,28 @@
     A Pokedex CLI application which takes full advantage of modern terminals.
   '';
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    systems.url = "github:nix-systems/default";
+    rust-flake.url = "github:juspay/rust-flake";
+    rust-flake.inputs.nixpkgs.follows = "nixpkgs";
+    process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
+    cargo-doc-live.url = "github:srid/cargo-doc-live";
 
-  outputs = { self, nixpkgs }:
-    let
-      inherit (nixpkgs) lib;
+    git-hooks.url = "github:cachix/git-hooks.nix";
+    git-hooks.flake = false;
+  };
 
-      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
-    in {
-      devShells = forAllSystems (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in {
-          default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              alsa-lib
-              alsa-utils
-              cargo
-              clippy
-              gcc
-              rustfmt
-              rustc
-              rust-analyzer
-              sqlite
-              wget
-            ];
-            
-            nativeBuildInputs = with pkgs; [ pkg-config ];
-          };
-        });
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = import inputs.systems;
+
+      # See ./nix/modules/*.nix for the modules that are imported here.
+      imports = with builtins;
+        map
+          (fn: ./nix/modules/${fn})
+          (attrNames (readDir ./nix/modules));
     };
 }

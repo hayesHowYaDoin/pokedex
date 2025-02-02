@@ -20,10 +20,8 @@ pub fn play_sound(sound: Sound) {
     engine.state().add_context(context.clone());
 
     // Load sound buffer.
-    let door_open_buffer = SoundBufferResource::new_generic(
-        DataSource::from_memory(sound.data),
-    )
-    .unwrap();
+    let door_open_buffer =
+        SoundBufferResource::new_generic(DataSource::from_memory(sound.data)).unwrap();
 
     // Create generic source (without spatial effects) using that buffer.
     let source = SoundSourceBuilder::new()

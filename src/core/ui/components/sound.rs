@@ -1,6 +1,6 @@
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Sound {
-  pub data: Vec<u8>,
+    pub data: Vec<u8>,
 }
 
 impl Sound {

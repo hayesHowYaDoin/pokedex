@@ -1,10 +1,7 @@
 use color_eyre::Result;
 use thiserror::Error;
 
-use crate::core::ui::pages::{
-    DetailPagePokemon,
-    ListPagePokemon,
-};
+use crate::core::ui::pages::{DetailPagePokemon, ListPagePokemon};
 
 #[derive(Debug, Error)]
 #[error("{0}")]

@@ -7,7 +7,9 @@ pub struct TypesBox {
 
 impl TypesBox {
     pub fn new<T: IntoIterator<Item = Type>>(types: T) -> Self {
-        TypesBox { types: Vec::<Type>::from_iter(types) }
+        TypesBox {
+            types: Vec::<Type>::from_iter(types),
+        }
     }
 
     pub fn types(&self) -> &Vec<Type> {

@@ -1,15 +1,12 @@
 use ratatui::{
     prelude::{Constraint, Rect, Style},
     style::Stylize,
-    Frame,
     widgets::{Block, Row, Table, TableState},
+    Frame,
 };
 
+use super::{super::palette::type_color_medium, TuiStatefulComponent};
 use crate::core::ui::components::{PokemonTable, PokemonTableEntry};
-use super::{
-    TuiStatefulComponent,
-    super::palette::type_color_medium,
-};
 
 const WIDTHS: [Constraint; 4] = [
     Constraint::Length(5),
@@ -25,7 +22,10 @@ pub struct TuiPokemonTable<'a> {
 
 impl<'a> TuiPokemonTable<'a> {
     pub fn new(pokemon_table: PokemonTable, block: Block<'a>) -> Self {
-        Self { pokemon_table, block }
+        Self {
+            pokemon_table,
+            block,
+        }
     }
 }
 
@@ -42,7 +42,8 @@ impl TuiStatefulComponent for TuiPokemonTable<'_> {
             .row_highlight_style(Style::new().reversed())
             .highlight_symbol(">>");
 
-        let mut table_state = TableState::default().with_selected(self.pokemon_table.get_selected_index());
+        let mut table_state =
+            TableState::default().with_selected(self.pokemon_table.get_selected_index());
         frame.render_stateful_widget(table, *layout, &mut table_state);
     }
 }
@@ -54,7 +55,10 @@ impl From<PokemonTableEntry> for Row<'_> {
             entry.number.to_string(),
             entry.name,
             entry.primary_type.to_string(),
-            entry.secondary_type.map_or("".to_string(), |t| t.to_string()),
-        ]).fg(color)
+            entry
+                .secondary_type
+                .map_or("".to_string(), |t| t.to_string()),
+        ])
+        .fg(color)
     }
 }

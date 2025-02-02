@@ -5,7 +5,7 @@ pub struct TextBox {
 
 impl TextBox {
     pub fn new(text: String) -> Self {
-        TextBox{ text }
+        TextBox { text }
     }
 
     pub fn text(&self) -> &str {
