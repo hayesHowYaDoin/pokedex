@@ -4,6 +4,10 @@ use rusqlite::ToSql;
 
 use super::database::DatabaseError;
 
+// ============================================================================
+// - TABLE KEYS ---------------------------------------------------------------
+// ============================================================================
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PokemonID(pub u32);
 
@@ -55,6 +59,18 @@ impl Into<u32> for StatID {
     }
 }
 
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct AbilitySlot(pub u32);
+
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct AbilityID(pub u32);
+
+// ============================================================================
+// - POKEMON TABLE ------------------------------------------------------------
+// ============================================================================
+
 #[derive(Debug)]
 pub struct PokemonDTO {
     pub species_id: u32,
@@ -76,6 +92,10 @@ pub trait PokemonTableRepository {
     fn fetch_all(&self) -> Result<HashMap<PokemonID, PokemonDTO>, DatabaseError>;
 }
 
+// ============================================================================
+// - TYPES TABLE --------------------------------------------------------------
+// ============================================================================
+
 #[derive(Debug)]
 pub struct TypesDTO {
     pub identifier: String,
@@ -92,6 +112,10 @@ pub trait TypesTableRepository {
     fn fetch(&self, id: &TypeID) -> Result<TypesDTO, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<TypeID, TypesDTO>, DatabaseError>;
 }
+
+// ============================================================================
+// - POKEMON TYPE TABLE -------------------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct PokemonTypeDTO {
@@ -110,6 +134,10 @@ pub trait PokemonTypeTableRepository {
     fn fetch(&self, id: &PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
     fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError>;
 }
+
+// ============================================================================
+// - POKEMON SIZE TABLE -------------------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct PokemonSizeDTO {
@@ -130,6 +158,10 @@ pub trait PokemonSizeTableRepository {
     fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
 }
 
+// ============================================================================
+// - STATS NAMES TABLE --------------------------------------------------------
+// ============================================================================
+
 #[derive(Debug)]
 pub struct StatNamesDTO {
     pub name: String,
@@ -144,6 +176,10 @@ impl StatNamesDTO {
 pub trait StatNamesRepository {
     fn fetch_all(&self) -> Result<HashMap<StatID, StatNamesDTO>, DatabaseError>;
 }
+
+// ============================================================================
+// - POKEMON STATS TABLE ------------------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct PokemonStatsDTO {
@@ -164,6 +200,10 @@ pub trait PokemonStatsRepository {
     ) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
 }
 
+// ============================================================================
+// - POKEMON DESCRIPTION TABLE ------------------------------------------------
+// ============================================================================
+
 #[derive(Debug)]
 pub struct PokemonDescriptionDTO {
     pub text: String,
@@ -179,8 +219,9 @@ pub trait PokemonDescriptionsRepository {
     fn fetch(&self, pokemon_id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError>;
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AbilityID(pub u32);
+// ============================================================================
+// - ABILITIES TABLE ----------------------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct AbilityDTO {
@@ -197,6 +238,10 @@ pub trait AbilitiesRepository {
     fn fetch_all(&self) -> Result<HashMap<AbilityID, AbilityDTO>, DatabaseError>;
 }
 
+// ============================================================================
+// - POKEMON ABILITIES TABLE --------------------------------------------------
+// ============================================================================
+
 #[derive(Debug)]
 pub struct PokemonAbilitiesDTO {
     pub id: AbilityID,
@@ -208,12 +253,13 @@ impl PokemonAbilitiesDTO {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AbilitySlot(pub u32);
-
 pub trait PokemonAbilitiesRepository {
     fn fetch(&self, id: &PokemonID) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
 }
+
+// ============================================================================
+// - POKEMON SPECIES NAMES TABLE ----------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct PokemonSpeciesNamesDTO {
@@ -229,6 +275,10 @@ impl PokemonSpeciesNamesDTO {
 pub trait PokemonSpeciesNamesRepository {
   fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
 }
+
+// ============================================================================
+// - POKEMON GENDER TABLE -----------------------------------------------------
+// ============================================================================
 
 #[derive(Debug)]
 pub struct PokemonGenderDTO {
