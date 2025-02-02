@@ -70,9 +70,7 @@ impl ListPagePokemonRepository for DatabaseMapper {
                     name,
                     PokemonTypes::new(
                         pokemon_types.first()?.to_owned().into(),
-                        pokemon_types
-                            .get(1)
-                            .map(|t| t.to_owned().into()),
+                        pokemon_types.get(1).map(|t| t.to_owned().into()),
                     ),
                 ))
             })
@@ -167,9 +165,7 @@ fn build_types(
 
     Ok(PokemonTypes::new(
         pokemon_types_names.first().unwrap().to_owned().into(),
-        pokemon_types_names
-            .get(1)
-            .map(|t| t.to_owned().into()),
+        pokemon_types_names.get(1).map(|t| t.to_owned().into()),
     ))
 }
 
@@ -210,7 +206,7 @@ fn build_attributes(
         _ => {
             let female_rate = pokemon_gender.rate as f32 / 8.0;
             Some(PokemonGenderRates::new(1.0 - female_rate, female_rate)?)
-        },
+        }
     };
 
     Ok(PokemonAttributes::new(

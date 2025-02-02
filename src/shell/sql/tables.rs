@@ -59,10 +59,8 @@ impl From<StatID> for u32 {
     }
 }
 
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AbilitySlot(pub u32);
-
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AbilityID(pub u32);
@@ -249,12 +247,15 @@ pub struct PokemonAbilitiesDTO {
 
 impl PokemonAbilitiesDTO {
     pub fn new(id: AbilityID) -> PokemonAbilitiesDTO {
-        PokemonAbilitiesDTO {id}
+        PokemonAbilitiesDTO { id }
     }
 }
 
 pub trait PokemonAbilitiesRepository {
-    fn fetch(&self, id: &PokemonID) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
+    fn fetch(
+        &self,
+        id: &PokemonID,
+    ) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
 }
 
 // ============================================================================
@@ -263,17 +264,17 @@ pub trait PokemonAbilitiesRepository {
 
 #[derive(Debug)]
 pub struct PokemonSpeciesNamesDTO {
-  pub genus: String,
+    pub genus: String,
 }
 
 impl PokemonSpeciesNamesDTO {
-  pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
-    PokemonSpeciesNamesDTO { genus }
-  }
+    pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
+        PokemonSpeciesNamesDTO { genus }
+    }
 }
 
 pub trait PokemonSpeciesNamesRepository {
-  fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
 }
 
 // ============================================================================
@@ -282,15 +283,15 @@ pub trait PokemonSpeciesNamesRepository {
 
 #[derive(Debug)]
 pub struct PokemonGenderDTO {
-  pub rate: i32,
+    pub rate: i32,
 }
 
 impl PokemonGenderDTO {
-  pub fn new(rate: i32) -> PokemonGenderDTO {
-    PokemonGenderDTO { rate }
-  }
+    pub fn new(rate: i32) -> PokemonGenderDTO {
+        PokemonGenderDTO { rate }
+    }
 }
 
 pub trait PokemonGenderRepository {
-  fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
 }

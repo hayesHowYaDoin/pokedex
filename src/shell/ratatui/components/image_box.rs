@@ -1,14 +1,8 @@
-use ratatui::{
-    Frame,
-    prelude::Rect,
-};
-use ratatui_image::{
-    picker::Picker,
-    StatefulImage,
-};
+use ratatui::{prelude::Rect, Frame};
+use ratatui_image::{picker::Picker, StatefulImage};
 
-use crate::core::ui::components::ImageBox;
 use super::TuiStatefulComponent;
+use crate::core::ui::components::ImageBox;
 
 pub struct TuiImageBox<'a> {
     image_box: &'a ImageBox,
@@ -23,7 +17,9 @@ impl<'a> TuiImageBox<'a> {
 
 impl TuiStatefulComponent for TuiImageBox<'_> {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
-        let mut image_protocol = self.picker.new_resize_protocol(self.image_box.image().clone());
+        let mut image_protocol = self
+            .picker
+            .new_resize_protocol(self.image_box.image().clone());
         let widget = StatefulImage::default();
 
         frame.render_stateful_widget(widget, *layout, &mut image_protocol);

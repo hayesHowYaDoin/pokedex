@@ -1,13 +1,13 @@
 use ratatui::{
-    Frame,
     prelude::Rect,
     style::Style,
     text::{Line, Span},
-    widgets::{Block, Paragraph, Wrap}
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
 };
 
 use crate::core::ui::components::TypesBox;
-use crate::shell::ratatui::palette::{type_color_light, type_color_dark};
+use crate::shell::ratatui::palette::{type_color_dark, type_color_light};
 
 use super::TuiComponent;
 
@@ -24,15 +24,21 @@ impl<'a> TuiTypesBox<'a> {
 
 impl TuiComponent for TuiTypesBox<'_> {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
-        let text = self.types_box.types()
+        let text = self
+            .types_box
+            .types()
             .iter()
-            .flat_map(|t| vec![
-                Span::styled(
-                    format!(" {} ", t),
-                    Style::default().fg(type_color_dark(t)).bg(type_color_light(t))
-                ),
-                Span::raw(" ")
-            ])
+            .flat_map(|t| {
+                vec![
+                    Span::styled(
+                        format!(" {} ", t),
+                        Style::default()
+                            .fg(type_color_dark(t))
+                            .bg(type_color_light(t)),
+                    ),
+                    Span::raw(" "),
+                ]
+            })
             .take(self.types_box.types().len() * 2 - 1)
             .collect::<Vec<Span>>();
 
@@ -43,4 +49,4 @@ impl TuiComponent for TuiTypesBox<'_> {
 
         frame.render_widget(&widget, *layout);
     }
-}         
+}
