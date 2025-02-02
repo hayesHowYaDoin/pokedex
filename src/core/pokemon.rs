@@ -169,8 +169,8 @@ pub enum PokemonGenders {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PokemonAttributes {
-    pub height: String,
-    pub weight: String,
+    pub height_m: String,
+    pub weight_kg: String,
     pub category: String,
     pub abilities: Vec<String>,
     pub genders: HashSet<PokemonGenders>,
@@ -185,8 +185,8 @@ impl PokemonAttributes {
         genders: HashSet<PokemonGenders>
     ) -> Self {
         PokemonAttributes {
-            height,
-            weight,
+            height_m: height,
+            weight_kg: weight,
             category,
             abilities,
             genders,

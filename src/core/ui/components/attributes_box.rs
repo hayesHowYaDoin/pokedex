@@ -17,9 +17,9 @@ impl AttributesBox {
             .join(" ");
 
         let text = format!(
-            "Height: {}\nWeight: {}\nCategory: {}\nAbilities: {}\nGender: {}",
-            attributes.height,
-            attributes.weight,
+            "Height: {}m\nWeight: {}kg\nCategory: {}\nAbilities: {}\nGender: {}",
+            attributes.height_m,
+            attributes.weight_kg,
             attributes.category,
             abilities,
             genders,
