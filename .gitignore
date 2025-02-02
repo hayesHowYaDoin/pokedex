@@ -31,3 +31,4 @@ data/assets/
 
 # Nix
 .direnv
+.pre-commit-config.yaml
