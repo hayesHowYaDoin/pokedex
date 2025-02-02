@@ -229,3 +229,18 @@ impl PokemonSpeciesNamesDTO {
 pub trait PokemonSpeciesNamesRepository {
   fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
 }
+
+#[derive(Debug)]
+pub struct PokemonGenderDTO {
+  pub rate: i32,
+}
+
+impl PokemonGenderDTO {
+  pub fn new(rate: i32) -> PokemonGenderDTO {
+    PokemonGenderDTO { rate }
+  }
+}
+
+pub trait PokemonGenderRepository {
+  fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
+}
