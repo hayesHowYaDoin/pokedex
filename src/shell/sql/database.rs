@@ -6,9 +6,10 @@ use thiserror::Error;
 use super::tables::{
     AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
     PokemonAbilitiesRepository, PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository,
-    PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO, PokemonStatsRepository,
-    PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO,
-    StatNamesRepository, TypeID, TypesDTO, TypesTableRepository,
+    PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonSpeciesNamesDTO,
+    PokemonSpeciesNamesRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository,
+    PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID,
+    TypesDTO, TypesTableRepository,
 };
 
 pub struct Database {
@@ -296,12 +297,36 @@ impl PokemonAbilitiesRepository for Database {
                 let ability_id: u32 = row.get(1)?;
                 let slot: u32 = row.get(3)?;
 
-                Ok((AbilitySlot(slot), PokemonAbilitiesDTO::new(AbilityID(ability_id))))
+                Ok((
+                    AbilitySlot(slot),
+                    PokemonAbilitiesDTO::new(AbilityID(ability_id)),
+                ))
             })
             .expect("Failed to execute query map")
             .filter_map(|t| t.ok())
             .collect();
 
         Ok(pokemon_abilities)
+    }
+}
+
+impl PokemonSpeciesNamesRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError> {
+        let sql_cmd =
+            "SELECT pokemon_species_id, local_language_id, genus FROM pokemon_species_names \
+            WHERE pokemon_species_id = ? AND local_language_id = 9";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_species_names = stmt
+            .query_row([id], |row| {
+                let genus: String = row.get(2)?;
+
+                Ok(PokemonSpeciesNamesDTO::new(genus))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_species_names)
     }
 }
