@@ -19,9 +19,9 @@ impl ToSql for PokemonID {
     }
 }
 
-impl Into<u32> for PokemonID {
-    fn into(self) -> u32 {
-        self.0
+impl From<PokemonID> for u32 {
+    fn from(val: PokemonID) -> Self {
+        val.0
     }
 }
 
@@ -36,9 +36,9 @@ impl ToSql for TypeID {
     }
 }
 
-impl Into<u32> for TypeID {
-    fn into(self) -> u32 {
-        self.0
+impl From<TypeID> for u32 {
+    fn from(val: TypeID) -> Self {
+        val.0
     }
 }
 
@@ -53,9 +53,9 @@ impl ToSql for StatID {
     }
 }
 
-impl Into<u32> for StatID {
-    fn into(self) -> u32 {
-        self.0
+impl From<StatID> for u32 {
+    fn from(val: StatID) -> Self {
+        val.0
     }
 }
 

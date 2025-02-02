@@ -95,12 +95,12 @@ fn get_stats_with_labels(stats: &PokemonStats) -> ([u32; 6], [&str; 6]) {
     const STAT_LABELS: [&str; 6] = ["HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"];
 
     let raw_stats = [
-        stats.hp as u32,
-        stats.attack as u32,
-        stats.defense as u32,
-        stats.special_attack as u32,
-        stats.special_defense as u32,
-        stats.speed as u32,
+        stats.hp,
+        stats.attack,
+        stats.defense,
+        stats.special_attack,
+        stats.special_defense,
+        stats.speed,
     ];
 
     (raw_stats, STAT_LABELS)
@@ -120,6 +120,7 @@ pub struct DetailPagePokemon {
 }
 
 impl DetailPagePokemon {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         number: u32,
         name: String,
