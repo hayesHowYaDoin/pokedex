@@ -60,7 +60,7 @@ impl ListPagePokemonRepository for DatabaseMapper {
                     .collect();
 
                 if (pokemon_types.len() != 1 && pokemon_types.len() != 2)
-                    || pokemon_types.get(0).is_none()
+                    || pokemon_types.first().is_none()
                 {
                     return None;
                 }
@@ -69,10 +69,10 @@ impl ListPagePokemonRepository for DatabaseMapper {
                     number,
                     name,
                     PokemonTypes::new(
-                        pokemon_types.get(0)?.to_owned().into(),
+                        pokemon_types.first()?.to_owned().into(),
                         pokemon_types
                             .get(1)
-                            .map_or(None, |t| Some(t.to_owned().into())),
+                            .map(|t| t.to_owned().into()),
                     ),
                 ))
             })
@@ -158,7 +158,7 @@ fn build_types(
         .collect();
 
     if (pokemon_types_names.len() != 1 && pokemon_types_names.len() != 2)
-        || pokemon_types_names.get(0).is_none()
+        || pokemon_types_names.first().is_none()
     {
         return Err(DatabaseError::FetchError(
             "Pokemon has invalid number of types.".to_string(),
@@ -166,10 +166,10 @@ fn build_types(
     }
 
     Ok(PokemonTypes::new(
-        pokemon_types_names.get(0).unwrap().to_owned().into(),
+        pokemon_types_names.first().unwrap().to_owned().into(),
         pokemon_types_names
             .get(1)
-            .map_or(None, |t| Some(t.to_owned().into())),
+            .map(|t| t.to_owned().into()),
     ))
 }
 
@@ -190,7 +190,7 @@ fn build_attributes(
         ));
     }
 
-    let abilities_vec: Vec<_> = vec![
+    let abilities_vec: Vec<_> = [
         pokemon_abilities.get(&AbilitySlot(0)),
         pokemon_abilities.get(&AbilitySlot(1)),
     ]

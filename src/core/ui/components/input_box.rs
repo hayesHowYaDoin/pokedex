@@ -8,7 +8,7 @@ pub struct InputBox {
 
 impl InputBox {
     pub fn new(text: String) -> Self {
-        Self {text: text}
+        Self {text}
     }
 
     pub fn push_char(&mut self, c: impl Into<char>) {

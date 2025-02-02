@@ -8,7 +8,7 @@ pub fn capitalize(s: &str) -> String {
 
 pub fn capitalize_words(s: &str) -> String {
     s.split_whitespace()
-        .map(|w| capitalize(w))
+        .map(capitalize)
         .collect::<Vec<String>>()
         .join(" ")
 }
