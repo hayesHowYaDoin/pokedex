@@ -214,3 +214,18 @@ pub struct AbilitySlot(pub u32);
 pub trait PokemonAbilitiesRepository {
     fn fetch(&self, id: &PokemonID) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
 }
+
+#[derive(Debug)]
+pub struct PokemonSpeciesNamesDTO {
+  pub genus: String,
+}
+
+impl PokemonSpeciesNamesDTO {
+  pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
+    PokemonSpeciesNamesDTO { genus }
+  }
+}
+
+pub trait PokemonSpeciesNamesRepository {
+  fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
+}

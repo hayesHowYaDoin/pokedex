@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::path::Path;
 
-use color_eyre::{Result, eyre};
+use color_eyre::{eyre, Result};
 
 use crate::core::{
     pokemon::{
@@ -20,9 +20,10 @@ use super::{
     tables::{
         AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
         PokemonAbilitiesRepository, PokemonDescriptionDTO, PokemonDescriptionsRepository,
-        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonStatsDTO,
-        PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository,
-        StatID, TypeID, TypesDTO, TypesTableRepository,
+        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonSpeciesNamesDTO,
+        PokemonSpeciesNamesRepository, PokemonStatsDTO, PokemonStatsRepository,
+        PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID,
+        TypesDTO, TypesTableRepository,
     },
     Database, DatabaseError,
 };
@@ -97,6 +98,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let pokemon_description = PokemonDescriptionsRepository::fetch(&self.database, &id)?;
         let abilities = AbilitiesRepository::fetch_all(&self.database)?;
         let pokemon_abilities = PokemonAbilitiesRepository::fetch(&self.database, &id)?;
+        let pokemon_species = PokemonSpeciesNamesRepository::fetch(&self.database, &id)?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
@@ -104,7 +106,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
             build_image(id),
             build_types(pokemon_types, types)?,
             build_description(pokemon_description),
-            build_attributes(pokemon_size, abilities, pokemon_abilities)?,
+            build_attributes(pokemon_size, abilities, pokemon_abilities, pokemon_species)?,
             build_stats(pokemon_stats_dto),
             build_cry(id),
         );
@@ -186,9 +188,12 @@ fn build_attributes(
     pokemon_size: PokemonSizeDTO,
     abilities: HashMap<AbilityID, AbilityDTO>,
     pokemon_abilities: HashMap<AbilitySlot, PokemonAbilitiesDTO>,
+    pokemon_species: PokemonSpeciesNamesDTO,
 ) -> Result<PokemonAttributes> {
     if !pokemon_abilities.contains_key(&AbilitySlot(1)) {
-        return Err(eyre::eyre!("Failed to build attributes: no ability in first slot".to_string()));
+        return Err(eyre::eyre!(
+            "Failed to build attributes: no ability in first slot".to_string()
+        ));
     }
 
     let abilities_vec: Vec<_> = vec![
@@ -201,13 +206,15 @@ fn build_attributes(
     .collect();
 
     if !abilities_vec.len() == 0 {
-        return Err(eyre::eyre!("Failed to build attributes: no abilities found".to_string()));
+        return Err(eyre::eyre!(
+            "Failed to build attributes: no abilities found".to_string()
+        ));
     }
 
     Ok(PokemonAttributes::new(
         (pokemon_size.height_dm as f32 / 10.0).to_string(),
         (pokemon_size.weight_hg as f32 / 10.0).to_string(),
-        "Seed".to_string(),
+        pokemon_species.genus,
         abilities_vec,
         [PokemonGenders::Male, PokemonGenders::Female]
             .into_iter()
