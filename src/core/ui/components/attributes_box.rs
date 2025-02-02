@@ -1,4 +1,4 @@
-use crate::core::pokemon::{PokemonGenders, PokemonAttributes};
+use crate::core::pokemon::PokemonAttributes;
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AttributesBox {
@@ -8,24 +8,23 @@ pub struct AttributesBox {
 impl AttributesBox {
     pub fn new(attributes: PokemonAttributes) -> Self {
         let abilities = attributes.abilities.join(", ");
-        let genders = attributes.genders.iter()
-            .map(|gender| match gender {
-                PokemonGenders::Male => "♂",
-                PokemonGenders::Female => "♀",
-            })
-            .collect::<Vec<&str>>()
-            .join(" ");
-
+        let gender_rates = match attributes.genders {
+            Some(rates) => {
+                format!(
+                    "♀: {:.0}% ♂: {:.0}%",
+                    rates.female * 100.0,
+                    rates.male * 100.0
+                )
+            }
+            None => "N/A".to_string(),
+        };
         let text = format!(
             "Height: {}m\nWeight: {}kg\nCategory: {}\nAbilities: {}\nGender: {}",
-            attributes.height_m,
-            attributes.weight_kg,
-            attributes.category,
-            abilities,
-            genders,
-        ).to_string();
+            attributes.height_m, attributes.weight_kg, attributes.category, abilities, gender_rates,
+        )
+        .to_string();
 
-        AttributesBox{ text }
+        AttributesBox { text }
     }
 
     pub fn text(&self) -> &str {

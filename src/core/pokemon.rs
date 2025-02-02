@@ -1,3 +1,5 @@
+use color_eyre::{Result, eyre};
+
 use std::collections::HashSet;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -160,11 +162,20 @@ impl PokemonDescription {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PokemonGenderRates {
+    pub male: f32,
+    pub female: f32,
+}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum PokemonGenders {
-    Male,
-    Female,
+impl PokemonGenderRates {
+    pub fn new(male: f32, female: f32) -> Result<Self> {
+        if male + female != 1.0 {
+            return Err(eyre::eyre!("Male and female rates must sum to 1.0"));
+        }
+
+        Ok(PokemonGenderRates{male, female})
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -173,7 +184,7 @@ pub struct PokemonAttributes {
     pub weight_kg: String,
     pub category: String,
     pub abilities: Vec<String>,
-    pub genders: HashSet<PokemonGenders>,
+    pub genders: Option<PokemonGenderRates>,
 }
 
 impl PokemonAttributes {
@@ -182,7 +193,7 @@ impl PokemonAttributes {
         weight: String,
         category: String,
         abilities: Vec<String>,
-        genders: HashSet<PokemonGenders>
+        genders: Option<PokemonGenderRates>,
     ) -> Self {
         PokemonAttributes {
             height_m: height,

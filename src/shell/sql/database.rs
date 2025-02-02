@@ -6,10 +6,11 @@ use thiserror::Error;
 use super::tables::{
     AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
     PokemonAbilitiesRepository, PokemonDTO, PokemonDescriptionDTO, PokemonDescriptionsRepository,
-    PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonSpeciesNamesDTO,
-    PokemonSpeciesNamesRepository, PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository,
-    PokemonTypeDTO, PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID,
-    TypesDTO, TypesTableRepository,
+    PokemonGenderDTO, PokemonGenderRepository, PokemonID, PokemonSizeDTO,
+    PokemonSizeTableRepository, PokemonSpeciesNamesDTO, PokemonSpeciesNamesRepository,
+    PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO,
+    PokemonTypeTableRepository, StatID, StatNamesDTO, StatNamesRepository, TypeID, TypesDTO,
+    TypesTableRepository,
 };
 
 pub struct Database {
@@ -328,5 +329,24 @@ impl PokemonSpeciesNamesRepository for Database {
             .expect("Failed to execute query row");
 
         Ok(pokemon_species_names)
+    }
+}
+
+impl PokemonGenderRepository for Database {
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError> {
+        let sql_cmd = "SELECT id, gender_rate FROM pokemon_genders WHERE id = ?";
+        let mut stmt = self
+            .conn
+            .prepare(sql_cmd)
+            .expect("Failed to prepare statement");
+        let pokemon_gender = stmt
+            .query_row([id], |row| {
+                let rate: i32 = row.get(1)?;
+
+                Ok(PokemonGenderDTO::new(rate))
+            })
+            .expect("Failed to execute query row");
+
+        Ok(pokemon_gender)
     }
 }

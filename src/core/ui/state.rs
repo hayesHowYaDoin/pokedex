@@ -101,7 +101,7 @@ mod test {
 
     use super::*;
     use crate::core::{
-        pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonStats, PokemonTypes, Type},
+        pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats, PokemonTypes, Type},
         ui::pages::{DetailPagePokemon, ListPagePokemon},
     };
 
@@ -127,7 +127,7 @@ mod test {
                 "".to_string(),
                 "".to_string(),
                 vec!["".to_string()],
-                HashSet::new(),
+                None,
             ),
             PokemonStats::new(0, 0, 0, 0, 0, 0),
             PokemonCry::new(vec![]),

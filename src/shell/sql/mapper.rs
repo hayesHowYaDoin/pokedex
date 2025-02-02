@@ -5,7 +5,7 @@ use color_eyre::{eyre, Result};
 
 use crate::core::{
     pokemon::{
-        PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenders, PokemonStats,
+        PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats,
         PokemonTypes,
     },
     ui::{
@@ -20,10 +20,10 @@ use super::{
     tables::{
         AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
         PokemonAbilitiesRepository, PokemonDescriptionDTO, PokemonDescriptionsRepository,
-        PokemonID, PokemonSizeDTO, PokemonSizeTableRepository, PokemonSpeciesNamesDTO,
-        PokemonSpeciesNamesRepository, PokemonStatsDTO, PokemonStatsRepository,
-        PokemonTableRepository, PokemonTypeDTO, PokemonTypeTableRepository, StatID, TypeID,
-        TypesDTO, TypesTableRepository,
+        PokemonGenderDTO, PokemonGenderRepository, PokemonID, PokemonSizeDTO,
+        PokemonSizeTableRepository, PokemonSpeciesNamesDTO, PokemonSpeciesNamesRepository,
+        PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO,
+        PokemonTypeTableRepository, StatID, TypeID, TypesDTO, TypesTableRepository,
     },
     Database, DatabaseError,
 };
@@ -99,6 +99,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let abilities = AbilitiesRepository::fetch_all(&self.database)?;
         let pokemon_abilities = PokemonAbilitiesRepository::fetch(&self.database, &id)?;
         let pokemon_species = PokemonSpeciesNamesRepository::fetch(&self.database, &id)?;
+        let pokemon_gender = PokemonGenderRepository::fetch(&self.database, &id)?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
@@ -106,7 +107,13 @@ impl DetailPagePokemonRepository for DatabaseMapper {
             build_image(id),
             build_types(pokemon_types, types)?,
             build_description(pokemon_description),
-            build_attributes(pokemon_size, abilities, pokemon_abilities, pokemon_species)?,
+            build_attributes(
+                pokemon_size,
+                abilities,
+                pokemon_abilities,
+                pokemon_species,
+                pokemon_gender,
+            )?,
             build_stats(pokemon_stats_dto),
             build_cry(id),
         );
@@ -189,6 +196,7 @@ fn build_attributes(
     abilities: HashMap<AbilityID, AbilityDTO>,
     pokemon_abilities: HashMap<AbilitySlot, PokemonAbilitiesDTO>,
     pokemon_species: PokemonSpeciesNamesDTO,
+    pokemon_gender: PokemonGenderDTO,
 ) -> Result<PokemonAttributes> {
     if !pokemon_abilities.contains_key(&AbilitySlot(1)) {
         return Err(eyre::eyre!(
@@ -211,13 +219,19 @@ fn build_attributes(
         ));
     }
 
+    let gender_rate = match pokemon_gender.rate {
+        -1 => None,
+        _ => {
+            let female_rate = pokemon_gender.rate as f32 / 8.0;
+            Some(PokemonGenderRates::new(1.0 - female_rate, female_rate)?)
+        },
+    };
+
     Ok(PokemonAttributes::new(
         (pokemon_size.height_dm as f32 / 10.0).to_string(),
         (pokemon_size.weight_hg as f32 / 10.0).to_string(),
         pokemon_species.genus,
         abilities_vec,
-        [PokemonGenders::Male, PokemonGenders::Female]
-            .into_iter()
-            .collect(),
+        gender_rate,
     ))
 }
