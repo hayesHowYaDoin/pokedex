@@ -4,8 +4,8 @@ pub struct TextBox {
 }
 
 impl TextBox {
-    pub fn new(text: &str) -> Self {
-        TextBox{ text: text.to_string() }
+    pub fn new(text: String) -> Self {
+        TextBox{ text }
     }
 
     pub fn text(&self) -> &str {

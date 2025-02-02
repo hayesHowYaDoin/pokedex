@@ -16,7 +16,19 @@
           pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = with pkgs; [  alsa-lib alsa-utils cargo clippy gcc rustfmt rustc rust-analyzer sqlite ];
+            buildInputs = with pkgs; [
+              alsa-lib
+              alsa-utils
+              cargo
+              clippy
+              gcc
+              rustfmt
+              rustc
+              rust-analyzer
+              sqlite
+              wget
+            ];
+            
             nativeBuildInputs = with pkgs; [ pkg-config ];
           };
         });
