@@ -121,6 +121,13 @@ fn capitalize(s: &str) -> String {
     }
 }
 
+fn capitalize_words(s: &str) -> String {
+    s.split_whitespace()
+        .map(|w| capitalize(w))
+        .collect::<Vec<String>>()
+        .join(" ")
+}
+
 fn build_image(id: PokemonID) -> image::DynamicImage {
     let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id));
     image::ImageReader::open(image_path)
@@ -190,7 +197,7 @@ fn build_attributes(
     ]
     .iter()
     .filter_map(|a| a.and_then(|a| abilities.get(&a.id)))
-    .map(|a| capitalize(&a.identifier))
+    .map(|a| capitalize_words(&a.identifier.replace("-", " ")))
     .collect();
 
     if !abilities_vec.len() == 0 {
