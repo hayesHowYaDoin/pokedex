@@ -1,5 +1,5 @@
 {
-    "name": "pokedex",
+    "name": "rich_pokedex",
     "build": {
         "dockerfile": "../tools/docker/Dockerfile",
         "context": "../tools/docker/",
