@@ -198,8 +198,8 @@ fn build_attributes(
     }
 
     Ok(PokemonAttributes::new(
-        pokemon_size.height_dm.to_string(),
-        pokemon_size.weight_hg.to_string(),
+        (pokemon_size.height_dm as f32 / 10.0).to_string(),
+        (pokemon_size.weight_hg as f32 / 10.0).to_string(),
         "Seed".to_string(),
         abilities_vec,
         [PokemonGenders::Male, PokemonGenders::Female]
