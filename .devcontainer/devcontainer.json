@@ -1,34 +1,54 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or the definition README at
+// https://github.com/microsoft/vscode-dev-containers/tree/master/containers/docker-existing-dockerfile
 {
-    "name": "rich_pokedex",
-    "build": {
-        "dockerfile": "../tools/docker/Dockerfile",
-        "context": "../tools/docker/",
-        "args": {"USERNAME": "vscode"}
-    },
-
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "rust-lang.rust-analyzer",
-                "swellaby.vscode-rust-test-adapter",
-                "vadimcn.vscode-lldb",
-                "yzhang.markdown-all-in-one"
-            ]
-        }
-    },
-
-    "remoteUser": "vscode",
-    "privileged": true,
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/workspace,type=bind,consistency=cached",
-    "workspaceFolder": "/home/vscode/workspace",
-
-    "forwardPorts": [8000],
-
-    "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/workspace && sudo chmod -R 755 /home/vscode/workspace",
-
-    "postStartCommand": "./data/download.sh",
-
-    "remoteEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}"
+  "name": "devcontainer-project",
+  "dockerFile": "./Dockerfile",
+  "context": "${localWorkspaceFolder}",
+  "build": {
+    "args": {
+      "USER_UID": "${localEnv:USER_UID}",
+      "USER_GID": "${localEnv:USER_GID}"
     }
+  },
+
+  // run arguments passed to docker
+  "runArgs": [
+    "--security-opt", "label=disable"
+  ],
+
+  "containerEnv": {
+     // extensions to preload before other extensions
+    "PRELOAD_EXTENSIONS": "arrterian.nix-env-selector"
+  },
+
+   // disable command overriding and updating remote user ID
+  "overrideCommand": false,
+  "userEnvProbe": "loginShell",
+  "updateRemoteUserUID": false,
+
+  // build development environment on creation, make sure you already have shell.nix
+  "onCreateCommand": "nix develop",
+
+  // Add the IDs of extensions you want installed when the container is created.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // select nix environment
+        "arrterian.nix-env-selector",
+
+        // Workspace extensions
+        "rust-lang.rust-analyzer",
+        "jnoortheen.nix-ide",
+        "mkhl.direnv",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi",
+        "vadimcn.vscode-lldb",
+        "yzhang.markdown-all-in-one",
+        "swellaby.vscode-rust-test-adapter"
+      ]
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": []
 }

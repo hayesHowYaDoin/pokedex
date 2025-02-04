@@ -14,12 +14,6 @@
         # config.process-compose.cargo-doc-live.outputs.package
         alsa-lib
         alsa-utils
-        # cargo
-        # clippy
-        # gcc
-        # rustfmt
-        # rustc
-        # rust-analyzer
         sqlite
         wget
       ];
