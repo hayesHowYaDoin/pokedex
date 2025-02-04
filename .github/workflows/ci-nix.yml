@@ -1,10 +1,12 @@
+on: [push]
+
 name: "CI Nix"
-on:
+# on:
   # Run only when pushing to master branch, and making PRs
-  push:
-    branches:
-      - master
-  pull_request:
+  # push:
+  #   branches:
+  #     - master
+  # pull_request:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
