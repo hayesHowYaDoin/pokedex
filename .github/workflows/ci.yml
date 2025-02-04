@@ -6,6 +6,9 @@ jobs:
   check:
     name: Rust project
     runs-on: ubuntu-latest
+    env:
+      SDL_VIDEODRIVER: "dummy"
+      SDL_AUDIODRIVER: "disk"
     steps:
       - uses: actions/checkout@v2
       - uses: DeterminateSystems/nix-installer-action@main
