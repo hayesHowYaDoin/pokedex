@@ -18,7 +18,5 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Install omnix
         run: nix --accept-flake-config profile install "github:juspay/omnix"
-      - name: Start shell
-        run: nix develop --impure
       - name: Run CI
         run: om ci
