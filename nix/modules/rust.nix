@@ -8,8 +8,11 @@
   ];
   perSystem = { config, self', pkgs, lib, ... }: {
     rust-project.crates."rich_pokedex".crane.args = {
+      nativeBuildInputs = with pkgs; [ pkg-config ];
+      # buildInputs = with pkgs; [ alsa-lib.dev udev.dev ];
       buildInputs = with pkgs; [
-        alsa-lib
+        alsa-lib.dev
+        udev.dev
         alsa-utils
       ] ++ lib.optionals pkgs.stdenv.isDarwin (
         with pkgs.darwin.apple_sdk.frameworks; [
