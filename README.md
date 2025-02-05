@@ -1,6 +1,10 @@
 # Pokedex
 
-![CI Pipeline](https://github.com/hayesHowYaDoin/pokedex/actions/workflows/ci.yml/badge.svg?event=push)
+![Builds](https://github.com/hayesHowYaDoin/pokedex/actions/workflows/build.yml/badge.svg?event=push)
+![Lints](https://github.com/hayesHowYaDoin/pokedex/actions/workflows/lint.yml/badge.svg?event=push)
+![Tests](https://github.com/hayesHowYaDoin/pokedex/actions/workflows/test.yml/badge.svg?event=push)
+
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 This application is intended to serve as a method of browsing the various 
 statistics of the various Pokemon™ from the hit game series Pokemon™.
