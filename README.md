@@ -1,5 +1,7 @@
 # Pokedex
 
+![CI Pipeline](https://github.com/hayesHowYaDoin/pokedex/.github/workflows/ci.yml/badge.svg?event=push)
+
 This application is intended to serve as a method of browsing the various 
 statistics of the various Pokemon™ from the hit game series Pokemon™.
 
