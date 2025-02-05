@@ -6,7 +6,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
