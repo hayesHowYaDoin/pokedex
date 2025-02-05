@@ -1,22 +1,16 @@
 on: [push]
 
-name: "CI Nix"
-# on:
-  # Run only when pushing to master branch, and making PRs
-  # push:
-  #   branches:
-  #     - master
-  # pull_request:
+name: CI
+
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-14]
+  check:
+    name: Rust project
+    runs-on: ubuntu-latest
+    env:
+      SDL_VIDEODRIVER: "dummy"
+      SDL_AUDIODRIVER: "disk"
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
-      - name: Install omnix
-        run: nix --accept-flake-config profile install "github:juspay/omnix"
-      - name: Run CI
-        run: om ci
+      - run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+      - run: nix build

@@ -1,4 +1,5 @@
 { inputs, ... }:
+
 {
   imports = [
     inputs.rust-flake.flakeModules.default
@@ -6,6 +7,7 @@
     inputs.process-compose-flake.flakeModule
     inputs.cargo-doc-live.flakeModule
   ];
+
   perSystem = { config, self', pkgs, lib, ... }: {
     rust-project.crates."rich_pokedex".crane.args = {
       nativeBuildInputs = with pkgs; [ pkg-config ];
