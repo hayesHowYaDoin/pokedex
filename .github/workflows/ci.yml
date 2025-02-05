@@ -1,17 +1,14 @@
 name: CI Pipeline
 
-on:
-  pull_request:
-  push:
-    branches: master
-    
+on: [push, pull_request]
+
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, macos-latest]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
