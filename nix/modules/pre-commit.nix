@@ -1,4 +1,5 @@
 { inputs, ... }:
+
 {
   imports = [
     (inputs.git-hooks + /flake-module.nix)
