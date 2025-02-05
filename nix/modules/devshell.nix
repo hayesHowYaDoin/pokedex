@@ -14,6 +14,8 @@
         # config.process-compose.cargo-doc-live.outputs.package
         alsa-lib
         alsa-utils
+        alsa-lib.dev
+        udev.dev
         sqlite
         wget
       ];
