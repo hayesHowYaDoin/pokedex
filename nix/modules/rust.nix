@@ -40,9 +40,7 @@
         '';
 
       postFixup =
-        # HACK: The Linux desktop app is unable to locate the assets
-        # directory, but it does look into the current directory.
-        # So, `cd` to the directory containing assets (which is
+        # `cd` to the directory containing assets (which is
         # `bin/`, per the installPhase above) before launching the
         # app.
         (oldAttrs.postFixup or "") + ''
