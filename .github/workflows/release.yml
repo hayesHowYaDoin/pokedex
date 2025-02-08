@@ -13,24 +13,62 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  debian:
-    name: Debian Package
-    runs-on: [ubuntu-latest]
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
+  # debian:
+  #   name: Debian Package
+  #   runs-on: [ubuntu-latest]
+  #   steps:
+  #     - name: Checkout sources
+  #       uses: actions/checkout@v2
       
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+  #     - name: Install Nix
+  #       uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Install Linux Dependencies
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libasound2-dev
+  #     - name: Install Linux Dependencies
+  #       if: ${{ runner.os == 'Linux' }}
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install --no-install-recommends -y libasound2-dev
 
-      - name: Enter Development Environment
-        run: nix develop
+  #     - name: Enter Development Environment
+  #       run: nix develop
 
-      - name: Build Debian Package
-        run: cargo deb
+  #     - name: Build Debian Package
+  #       run: cargo deb
+  quickcheck:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.rustversion.outputs.rustversion }}
+    steps:
+    - uses: actions/checkout@v2
+    - run: cargo check
+    - run: cargo pkgid
+    - run: 'echo "$(cargo pkgid | cut -d# -f2)"'
+    - id: rustversion
+      run: 'echo "::set-output name=rustversion::$(cargo pkgid | cut -d# -f2)"'
+  build:
+    needs: quickcheck
+    name: 'build-${{matrix.os}}'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build
+    - name: Run tests
+      run: cargo test
+  debbuild:
+    needs: [build]
+    runs-on: ubuntu-latest
+    name: Amd64Deb
+    steps:
+    - uses: actions/checkout@v2
+    - name: BuildDeb
+      id: debbuild
+      uses: ebbflow-io/cargo-deb-amd64-ubuntu@1.0
+    - name: Upload Deb Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: amd64deb
+        path: ./target/x86_64-unknown-linux-musl/debian/*
