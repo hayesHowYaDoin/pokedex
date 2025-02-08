@@ -1,14 +1,21 @@
-name: Builds
+name: Release
 
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  check:
-    name: Check
-    runs-on: [ubuntu-latest, macos-latest]
+  debian:
+    name: Debian Package
+    runs-on: [ubuntu-latest]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -25,7 +32,5 @@ jobs:
       - name: Enter Development Environment
         run: nix develop
 
-      - name: Run cargo check
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
+      - name: Build Debian Package
+        run: just build-deb
