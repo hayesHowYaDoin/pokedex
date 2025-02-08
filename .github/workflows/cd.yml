@@ -46,8 +46,8 @@ jobs:
     runs-on: [ubuntu-latest, macos-latest]
     name: Flake
     steps:
-      - uses: actions/checkout@v2
-      - uses: DeterminateSystems/nix-installer-action@main
+    - uses: actions/checkout@v2
+    - uses: DeterminateSystems/nix-installer-action@main
     - name: Install System Dependencies
       if: ${{ runner.os == 'Linux' }}
       run: |
