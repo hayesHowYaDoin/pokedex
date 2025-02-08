@@ -1,4 +1,4 @@
-name: Release
+name: Continuous Deployment
 
 # on:
 #   push:
@@ -13,31 +13,18 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
+  quality:
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.rustversion.outputs.rustversion }}
     steps:
     - uses: actions/checkout@v2
     - name: Install System Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
-    - uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: -- -D warnings
-    - uses: actions-rs/cargo@v1
-      with:
-        command: check
-    - run: cargo pkgid
-    - run: 'echo "$(cargo pkgid | cut -d# -f2)"'
-    - id: rustversion
-      run: 'echo "::set-output name=rustversion::$(cargo pkgid | cut -d# -f2)"'
+    - run: cargo fmt --all -- --check
+    - run: cargo clippy -- -D warnings
+    - run: cargo test
+
   build:
     needs: lint
     name: 'build-${{matrix.os}}'
@@ -52,12 +39,24 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - name: Build
       run: cargo build
-    - name: Test
-      run: cargo test
+
+  flake:
+    needs: build
+    runs-on: [ubuntu-latest, macos-latest]
+    name: Flake
+    steps:
+      - uses: actions/checkout@v2
+      - uses: DeterminateSystems/nix-installer-action@main
+    - name: Install System Dependencies
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y libasound2-dev
+    - run: nix build .
+
   debian:
-    needs: [build]
+    needs: build
     runs-on: ubuntu-latest
     name: Amd64Deb
     steps:
