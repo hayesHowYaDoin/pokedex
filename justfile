@@ -7,7 +7,10 @@ pre-commit-all:
 build *ARGS:
   cargo build {{ARGS}}
 
-package *ARGS:
+build-deb *ARGS:
+  cargo deb {{ARGS}}
+
+build-nix *ARGS:
   nix build .#rich_pokedex {{ARGS}}
 
 run *ARGS:
@@ -15,6 +18,3 @@ run *ARGS:
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
-
-build-deb:
-  cargo deb

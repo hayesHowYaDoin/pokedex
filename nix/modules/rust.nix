@@ -40,9 +40,8 @@
         '';
 
       postFixup =
-        # `cd` to the directory containing assets (which is
-        # `bin/`, per the installPhase above) before launching the
-        # app.
+        # `cd` to the directory containing assets (which is `bin/`, per the 
+        # installPhase above) before launching the app.
         (oldAttrs.postFixup or "") + ''
           wrapProgram $out/bin/${oldAttrs.pname} \
             --chdir $out/bin

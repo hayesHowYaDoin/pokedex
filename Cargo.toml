@@ -38,6 +38,6 @@ assets = [
   # Binary
   ["target/release/rich_pokedex", "usr/bin/rich_pokedex", "755"],
   # Assets
-  ["data/pokedex.sqlite", "var/lib/rich_pokedex/pokedex.sqlite", "644"],
-  ["data/assets/*", "var/lib/rich_pokedex/assets", "644"],
+  ["data/pokedex.sqlite", "usr/bin/rich_pokedex/pokedex.sqlite", "644"],
+  ["data/assets/**/*", "usr/bin/rich_pokedex/assets/", "644"],
 ]
