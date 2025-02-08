@@ -91,7 +91,7 @@ impl From<&ListPagePokemon> for PokemonTableEntry {
 
 #[cfg(test)]
 mod test {
-    use std::{collections::HashSet, sync::LazyLock};
+    use std::sync::LazyLock;
 
     use cascade::cascade;
     use image::DynamicImage;
@@ -99,8 +99,7 @@ mod test {
     use super::*;
     use crate::core::{
         pokemon::{
-            PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats,
-            PokemonTypes, Type,
+            PokemonAttributes, PokemonCry, PokemonDescription, PokemonStats, PokemonTypes, Type,
         },
         ui::pages::{DetailPagePokemon, ListPagePokemon},
     };
