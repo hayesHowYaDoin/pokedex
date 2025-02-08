@@ -34,7 +34,7 @@ jobs:
 
   #     - name: Build Debian Package
   #       run: cargo deb
-  quickcheck:
+  lint:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.rustversion.outputs.rustversion }}
@@ -44,13 +44,23 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo check
+    - uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+    - uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings
+    - uses: actions-rs/cargo@v1
+      with:
+        command: check
     - run: cargo pkgid
     - run: 'echo "$(cargo pkgid | cut -d# -f2)"'
     - id: rustversion
       run: 'echo "::set-output name=rustversion::$(cargo pkgid | cut -d# -f2)"'
   build:
-    needs: quickcheck
+    needs: lint
     name: 'build-${{matrix.os}}'
     runs-on: ${{ matrix.os }}
     strategy:
@@ -73,8 +83,8 @@ jobs:
     name: Amd64Deb
     steps:
     - uses: actions/checkout@v2
-    - name: Build Debian Package
-      uses: ebbflow-io/cargo-deb-armv7-debian@1.47.0-1
+    - run: cargo install cargo-deb
+    - run: cargo deb
     # - name: Upload Deb Artifact
     #   uses: actions/upload-artifact@v2
     #   with:
