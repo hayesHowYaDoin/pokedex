@@ -26,7 +26,7 @@ jobs:
     - run: cargo test
 
   build:
-    needs: lint
+    needs: quality
     name: 'build-${{matrix.os}}'
     runs-on: ${{ matrix.os }}
     strategy:
