@@ -33,4 +33,4 @@ jobs:
         run: nix develop
 
       - name: Build Debian Package
-        run: just build-deb
+        run: cargo deb
