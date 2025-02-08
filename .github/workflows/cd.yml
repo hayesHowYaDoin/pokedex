@@ -1,12 +1,5 @@
 name: Continuous Deployment
 
-# on:
-#   push:
-#     branches:
-#       - main
-#   pull_request:
-#     branches:
-#       - main
 on: [push, pull_request]
 
 env:
@@ -44,7 +37,6 @@ jobs:
   flake:
     needs: build
     runs-on: [ubuntu-latest, macos-latest]
-    name: Flake
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
@@ -58,7 +50,6 @@ jobs:
   debian:
     needs: build
     runs-on: ubuntu-latest
-    name: Amd64Deb
     steps:
     - uses: actions/checkout@v2
     - run: cargo install cargo-deb
