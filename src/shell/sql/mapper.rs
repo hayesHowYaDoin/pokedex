@@ -60,7 +60,7 @@ impl ListPagePokemonRepository for DatabaseMapper {
                     .collect();
 
                 if (pokemon_types.len() != 1 && pokemon_types.len() != 2)
-                    || pokemon_types.first().is_none()
+                    || pokemon_types.is_empty()
                 {
                     return None;
                 }
@@ -156,7 +156,7 @@ fn build_types(
         .collect();
 
     if (pokemon_types_names.len() != 1 && pokemon_types_names.len() != 2)
-        || pokemon_types_names.first().is_none()
+        || pokemon_types_names.is_empty()
     {
         return Err(DatabaseError::FetchError(
             "Pokemon has invalid number of types.".to_string(),
