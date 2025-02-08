@@ -40,6 +40,10 @@ jobs:
       version: ${{ steps.rustversion.outputs.rustversion }}
     steps:
     - uses: actions/checkout@v2
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: cargo check
     - run: cargo pkgid
     - run: 'echo "$(cargo pkgid | cut -d# -f2)"'
@@ -54,21 +58,25 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
+    - name: Install System Dependencies
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y libasound2-dev
     - name: Build
       run: cargo build
-    - name: Run tests
+    - name: Test
       run: cargo test
-  debbuild:
+  debian:
     needs: [build]
     runs-on: ubuntu-latest
     name: Amd64Deb
     steps:
     - uses: actions/checkout@v2
-    - name: BuildDeb
-      id: debbuild
-      uses: ebbflow-io/cargo-deb-amd64-ubuntu@1.0
-    - name: Upload Deb Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: amd64deb
-        path: ./target/x86_64-unknown-linux-musl/debian/*
+    - name: Build Debian Package
+      run: cargo deb
+    # - name: Upload Deb Artifact
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: amd64deb
+    #     path: ./target/x86_64-unknown-linux-musl/debian/*
