@@ -74,7 +74,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build Debian Package
-      run: cargo deb
+      uses: ebbflow-io/cargo-deb-armv7-debian@1.47.0-1
     # - name: Upload Deb Artifact
     #   uses: actions/upload-artifact@v2
     #   with:
