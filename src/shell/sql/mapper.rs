@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::path::Path;
 
 use color_eyre::{eyre, Result};
 
@@ -18,6 +17,7 @@ use crate::core::{
 };
 
 use super::{
+    file::{ASSETS_PATH, DATABASE_PATH},
     tables::{
         AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
         PokemonAbilitiesRepository, PokemonDescriptionDTO, PokemonDescriptionsRepository,
@@ -34,9 +34,9 @@ pub struct DatabaseMapper {
 }
 
 impl DatabaseMapper {
-    pub fn new<P: AsRef<Path>>(database_path: P) -> Result<Self> {
+    pub fn new() -> Result<Self> {
         Ok(DatabaseMapper {
-            database: Database::new(database_path)?,
+            database: Database::new(DATABASE_PATH.as_path())?,
         })
     }
 }
@@ -122,7 +122,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
 }
 
 fn build_image(id: PokemonID) -> image::DynamicImage {
-    let image_path = format!("./data/assets/{}/bw_front.png", Into::<u32>::into(id));
+    let image_path = ASSETS_PATH.join(format!("{}/bw_front.png", Into::<u32>::into(id)));
     image::ImageReader::open(image_path)
         .expect("Unable to open image.")
         .decode()
@@ -130,8 +130,8 @@ fn build_image(id: PokemonID) -> image::DynamicImage {
 }
 
 fn build_cry(id: PokemonID) -> PokemonCry {
-    let cry_bytes = std::fs::read(format!("./data/assets/{}/cry.wav", Into::<u32>::into(id)))
-        .expect("Unable to locate cry resource.");
+    let cry_path = ASSETS_PATH.join(format!("{}/cry.wav", Into::<u32>::into(id)));
+    let cry_bytes = std::fs::read(cry_path).expect("Unable to locate cry resource.");
     PokemonCry::new(cry_bytes)
 }
 
