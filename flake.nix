@@ -12,6 +12,7 @@
     rust-flake.inputs.nixpkgs.follows = "nixpkgs";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     cargo-doc-live.url = "github:srid/cargo-doc-live";
+    flake-root.url = "github:srid/flake-root";
 
     git-hooks.url = "github:cachix/git-hooks.nix";
     git-hooks.flake = false;
@@ -22,9 +23,11 @@
       systems = import inputs.systems;
 
       # See ./nix/modules/*.nix for the modules that are imported here.
-      imports = with builtins;
+      imports = [
+        inputs.flake-root.flakeModule
+      ] ++ (with builtins;
         map
           (fn: ./nix/modules/${fn})
-          (attrNames (readDir ./nix/modules));
+          (attrNames (readDir ./nix/modules)));
     };
 }
