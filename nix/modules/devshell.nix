@@ -12,6 +12,7 @@
 
       packages = with pkgs; [
         cargo-deb
+        cargo-cross
         rustup
         just
         nixd
@@ -27,7 +28,6 @@
         export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
 
         rustup target add aarch64-unknown-linux-gnu
-        rustup target add i686-unknown-linux-gnu
         rustup target add x86_64-unknown-linux-gnu
       '';
     };
