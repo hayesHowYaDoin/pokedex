@@ -20,26 +20,10 @@ jobs:
   #       sudo apt-get install --no-install-recommends -y libasound2-dev
   #   - run: cargo fmt --all -- --check
   #   - run: cargo clippy -- -D warnings
-
-  # build:
-  #   needs: quality
-  #   name: 'build-${{matrix.os}}'
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest, macos-latest]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - name: Install System Dependencies
-  #     if: ${{ runner.os == 'Linux' }}
-  #     run: |
-  #       sudo apt-get update
-  #       sudo apt-get install --no-install-recommends -y libasound2-dev
-  #   - run: cargo build
   #   - run: cargo test
 
   # flake:
-  #   needs: build
+  #   needs: quality
   #   name: 'flake-${{matrix.os}}'
   #   runs-on: ${{ matrix.os }}
   #   strategy:
@@ -55,110 +39,94 @@ jobs:
   #       sudo apt-get install --no-install-recommends -y libasound2-dev
   #   - run: nix build .
 
-  debian-build:
-    # needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - name: Build
-      run: |
-        cargo install cargo-deb
-        rustup target add x86_64-unknown-linux-musl
-        cargo deb --target=x86_64-unknown-linux-musl
-    - name: Upload Deb Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: amd64deb
-        path: ./target/x86_64-unknown-linux-musl/debian/*
+  # binaries:
+  #   needs: quality
+  #   name: 'build-${{matrix.os}}'
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: DeterminateSystems/nix-installer-action@main
+  #   - name: Install System Dependencies
+  #     if: ${{ runner.os == 'Linux' }}
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install --no-install-recommends -y libasound2-dev
+  #   - run: nix develop --command cargo build --release
+    # - name: Zip binaries
+    #   run: 'zip -j rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex'
+    # - name: Upload Zipped Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: macos
+    #     path: 'rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip'
+    # - name: Upload Bin Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ matrix.os }}
+    #     path: ./target/release/rich_pokedex
 
-  raspbian-build:
-    # needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - name: Build
-      run: |
-        cargo install cargo-deb
-        rustup target add armv7-unknown-linux-musleabih
-        cargo deb --target=armv7-unknown-linux-musleabih
-    - name: Upload Deb Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: armv7deb
-        path: ./target/armv7-unknown-linux-musleabihf/debian/*
+  # draft-release:
+  #   needs: binaries
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Create Release
+  #       id: create_release
+  #       uses: actions/create-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: '${{ github.ref }}'
+  #         release_name: Release ${{ github.ref }}
+  #         body: 'Change Me'
+  #         draft: true
+  #         prerelease: true
+  #     - uses: actions/download-artifact@v2
+  #     - run: ls -lhaexecutable
+  #       with:
+  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #         asset_path: ./target/release/rich_pokedex
+  #         asset_name: 'rich_pokedex_${{ github.ref }}_linux'
+  #         asset_content_type: application/octet-stream
+  #     - name: Upload Macos Release Asset
+  #       uses: actions/upload-release-asset@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #         asset_path: ./macos/rich_pokedex_${{ github.ref }}_macos.zip
+  #         asset_name: 'rich_pokedex_${{ github.ref }}_macos.zip'
+  #         asset_content_type: application/zip
 
-  macos-build:
-    # needs: build
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --release
-    - name: Zip binaries
-      run: 'zip -j rich_pokedex_${{ github.ref }}_macos.zip ./target/release/rich_pokedex'
-    - name: Upload Zipped Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos
-        path: 'rich_pokedex_${{ github.ref }}_macos.zip'
-    - name: Upload Bin Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos
-        path: ./target/release/rich_pokedex
+  test-build:
+    strategy:
+      matrix:
+        target:
+          - aarch64-unknown-linux-gnu
+          # - i686-pc-windows-gnu
+          - i686-unknown-linux-gnu
+          # - x86_64-pc-windows-gnu
+          - x86_64-unknown-linux-gnu
 
-  draft-release:
-    needs: [debian-build, raspbian-build, macos-build]
+    name: Build Executable
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
         with:
-          tag_name: '${{ github.ref }}'
-          release_name: Release ${{ github.ref }}
-          body: 'Change Me'
-          draft: true
-          prerelease: true
-      - uses: actions/download-artifact@v2
-      - run: ls -lha
-      - name: Upload amd64 deb Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          toolchain: stable
+      - name: Install dependencies
+        run: |
+          rustup target add ${{ matrix.target }}
+      - name: Build
+        uses: actions-rs/cargo@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./amd64deb/rich_pokedex_${{ github.ref }}_amd64.deb
-          asset_name: 'rich_pokedex_${{ github.ref }}_amd64.deb'
-          asset_content_type: application/vnd.debian.binary-package
-      - name: Upload armv7 deb Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./armv7deb/rich_pokedex_${{ github.ref }}_armhf.deb
-          asset_name: 'rich_pokedex_${{ github.ref }}_armhf.deb'
-          asset_content_type: application/vnd.debian.binary-package
-      - name: Upload Macos Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./macos/rich_pokedex_${{ github.ref }}_macos.zip
-          asset_name: 'rich_pokedex_${{ github.ref }}_macos.zip'
-          asset_content_type: application/zip
+          use-cross: true
+          command: build
+          args: --target ${{ matrix.target }} --release --all-features
