@@ -12,6 +12,7 @@
 
       packages = with pkgs; [
         cargo-deb
+        rustup
         just
         nixd
         bacon
@@ -24,6 +25,10 @@
       shellHook = ''
         export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.sqlite"
         export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
+
+        rustup target add aarch64-unknown-linux-gnu
+        rustup target add i686-unknown-linux-gnu
+        rustup target add x86_64-unknown-linux-gnu
       '';
     };
   };
