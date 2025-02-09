@@ -17,7 +17,9 @@
         ];
 
         buildInputs = with pkgs;
-          [ alsa-lib.dev udev.dev alsa-utils ]
+          [ ]
+          ++ lib.optionals pkgs.stdenv.isLinux
+            [ alsa-lib.dev udev.dev alsa-utils ]
           ++ lib.optionals pkgs.stdenv.isDarwin
             (with pkgs.darwin.apple_sdk.frameworks; [ IOKit ]);
       };
