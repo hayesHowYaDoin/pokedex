@@ -70,7 +70,7 @@ jobs:
       with:
         cmd: bash build/pre.sh; cargo deb --target=x86_64-unknown-linux-musl
     - name: Upload Deb Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: amd64deb
         path: ./target/x86_64-unknown-linux-musl/debian/*
@@ -90,7 +90,7 @@ jobs:
       with:
         cmd: bash build/pre.sh; cargo deb --target=armv7-unknown-linux-musleabihf
     - name: Upload Deb Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: armv7deb
         path: ./target/armv7-unknown-linux-musleabihf/debian/*
@@ -106,12 +106,58 @@ jobs:
     - name: Zip binaries
       run: 'zip -j rich_pokedex_${{ github.ref }}_macos.zip ./target/release/rich_pokedex ./target/release/rich_pokedex'
     - name: Upload Zipped Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: macos
         path: 'rich_pokedex_${{ github.ref }}_macos.zip'
     - name: Upload Bin Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: macos
         path: ./target/release/rich_pokedex
+
+  draft-release:
+    needs: [debbuild, raspbianbuild, macosbuild ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: '${{ github.ref }}'
+          release_name: Release ${{ github.ref }}
+          body: 'Change Me'
+          draft: true
+          prerelease: true
+      - uses: actions/download-artifact@v2
+      - run: ls -lha
+      - name: Upload amd64 deb Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./amd64deb/rich_pokedex_${{ github.ref }}_amd64.deb
+          asset_name: 'rich_pokedex_${{ github.ref }}_amd64.deb'
+          asset_content_type: application/vnd.debian.binary-package
+      - name: Upload armv7 deb Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./armv7deb/rich_pokedex_${{ github.ref }}_armhf.deb
+          asset_name: 'rich_pokedex_${{ github.ref }}_armhf.deb'
+          asset_content_type: application/vnd.debian.binary-package
+      - name: Upload Macos Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./macos/rich_pokedex_${{ github.ref }}_macos.zip
+          asset_name: 'rich_pokedex_${{ github.ref }}_macos.zip'
+          asset_content_type: application/zip
