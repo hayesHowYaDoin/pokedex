@@ -117,7 +117,7 @@ jobs:
         path: ./target/release/rich_pokedex
 
   draft-release:
-    needs: [debbuild, raspbianbuild, macosbuild ]
+    needs: [debian-build, raspbian-build, macos-build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
