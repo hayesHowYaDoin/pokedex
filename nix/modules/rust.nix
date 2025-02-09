@@ -36,9 +36,9 @@
     packages.default = self'.packages.rich_pokedex.overrideAttrs (oldAttrs: {
       installPhase =
         (oldAttrs.installPhase or "") + ''
-          mkdir -p $out/bin/data/assets
-          cp -r ./data/assets/* $out/bin/data/assets/
-          cp -r ./data/pokedex.sqlite $out/bin/data/pokedex.sqlite
+          mkdir -p $out/share/rich_pokedex/
+          cp -r ./data/assets/ $out/share/rich_pokedex/
+          cp ./data/pokedex.sqlite $out/share/rich_pokedex/
         '';
 
       postFixup =
