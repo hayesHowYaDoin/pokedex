@@ -101,14 +101,11 @@ jobs:
   #         asset_name: 'rich_pokedex_${{ github.ref }}_macos.zip'
   #         asset_content_type: application/zip
 
-  test-build:
+  linux-build:
     strategy:
       matrix:
         target:
           - aarch64-unknown-linux-gnu
-          # - i686-pc-windows-gnu
-          - i686-unknown-linux-gnu
-          # - x86_64-pc-windows-gnu
           - x86_64-unknown-linux-gnu
 
     name: Build Executable
@@ -121,6 +118,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libasound2-dev libc6-dev-i386
+          sudo apt-get install --no-install-recommends -y libasound2-dev
           rustup target add ${{ matrix.target }}
       - run: nix develop --command cargo build --release --target ${{ matrix.target }} --all-features
