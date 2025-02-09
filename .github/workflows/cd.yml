@@ -1,6 +1,10 @@
 name: Continuous Deployment
 
-on: [push, pull_request]
+# on:
+#   push:
+#     tags:
+#       - 'v*'
+on: [push]
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,7 +20,6 @@ jobs:
         sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: cargo fmt --all -- --check
     - run: cargo clippy -- -D warnings
-    - run: cargo test
 
   build:
     needs: quality
@@ -33,6 +36,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: cargo build
+    - run: cargo test
 
   flake:
     needs: build
@@ -51,15 +55,63 @@ jobs:
         sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: nix build .
 
-  debian:
+  debian-build:
     needs: build
     runs-on: ubuntu-latest
+    name: Amd64Deb
     steps:
     - uses: actions/checkout@v2
-    - run: cargo install cargo-deb
     - name: Install System Dependencies
       if: ${{ runner.os == 'Linux' }}
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo deb
+    - uses: ebbflow-io/cargo-deb-amd64-ubuntu@1.0
+      with:
+        cmd: bash build/pre.sh; cargo deb --target=x86_64-unknown-linux-musl
+    - name: Upload Deb Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: amd64deb
+        path: ./target/x86_64-unknown-linux-musl/debian/*
+
+  raspbian-build:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Armv7Deb
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install System Dependencies
+      if: ${{ runner.os == 'Linux' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -y libasound2-dev
+    - uses: ebbflow-io/cargo-deb-armv7-debian@1.0
+      with:
+        cmd: bash build/pre.sh; cargo deb --target=armv7-unknown-linux-musleabihf
+    - name: Upload Deb Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: armv7deb
+        path: ./target/armv7-unknown-linux-musleabihf/debian/*
+
+  macos-build:
+    needs: build
+    runs-on: macos-latest
+    name: MacOS
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build --release
+    - name: Zip binaries
+      run: 'zip -j rich_pokedex_${{ github.ref }}_macos.zip ./target/release/rich_pokedex ./target/release/rich_pokedex'
+    - name: Upload Zipped Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos
+        path: 'rich_pokedex_${{ github.ref }}_macos.zip'
+    - name: Upload Bin Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos
+        path: ./target/release/rich_pokedex
