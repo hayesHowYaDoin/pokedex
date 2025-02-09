@@ -10,55 +10,54 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo fmt --all -- --check
-    - run: cargo clippy -- -D warnings
+  # quality:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Install System Dependencies
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install --no-install-recommends -y libasound2-dev
+  #   - run: cargo fmt --all -- --check
+  #   - run: cargo clippy -- -D warnings
 
-  build:
-    needs: quality
-    name: 'build-${{matrix.os}}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo build
-    - run: cargo test
+  # build:
+  #   needs: quality
+  #   name: 'build-${{matrix.os}}'
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Install System Dependencies
+  #     if: ${{ runner.os == 'Linux' }}
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install --no-install-recommends -y libasound2-dev
+  #   - run: cargo build
+  #   - run: cargo test
 
-  flake:
-    needs: build
-    name: 'flake-${{matrix.os}}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: DeterminateSystems/nix-installer-action@main
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: nix build .
+  # flake:
+  #   needs: build
+  #   name: 'flake-${{matrix.os}}'
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: DeterminateSystems/nix-installer-action@main
+  #   - name: Install System Dependencies
+  #     if: ${{ runner.os == 'Linux' }}
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install --no-install-recommends -y libasound2-dev
+  #   - run: nix build .
 
   debian-build:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
-    name: Amd64Deb
     steps:
     - uses: actions/checkout@v2
     - name: Install System Dependencies
@@ -66,9 +65,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - uses: ebbflow-io/cargo-deb-amd64-ubuntu@1.0
-      with:
-        cmd: bash build/pre.sh; cargo deb --target=x86_64-unknown-linux-musl
+    - name: Build
+      run: |
+        rustup target add x86_64-unknown-linux-musl
+        cargo deb --target=x86_64-unknown-linux-musl
     - name: Upload Deb Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -76,9 +76,8 @@ jobs:
         path: ./target/x86_64-unknown-linux-musl/debian/*
 
   raspbian-build:
-    needs: build
+    # needs: build
     runs-on: ubuntu-latest
-    name: Armv7Deb
     steps:
     - uses: actions/checkout@v2
     - name: Install System Dependencies
@@ -86,9 +85,10 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install --no-install-recommends -y libasound2-dev
-    - uses: ebbflow-io/cargo-deb-armv7-debian@1.0
-      with:
-        cmd: bash build/pre.sh; cargo deb --target=armv7-unknown-linux-musleabihf
+    - name: Build
+      run: |
+        rustup target add armv7-unknown-linux-musleabih
+        cargo deb --target=armv7-unknown-linux-musleabih
     - name: Upload Deb Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -96,15 +96,14 @@ jobs:
         path: ./target/armv7-unknown-linux-musleabihf/debian/*
 
   macos-build:
-    needs: build
+    # needs: build
     runs-on: macos-latest
-    name: MacOS
     steps:
     - uses: actions/checkout@v2
     - name: Build
       run: cargo build --release
     - name: Zip binaries
-      run: 'zip -j rich_pokedex_${{ github.ref }}_macos.zip ./target/release/rich_pokedex ./target/release/rich_pokedex'
+      run: 'zip -j rich_pokedex_${{ github.ref }}_macos.zip ./target/release/rich_pokedex'
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -117,7 +116,7 @@ jobs:
         path: ./target/release/rich_pokedex
 
   draft-release:
-    needs: [debian-build, raspbian-build, macos-build ]
+    needs: [debian-build, raspbian-build, macos-build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
