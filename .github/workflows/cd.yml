@@ -119,5 +119,5 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libasound2-dev
       - run: |
-        cargo install cross
-        cross build --target ${{ matrix.target }} --release --all-features
+          cargo install cross
+          cross build --target ${{ matrix.target }} --release --all-features
