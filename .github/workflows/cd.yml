@@ -114,10 +114,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: DeterminateSystems/nix-installer-action@main
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libasound2-dev
-      - run: nix develop
-      - run: cross build --target ${{ matrix.target }} --release --all-features
+      - run: |
+        cargo install cross
+        cross build --target ${{ matrix.target }} --release --all-features
