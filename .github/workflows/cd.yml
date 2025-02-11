@@ -40,7 +40,7 @@ jobs:
     - run: nix build .
 
   binaries:
-    needs: quality
+    # needs: quality
     name: 'build-${{matrix.os}}'
     runs-on: ${{ matrix.os }}
     strategy:
