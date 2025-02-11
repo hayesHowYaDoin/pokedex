@@ -6,7 +6,7 @@
       name = "rich_pokedex_shell";
 
       inputsFrom = [
-        self'.devShells.rust
+        # self'.devShells.rust
         config.pre-commit.devShell # See ./nix/modules/pre-commit.nix
       ];
 
@@ -21,6 +21,7 @@
         alsa-utils
         sqlite
         wget
+        unzip
       ];
 
       shellHook = ''

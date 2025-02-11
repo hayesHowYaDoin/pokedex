@@ -16,12 +16,11 @@
           pkg-config
         ];
 
-        buildInputs = with pkgs;
-          [ ]
+        buildInputs = with pkgs; [ ]
           ++ lib.optionals pkgs.stdenv.isLinux
-            [ alsa-lib.dev udev.dev alsa-utils ]
+          [ alsa-lib.dev udev.dev alsa-utils ]
           ++ lib.optionals pkgs.stdenv.isDarwin
-            (with pkgs.darwin.apple_sdk.frameworks; [ IOKit ]);
+          (with pkgs.darwin.apple_sdk.frameworks; [ IOKit ]);
       };
 
       src = lib.cleanSourceWith {
