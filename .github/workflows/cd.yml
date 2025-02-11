@@ -60,11 +60,12 @@ jobs:
     - run: cd target && ls
     - run: cd target/release && ls
     - name: Zip Binaries
-      run: zip -j rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex
+      # run: zip -j rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex
+      run: zip -j rich_pokedex_v0.0.1_${{ matrix.os }}.zip ./target/release/rich_pokedex
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
-        path: 'rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip'
+        path: 'rich_pokedex_v0.0.1_${{ matrix.os }}.zip'
     # - name: Upload Bin Artifact
     #   uses: actions/upload-artifact@v4
     #   with:
