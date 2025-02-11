@@ -85,7 +85,6 @@ jobs:
           draft: true
           prerelease: true
       - name: Upload x86_64 Linux Release Assets
-        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,7 +94,6 @@ jobs:
           asset_name: rich_pokedex_x86_64-linux
           asset_content_type: application/zip
       - name: Upload aarch64 Linux Release Assets
-        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
