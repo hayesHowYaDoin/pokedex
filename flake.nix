@@ -27,7 +27,7 @@
         inputs.flake-root.flakeModule
       ] ++ (with builtins;
         map
-          (fn: ./nix/modules/${fn})
-          (attrNames (readDir ./nix/modules)));
+          (fn: ./nix/${fn})
+          (attrNames (readDir ./nix)));
     };
 }
