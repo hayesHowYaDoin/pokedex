@@ -23,7 +23,7 @@ jobs:
   #   - run: cargo test
 
   flake:
-    needs: quality
+    # needs: quality
     name: 'flake-${{matrix.os}}'
     runs-on: ${{ matrix.os }}
     strategy:
