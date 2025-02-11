@@ -72,7 +72,6 @@ jobs:
   draft-release:
     needs: binaries
     runs-on: ubuntu-latest
-    permissions: con
     steps:
       - uses: actions/checkout@v2
       - name: Create Release
