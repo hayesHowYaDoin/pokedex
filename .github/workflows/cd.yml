@@ -46,7 +46,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-latest]
+        os: [ubuntu-latest, macos-latest, ubuntu-24.04-arm]
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
@@ -55,48 +55,43 @@ jobs:
     #   run: |
     #     sudo apt-get update
     #     sudo apt-get install --no-install-recommends -y libasound2-dev
+    - run: uname -mpi
     - run: nix develop --command cargo build --release
-    - name: Zip binaries
-      run: 'zip -r rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./result/bin ./result/share'
+    - name: Zip Binaries
+      run: zip -r rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
         path: 'rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip'
-    - name: Upload Bin Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.os }}
-        path: ./target/release/rich_pokedex
+    # - name: Upload Bin Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ matrix.os }}
+    #     path: ./target/release/rich_pokedex
 
-  # draft-release:
-  #   needs: binaries
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Create Release
-  #       id: create_release
-  #       uses: actions/create-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: '${{ github.ref }}'
-  #         release_name: Release ${{ github.ref }}
-  #         body: 'Change Me'
-  #         draft: true
-  #         prerelease: true
-  #     - uses: actions/download-artifact@v2
-  #     - run: ls -lhaexecutable
-  #       with:
-  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #         asset_path: ./target/release/rich_pokedex
-  #         asset_name: 'rich_pokedex_${{ github.ref }}_linux'
-  #         asset_content_type: application/octet-stream
-  #     - name: Upload Macos Release Asset
-  #       uses: actions/upload-release-asset@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #         asset_path: ./macos/rich_pokedex_${{ github.ref }}_macos.zip
-  #         asset_name: 'rich_pokedex_${{ github.ref }}_macos.zip'
-  #         asset_content_type: application/zip
+  draft-release:
+    needs: binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: '${{ github.ref }}'
+          release_name: Release ${{ github.ref }}
+          body: 'Change Me'
+          draft: true
+          prerelease: true
+      - name: Upload Release Assets
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./rich_pokedex_${{ github.ref }}_ubuntu-latest.zip
+          asset_name: rich_pokedex_x86_64-linux
+          asset_content_type: application/zip
