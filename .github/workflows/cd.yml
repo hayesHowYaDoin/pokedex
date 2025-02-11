@@ -72,18 +72,22 @@ jobs:
   draft-release:
     needs: binaries
     runs-on: ubuntu-latest
+    permissions: con
     steps:
       - uses: actions/checkout@v2
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: comnoco/create-release@v2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: '${{ github.ref }}'
+          tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: 'Change Me'
-          draft: true
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
           prerelease: true
       - name: Upload x86_64 Linux Release Assets
         uses: actions/upload-release-asset@v1
