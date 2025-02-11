@@ -17,8 +17,8 @@
         just
         nixd
         bacon
-        alsa-lib
-        alsa-utils
+        # alsa-lib
+        # alsa-utils
         sqlite
         wget
         unzip
