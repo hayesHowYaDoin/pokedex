@@ -22,22 +22,22 @@ jobs:
   #   - run: cargo clippy -- -D warnings
   #   - run: cargo test
 
-  flake:
-    # needs: quality
-    name: 'flake-${{matrix.os}}'
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v2
-    - uses: DeterminateSystems/nix-installer-action@main
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: nix build .
+  # flake:
+  #   # needs: quality
+  #   name: 'flake-${{matrix.os}}'
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, macos-latest]
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: DeterminateSystems/nix-installer-action@main
+  #   - name: Install System Dependencies
+  #     if: ${{ runner.os == 'Linux' }}
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt-get install --no-install-recommends -y libasound2-dev
+  #   - run: nix build .
 
   binaries:
     # needs: quality
@@ -46,7 +46,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, ubuntu-24.04-arm]
+        os: [ubuntu-latest, ubuntu-24.04-arm]
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
@@ -55,10 +55,9 @@ jobs:
     #   run: |
     #     sudo apt-get update
     #     sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: uname -mpi
     - run: nix develop --command cargo build --release
     - name: Zip Binaries
-      run: zip -r rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex
+      run: zip -j rich_pokedex_${{ github.ref }}_${{ matrix.os }}.zip ./target/release/rich_pokedex
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -85,7 +84,7 @@ jobs:
           body: 'Change Me'
           draft: true
           prerelease: true
-      - name: Upload Release Assets
+      - name: Upload x86_64 Linux Release Assets
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -94,4 +93,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./rich_pokedex_${{ github.ref }}_ubuntu-latest.zip
           asset_name: rich_pokedex_x86_64-linux
+          asset_content_type: application/zip
+      - name: Upload aarch64 Linux Release Assets
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./rich_pokedex_${{ github.ref }}_ubuntu-24.04-arm.zip
+          asset_name: rich_pokedex_aarch64-linux
           asset_content_type: application/zip
