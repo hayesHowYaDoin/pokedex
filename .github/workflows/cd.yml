@@ -58,10 +58,11 @@ jobs:
     - run: nix develop --command cargo build --release
     - name: Zip Binaries
       run: |
-        mkdir -p tmp
-        cp ./target/release/rich_pokedex tmp/
-        cp ./data/pokedex.sqlite tmp/
-        cp -r ./data/assets tmp/
+        mkdir -p tmp/usr/local/bin
+        mkdir -p tmp/usr/share/rich_pokedex
+        cp ./target/release/rich_pokedex tmp/usr/local/bin/
+        cp ./data/pokedex.sqlite tmp/usr/share/rich_pokedex/
+        cp -r ./data/assets tmp/usr/share/rich_pokedex
         cd tmp
         zip -r ../rich_pokedex.zip ./*
     - name: Upload Zipped Artifact
