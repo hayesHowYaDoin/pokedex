@@ -57,14 +57,7 @@ jobs:
     #     sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: nix develop --command cargo build --release
     - name: Zip Binaries
-      run: |
-        mkdir -p tmp/usr/local/bin
-        mkdir -p tmp/usr/share/rich_pokedex
-        cp ./target/release/rich_pokedex tmp/usr/local/bin/
-        cp ./data/pokedex.sqlite tmp/usr/share/rich_pokedex/
-        cp -r ./data/assets tmp/usr/share/rich_pokedex
-        cd tmp
-        zip -r ../rich_pokedex.zip ./*
+      run: zip -r rich_pokedex.zip ./target/release/rich_pokedex ./data/pokedex.sqlite ./data/assets
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:

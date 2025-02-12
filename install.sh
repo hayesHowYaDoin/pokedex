@@ -32,21 +32,30 @@ install_release() {
         exit 1
     fi
 
-    url="https://github.com/hayesHowYaDoin/pokedex/releases/latest/download/x86_64-linux"
+    # Create and navigate to temporary installation directory
+    mkdir -p tmp
+    cd tmp
+
+    url="https://github.com/hayesHowYaDoin/pokedex/releases/$version/download/$arch-$os";
     echo "Downloading from $url"
-    curl -L $url -o rich_pokedex.zip
+    {
+        curl -L $url -o rich_pokedex.zip;
+    } || { echo "Download failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Extracting files..."
-    unzip rich_pokedex.zip
+    unzip rich_pokedex.zip || { echo "Extraction failed"; exit 1; }
 
     echo "Installing..."
-    chmod +x rich_pokedex
-    mv rich_pokedex /usr/local/bin/
-    mv data/pokedex.sqlite /usr/share/bin/
-    mv -r data/assets /usr/share/bin/
+    {
+        mkdir -p /usr/share/rich_pokedex;
+        chmod +x ./rich_pokedex;
+
+        mv ./rich_pokedex /usr/local/bin && \
+        mv ./pokedex.sqlite ./assets /usr/share/rich_pokedex;
+    } || { echo "Installation failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Cleaning up..."
-    rm rich_pokedex.zip
+    cd .. && rm -fr ./tmp
 
     echo "Installation complete."
 }
@@ -60,4 +69,4 @@ fi
 version=$1
 os=$(detect_os)
 arch=$(detect_arch)
-install_release $version $os
+install_release $version $os $arch
