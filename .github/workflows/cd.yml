@@ -153,7 +153,7 @@ jobs:
         path: 'rich_pokedex.zip'
 
   draft-release:
-    needs: [build-amd64-linux, build-arm64-linux, build-arm64-macos]
+    needs: [build-amd64-linux, build-arm64-linux, build-amd64-macos, build-arm64-macos]
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
