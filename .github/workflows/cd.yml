@@ -70,7 +70,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.run_number }}_x86-linux_deb
-        path: 'target/debian/rich_pokedex_0.1.0-1_amd64.deb'
+        path: 'target/debian/rich-pokedex_0.1.0-1_amd64.deb'
 
   build-aarch64-linux:
     # needs: quality
