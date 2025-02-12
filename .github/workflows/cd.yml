@@ -160,8 +160,8 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./${{ github.run_number }}_x86-linux_deb/rich-pokedex_0.1.0-1_amd64.deb
-          asset_name: x86_64-linux_deb
-          asset_content_type: application/zip
+          asset_name: x86_64-linux.deb
+          asset_content_type: application/vnd.debian.binary-package
   #     - name: Upload x86_64 Linux Release Assets
   #       uses: actions/upload-release-asset@v1
   #       env:
