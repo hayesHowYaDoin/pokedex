@@ -70,7 +70,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.run_number }}_x86-linux_deb
-        path: 'target/debian/rich_pokedex_0.1.0_amd64.deb'
+        path: 'target/debian/rich_pokedex_0.1.0_1_amd64.deb'
 
   build-aarch64-linux:
     # needs: quality
@@ -103,7 +103,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ github.run_number }}_aarch64-linux_deb
-        path: 'target/debian/rich_pokedex_0.1.0_amd64.deb'
+        path: 'target/debian/rich-pokedex_0.1.0-1_arm64.deb'
 
   # build-macos:
   #   # needs: quality
@@ -136,23 +136,32 @@ jobs:
   #       name: ${{ github.run_number }}_${{ matrix.os }}
   #       path: 'rich_pokedex.zip'
 
-  # draft-release:
-  #   needs: binaries
-  #   runs-on: ubuntu-latest
-  #   permissions: write-all
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Create Release
-  #       id: create_release
-  #       uses: actions/create-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: '${{ github.run_number }}'
-  #         release_name: Release ${{ github.run_number }}
-  #         body: 'Change Me'
-  #     - uses: actions/download-artifact@v4
-  #     - run: ls -R
+  draft-release:
+    needs: binaries
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: '${{ github.run_number }}'
+          release_name: Release ${{ github.run_number }}
+          body: 'Change Me'
+      - uses: actions/download-artifact@v4
+      - run: ls -R
+      - name: Upload x86_64 Linux Debian Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ github.run_number }}_x86-linux_deb
+          asset_name: x86_64-linux_deb
+          asset_content_type: application/zip
   #     - name: Upload x86_64 Linux Release Assets
   #       uses: actions/upload-release-asset@v1
   #       env:
