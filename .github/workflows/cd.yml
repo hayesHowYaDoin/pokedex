@@ -72,42 +72,38 @@ jobs:
         name: ${{ github.run_number }}_x86-linux_deb
         path: 'target/debian/rich_pokedex_0.1.0_amd64.deb'
 
-  # build-linux:
-  #   # needs: quality
-  #   name: 'build-${{matrix.os}}'
-  #   runs-on: ${{ matrix.os }}
-  #   continue-on-error: true
-  #   strategy:
-  #     matrix:
-  #       os: [ubuntu-latest, ubuntu-24.04-arm]
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: DeterminateSystems/nix-installer-action@main
-  #   # - name: Install System Dependencies
-  #   #   if: ${{ runner.os == 'Linux' }}
-  #   #   run: |
-  #   #     sudo apt-get update
-  #   #     sudo apt-get install --no-install-recommends -y libasound2-dev
-  #   - run: nix develop --command cargo build --release
-  #   - run: nix develop --command cargo deb
-  #   - name: Zip Binaries
-  #     run: |
-  #       mkdir -p tmp/
-  #       cp ./target/release/rich_pokedex tmp/
-  #       cp ./data/pokedex.sqlite tmp/
-  #       cp -r ./data/assets tmp/
-  #       cd tmp
-  #       zip -r ../rich_pokedex.zip ./*
-  #   - name: Upload Zipped Artifact
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.run_number }}_${{ matrix.os }}
-  #       path: 'rich_pokedex.zip'
-  #   - name: Upload Debian Package
-  #     uses: actions/upload-artifact@v4
-  #     with:
-  #       name: ${{ github.run_number }}_${{ matrix.os }}_deb
-  #       path: 'target/debian/rich_pokedex_0.1.0_amd64.deb'
+  build-aarch64-linux:
+    # needs: quality
+    runs-on: ubuntu-24.04-arm
+    steps:
+    - uses: actions/checkout@v2
+    - uses: DeterminateSystems/nix-installer-action@main
+    # - name: Install System Dependencies
+    #   if: ${{ runner.os == 'Linux' }}
+    #   run: |
+    #     sudo apt-get update
+    #     sudo apt-get install --no-install-recommends -y libasound2-dev
+    # - run: nix develop --command cargo build --release
+    - run: nix develop --command cargo deb
+    - run: ls -al ./target/debian/
+    # - name: Zip Binaries
+    #   run: |
+    #     mkdir -p tmp/
+    #     cp ./target/release/rich_pokedex tmp/
+    #     cp ./data/pokedex.sqlite tmp/
+    #     cp -r ./data/assets tmp/
+    #     cd tmp
+    #     zip -r ../rich_pokedex.zip ./*
+    # - name: Upload Zipped Artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ${{ github.run_number }}_${{ matrix.os }}
+    #     path: 'rich_pokedex.zip'
+    - name: Upload Debian Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ github.run_number }}_aarch64-linux_deb
+        path: 'target/debian/rich_pokedex_0.1.0_amd64.deb'
 
   # build-macos:
   #   # needs: quality
