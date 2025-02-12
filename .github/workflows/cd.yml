@@ -57,12 +57,12 @@ jobs:
     #     sudo apt-get install --no-install-recommends -y libasound2-dev
     - run: nix develop --command cargo build --release
     - name: Zip Binaries
-      run: zip -j rich_pokedex_v0.0.1_${{ matrix.os }}.zip ./target/release/rich_pokedex
+      run: zip -j rich_pokedex.zip ./target/release/rich_pokedex
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: rich_pokedex_${{ matrix.os }}
-        path: 'rich_pokedex_v0.0.1_${{ matrix.os }}.zip'
+        name: v0.0.1_${{ matrix.os }}
+        path: 'rich_pokedex.zip'
     # - name: Upload Bin Artifact
     #   uses: actions/upload-artifact@v4
     #   with:
@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./rich_pokedex_ubuntu-latest
+          asset_path: ./v0.0.1_ubuntu-latest/rich_pokedex.zip
           asset_name: rich_pokedex_x86_64-linux
           asset_content_type: application/zip
       - name: Upload aarch64 Linux Release Assets
@@ -103,6 +103,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./rich_pokedex_ubuntu-24.04-arm
+          asset_path: ./v0.0.1_ubuntu-24.04-arm/rich_pokedex.zip
           asset_name: rich_pokedex_aarch64-linux
           asset_content_type: application/zip
