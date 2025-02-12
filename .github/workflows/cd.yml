@@ -102,8 +102,8 @@ jobs:
     - name: Upload Debian Package
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ github.run_number }}_aarch64-linux_deb
-        path: 'target/debian/rich-pokedex_0.1.0-1_arm64.deb'
+        name: amd64deb
+        path: 'target/debian/*'
 
   # build-macos:
   #   # needs: quality
@@ -159,8 +159,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ github.run_number }}_x86-linux_deb/rich-pokedex_0.1.0-1_amd64.deb
-          asset_name: x86_64-linux.deb
+          asset_path: ./amd64deb/rich-pokedex_0.1.0-1_amd64.deb
+          asset_name: rich-pokedex_0.1.0-1_amd64.deb
           asset_content_type: application/vnd.debian.binary-package
   #     - name: Upload x86_64 Linux Release Assets
   #       uses: actions/upload-release-asset@v1
