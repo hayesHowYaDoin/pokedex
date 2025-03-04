@@ -1,16 +1,15 @@
-// use fyrox_sound::buffer::SoundBufferResourceExtension;
-// use fyrox_sound::{
-//     buffer::{DataSource, SoundBufferResource},
-//     context::SoundContext,
-//     engine::SoundEngine,
-//     pool::Handle,
-//     source::{SoundSource, SoundSourceBuilder, Status},
-// };
+use fyrox_sound::buffer::SoundBufferResourceExtension;
+use fyrox_sound::{
+    buffer::{DataSource, SoundBufferResource},
+    context::SoundContext,
+    engine::SoundEngine,
+    pool::Handle,
+    source::{SoundSource, SoundSourceBuilder, Status},
+};
 
 use crate::core::ui::components::Sound;
 
 pub fn play_sound(sound: Sound) {
-    /*
     // Initialize sound engine with default output device.
     let engine = SoundEngine::new().unwrap();
 
@@ -36,5 +35,4 @@ pub fn play_sound(sound: Sound) {
     // Each sound sound must be added to context, context takes ownership on source
     // and returns pool handle to it by which it can be accessed later on if needed.
     let _source_handle: Handle<SoundSource> = context.state().add_source(source);
-    */
 }

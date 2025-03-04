@@ -2,27 +2,30 @@
 
 {
   perSystem = { config, self', pkgs, lib, ... }: {
-    devShells.default = pkgs.mkShell {
-      name = "rich_pokedex_shell";
-
+    devShells.default = pkgs.mkShell rec {
       inputsFrom = [
-        # self'.devShells.rust
         config.pre-commit.devShell # See ./nix/modules/pre-commit.nix
       ];
 
-      packages = with pkgs; [
+      nativeBuildInputs = with pkgs; [
+        pkg-config
+      ];
+
+      buildInputs = with pkgs; [
         cargo-deb
         cargo-cross
         rustup
         just
         nixd
         bacon
-        # alsa-lib
-        # alsa-utils
+        alsa-lib
+        alsa-utils
         sqlite
         wget
         unzip
       ];
+
+      LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 
       shellHook = ''
         export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.sqlite"
