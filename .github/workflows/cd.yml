@@ -88,52 +88,52 @@ jobs:
         name: arm64-linux-binaries
         path: 'rich_pokedex.zip'
 
-  build-amd64-macos:
-    needs: quality
-    runs-on: macos-13
-    steps:
-    - uses: actions/checkout@v2
-    - uses: DeterminateSystems/nix-installer-action@main
-    - run: nix develop --command cargo build --release
-    - run: ls -R
-    - name: Zip Binaries
-      run: |
-        mkdir -p tmp/
-        cp ./target/release/rich_pokedex tmp/
-        cp ./data/pokedex.sqlite tmp/
-        cp -r ./data/assets tmp/
-        cd tmp
-        zip -r ../rich_pokedex.zip ./*
-    - name: Upload Zipped Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: amd64-macos-binaries
-        path: 'rich_pokedex.zip'
+  # build-amd64-macos:
+  #   needs: quality
+  #   runs-on: macos-13
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: DeterminateSystems/nix-installer-action@main
+  #   - run: nix develop --command cargo build --release
+  #   - run: ls -R
+  #   - name: Zip Binaries
+  #     run: |
+  #       mkdir -p tmp/
+  #       cp ./target/release/rich_pokedex tmp/
+  #       cp ./data/pokedex.sqlite tmp/
+  #       cp -r ./data/assets tmp/
+  #       cd tmp
+  #       zip -r ../rich_pokedex.zip ./*
+  #   - name: Upload Zipped Artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: amd64-macos-binaries
+  #       path: 'rich_pokedex.zip'
 
-  build-arm64-macos:
-    needs: quality
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: DeterminateSystems/nix-installer-action@main
-    - run: nix develop --command cargo build --release
-    - run: ls -R
-    - name: Zip Binaries
-      run: |
-        mkdir -p tmp/
-        cp ./target/release/rich_pokedex tmp/
-        cp ./data/pokedex.sqlite tmp/
-        cp -r ./data/assets tmp/
-        cd tmp
-        zip -r ../rich_pokedex.zip ./*
-    - name: Upload Zipped Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: arm64-macos-binaries
-        path: 'rich_pokedex.zip'
+  # build-arm64-macos:
+  #   needs: quality
+  #   runs-on: macos-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: DeterminateSystems/nix-installer-action@main
+  #   - run: nix develop --command cargo build --release
+  #   - run: ls -R
+  #   - name: Zip Binaries
+  #     run: |
+  #       mkdir -p tmp/
+  #       cp ./target/release/rich_pokedex tmp/
+  #       cp ./data/pokedex.sqlite tmp/
+  #       cp -r ./data/assets tmp/
+  #       cd tmp
+  #       zip -r ../rich_pokedex.zip ./*
+  #   - name: Upload Zipped Artifact
+  #     uses: actions/upload-artifact@v4
+  #     with:
+  #       name: arm64-macos-binaries
+  #       path: 'rich_pokedex.zip'
 
   draft-release:
-    needs: [build-amd64-linux, build-arm64-linux, build-amd64-macos, build-arm64-macos]
+    needs: [build-amd64-linux, build-arm64-linux]
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -190,22 +190,22 @@ jobs:
           asset_name: arm64-linux
           asset_content_type: application/zip
   
-      - name: Upload amd64 MacOS Binaries
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./amd64-macos-binaries/rich_pokedex.zip
-          asset_name: amd64-macos
-          asset_content_type: application/zip
+      # - name: Upload amd64 MacOS Binaries
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./amd64-macos-binaries/rich_pokedex.zip
+      #     asset_name: amd64-macos
+      #     asset_content_type: application/zip
 
-      - name: Upload arm64 MacOS Binaries
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./arm64-macos-binaries/rich_pokedex.zip
-          asset_name: arm64-macos
-          asset_content_type: application/zip
+      # - name: Upload arm64 MacOS Binaries
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./arm64-macos-binaries/rich_pokedex.zip
+      #     asset_name: arm64-macos
+      #     asset_content_type: application/zip
