@@ -53,10 +53,10 @@ static INNER_RIGHT_VERTICAL: LazyLock<Layout> = LazyLock::new(|| {
 
 impl DetailPage {
     pub fn on_enter(&mut self) {
-        // let sound = self.get_launch_sound().clone();
-        // tokio::spawn(async move {
-        //     play_sound(sound);
-        // });
+        let sound = self.get_launch_sound().clone();
+        tokio::spawn(async move {
+            play_sound(sound);
+        });
     }
 
     pub fn render<B: Backend>(
