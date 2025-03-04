@@ -12,14 +12,16 @@
       ];
 
       buildInputs = with pkgs; [
+        alsa-lib
+        alsa-utils
+        bacon
+        cargo
         cargo-deb
-        cargo-cross
+        clippy
+        rustc
         rustup
         just
         nixd
-        bacon
-        alsa-lib
-        alsa-utils
         sqlite
         wget
         unzip
