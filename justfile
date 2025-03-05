@@ -10,11 +10,8 @@ build *ARGS:
 build-deb *ARGS:
   cargo deb {{ARGS}}
 
-build-nix *ARGS:
-  nix build .#rich_pokedex {{ARGS}}
-
 run *ARGS:
-  nix run .#rich_pokedex {{ARGS}}
+  cargo run {{ARGS}}
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
