@@ -47,6 +47,22 @@ the host computer.
 
 And... that's it!
 
+### Commands
+
+Most useful commands have been added to the justfile in the root of this 
+project. This allows for a clean, unified method of executing commands across 
+multiple utilities.
+
+These commands are as follows:
+```
+just default .......... Lists all available commands
+just watch ............ Runs persistant background code checker
+just pre-commit-all ... Runs pre-commit hooks on all files
+just build ............ Builds the application
+just build-deb ........ Builds the debian installer
+just run .............. Runs the application
+```
+
 ### Future Plans
 
 Please refer to any open issues for any future planned work on this project.
