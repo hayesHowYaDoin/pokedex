@@ -1,6 +1,5 @@
 use image::DynamicImage;
 
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct ImageBox {
     image: DynamicImage,
@@ -8,7 +7,7 @@ pub struct ImageBox {
 
 impl ImageBox {
     pub fn new(image: DynamicImage) -> Self {
-        Self {image}
+        Self { image }
     }
 
     pub fn image(&self) -> &DynamicImage {

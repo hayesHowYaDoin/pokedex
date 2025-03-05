@@ -1,10 +1,14 @@
-use colors_transform::{Rgb, Color as TransformColor};
+use colors_transform::{Color as TransformColor, Rgb};
 use ratatui::style::Color as TuiColor;
 
 use crate::core::pokemon::Type;
 
 fn rgb_to_color(rgb: Rgb) -> TuiColor {
-    TuiColor::Rgb(rgb.get_red() as u8, rgb.get_green() as u8, rgb.get_blue() as u8)
+    TuiColor::Rgb(
+        rgb.get_red() as u8,
+        rgb.get_green() as u8,
+        rgb.get_blue() as u8,
+    )
 }
 
 fn type_color(t: &Type) -> Rgb {
@@ -106,22 +110,22 @@ pub fn type_color_dark(t: &Type) -> TuiColor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_type_color_normal() {
         let _ = type_color(&Type::Normal);
     }
-    
+
     #[test]
     fn test_type_color_fire() {
         let _ = type_color(&Type::Fire);
     }
-    
+
     #[test]
     fn test_type_color_water() {
         let _ = type_color(&Type::Water);
     }
-    
+
     #[test]
     fn test_type_color_electric() {
         let _ = type_color(&Type::Electric);

@@ -1,4 +1,4 @@
-use color_eyre::{Result, eyre};
+use color_eyre::{eyre, Result};
 
 use std::collections::HashSet;
 
@@ -10,7 +10,7 @@ pub struct Pokemon {
 
 impl Pokemon {
     pub fn new(number: i32, name: String) -> Self {
-        Pokemon {number, name}
+        Pokemon { number, name }
     }
 }
 
@@ -60,7 +60,6 @@ impl std::fmt::Display for Type {
         };
         write!(f, "{}", s)
     }
-
 }
 
 impl From<String> for Type {
@@ -85,7 +84,6 @@ impl From<String> for Type {
             s if s == Type::Steel.to_string() => Type::Steel,
             s if s == Type::Fairy.to_string() => Type::Fairy,
             _ => Type::Normal,
-        
         }
     }
 }
@@ -98,10 +96,7 @@ pub struct PokemonTypes {
 
 impl PokemonTypes {
     pub fn new(primary: Type, secondary: Option<Type>) -> Self {
-        PokemonTypes {
-            primary,
-            secondary,
-        }
+        PokemonTypes { primary, secondary }
     }
 }
 
@@ -111,7 +106,9 @@ pub fn type_defense_weaknesses(type_: &Type) -> HashSet<Type> {
         Type::Fire => HashSet::from([Type::Water, Type::Rock, Type::Ground]),
         Type::Water => HashSet::from([Type::Electric, Type::Grass]),
         Type::Electric => HashSet::from([Type::Ground]),
-        Type::Grass => HashSet::from([Type::Fire, Type::Ice, Type::Poison, Type::Flying, Type::Bug]),
+        Type::Grass => {
+            HashSet::from([Type::Fire, Type::Ice, Type::Poison, Type::Flying, Type::Bug])
+        }
         Type::Ice => HashSet::from([Type::Fire, Type::Fighting, Type::Rock, Type::Steel]),
         Type::Fighting => HashSet::from([Type::Flying, Type::Psychic, Type::Fairy]),
         Type::Poison => HashSet::from([Type::Ground, Type::Psychic]),
@@ -119,7 +116,13 @@ pub fn type_defense_weaknesses(type_: &Type) -> HashSet<Type> {
         Type::Flying => HashSet::from([Type::Electric, Type::Ice, Type::Rock]),
         Type::Psychic => HashSet::from([Type::Bug, Type::Ghost, Type::Dark]),
         Type::Bug => HashSet::from([Type::Fire, Type::Flying, Type::Rock]),
-        Type::Rock => HashSet::from([Type::Water, Type::Grass, Type::Fighting, Type::Ground, Type::Steel]),
+        Type::Rock => HashSet::from([
+            Type::Water,
+            Type::Grass,
+            Type::Fighting,
+            Type::Ground,
+            Type::Steel,
+        ]),
         Type::Ghost => HashSet::from([Type::Ghost, Type::Dark]),
         Type::Dragon => HashSet::from([Type::Ice, Type::Dragon, Type::Fairy]),
         Type::Dark => HashSet::from([Type::Fighting, Type::Bug, Type::Fairy]),
@@ -131,13 +134,26 @@ pub fn type_defense_weaknesses(type_: &Type) -> HashSet<Type> {
 pub fn type_defense_strengths(type_: &Type) -> HashSet<Type> {
     match type_ {
         Type::Normal => HashSet::from([]),
-        Type::Fire => HashSet::from([Type::Bug, Type::Fire, Type::Grass, Type::Steel, Type::Ice, Type::Fairy]),
+        Type::Fire => HashSet::from([
+            Type::Bug,
+            Type::Fire,
+            Type::Grass,
+            Type::Steel,
+            Type::Ice,
+            Type::Fairy,
+        ]),
         Type::Water => HashSet::from([Type::Fire, Type::Water, Type::Ice, Type::Steel]),
         Type::Electric => HashSet::from([Type::Steel, Type::Electric, Type::Flying]),
         Type::Grass => HashSet::from([Type::Water, Type::Ground, Type::Grass, Type::Electric]),
         Type::Ice => HashSet::from([Type::Ice]),
         Type::Fighting => HashSet::from([Type::Rock, Type::Bug, Type::Dark]),
-        Type::Poison => HashSet::from([Type::Fighting, Type::Poison, Type::Grass, Type::Bug, Type::Fairy]),
+        Type::Poison => HashSet::from([
+            Type::Fighting,
+            Type::Poison,
+            Type::Grass,
+            Type::Bug,
+            Type::Fairy,
+        ]),
         Type::Ground => HashSet::from([Type::Poison, Type::Rock]),
         Type::Flying => HashSet::from([Type::Grass, Type::Fighting, Type::Bug]),
         Type::Psychic => HashSet::from([Type::Fighting, Type::Psychic]),
@@ -146,7 +162,18 @@ pub fn type_defense_strengths(type_: &Type) -> HashSet<Type> {
         Type::Ghost => HashSet::from([Type::Poison, Type::Bug]),
         Type::Dragon => HashSet::from([Type::Fire, Type::Water, Type::Electric, Type::Grass]),
         Type::Dark => HashSet::from([Type::Ghost, Type::Dark]),
-        Type::Steel => HashSet::from([Type::Normal, Type::Grass, Type::Ice, Type::Flying, Type::Psychic, Type::Bug, Type::Rock, Type::Dragon, Type::Steel, Type::Fairy]),
+        Type::Steel => HashSet::from([
+            Type::Normal,
+            Type::Grass,
+            Type::Ice,
+            Type::Flying,
+            Type::Psychic,
+            Type::Bug,
+            Type::Rock,
+            Type::Dragon,
+            Type::Steel,
+            Type::Fairy,
+        ]),
         Type::Fairy => HashSet::from([Type::Fighting, Type::Bug, Type::Dark]),
     }
 }
@@ -158,7 +185,7 @@ pub struct PokemonDescription {
 
 impl PokemonDescription {
     pub fn new(text: String) -> Self {
-        PokemonDescription {text}
+        PokemonDescription { text }
     }
 }
 
@@ -174,7 +201,7 @@ impl PokemonGenderRates {
             return Err(eyre::eyre!("Male and female rates must sum to 1.0"));
         }
 
-        Ok(PokemonGenderRates{male, female})
+        Ok(PokemonGenderRates { male, female })
     }
 }
 
@@ -216,7 +243,14 @@ pub struct PokemonStats {
 }
 
 impl PokemonStats {
-    pub fn new(hp: u32, attack: u32, defense: u32, special_attack: u32, special_defense: u32, speed: u32) -> Self {
+    pub fn new(
+        hp: u32,
+        attack: u32,
+        defense: u32,
+        special_attack: u32,
+        special_defense: u32,
+        speed: u32,
+    ) -> Self {
         PokemonStats {
             hp,
             attack,
@@ -235,7 +269,7 @@ pub struct PokemonImage {
 
 impl PokemonImage {
     pub fn new(image: String) -> Self {
-        PokemonImage {image}
+        PokemonImage { image }
     }
 }
 
@@ -246,6 +280,6 @@ pub struct PokemonCry {
 
 impl PokemonCry {
     pub fn new(cry: Vec<u8>) -> Self {
-        PokemonCry {cry}
+        PokemonCry { cry }
     }
 }

@@ -1,2 +1,2 @@
-pub mod sql;
 pub mod ratatui;
+pub mod sql;

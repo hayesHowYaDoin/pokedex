@@ -1,7 +1,4 @@
-use ratatui::{
-    Frame,
-    prelude::Rect,
-};
+use ratatui::{prelude::Rect, Frame};
 
 pub trait TuiComponent {
     fn render(&self, frame: &mut Frame, layout: &Rect);

@@ -2,20 +2,18 @@ use ratatui::{
     layout::{Constraint, Flex, Layout},
     prelude::{Rect, Style},
     style::Stylize,
-    Frame,
     widgets::{BarChart, Block, Paragraph},
+    Frame,
 };
 
-use crate::core::ui::components::PokemonStatChart;
 use super::TuiComponent;
+use crate::core::ui::components::PokemonStatChart;
 
 fn center(area: Rect, horizontal: Constraint, vertical: Constraint) -> Rect {
     let [area] = Layout::horizontal([horizontal])
         .flex(Flex::Center)
         .areas(area);
-    let [area] = Layout::vertical([vertical])
-        .flex(Flex::Center)
-        .areas(area);
+    let [area] = Layout::vertical([vertical]).flex(Flex::Center).areas(area);
 
     area
 }
@@ -33,10 +31,13 @@ impl<'a> TuiPokemonStatChart<'a> {
 
 impl TuiComponent for TuiPokemonStatChart<'_> {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
-        let data: Vec<(&str, u64)> = self.stat_chart.get_fields().iter().map(|field| {
-            (field.get_label(), field.get_value() as u64)
-        }).collect();
-        
+        let data: Vec<(&str, u64)> = self
+            .stat_chart
+            .get_fields()
+            .iter()
+            .map(|field| (field.get_label(), field.get_value() as u64))
+            .collect();
+
         let chart = BarChart::default()
             .bar_width(8)
             .bar_gap(2)
@@ -53,9 +54,8 @@ impl TuiComponent for TuiPokemonStatChart<'_> {
             Constraint::Length(layout.height / 2),
         );
 
-        let border = Paragraph::new("")
-            .block(self.block.clone());
-    
+        let border = Paragraph::new("").block(self.block.clone());
+
         frame.render_widget(border, *layout);
         frame.render_widget(chart, area);
     }

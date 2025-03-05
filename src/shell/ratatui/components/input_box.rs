@@ -1,11 +1,11 @@
 use ratatui::{
     prelude::Rect,
-    Frame,
     widgets::{Block, Paragraph},
+    Frame,
 };
 
-use crate::core::ui::components::InputBox;
 use super::TuiComponent;
+use crate::core::ui::components::InputBox;
 
 pub struct TuiInputBox {
     input_box: InputBox,
@@ -20,8 +20,7 @@ impl TuiInputBox {
 
 impl TuiComponent for TuiInputBox {
     fn render(&self, frame: &mut Frame, layout: &Rect) {
-        let widget = Paragraph::new(self.input_box.text())
-            .block(self.block.clone());
+        let widget = Paragraph::new(self.input_box.text()).block(self.block.clone());
 
         frame.render_widget(&widget, *layout);
     }
