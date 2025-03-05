@@ -2,6 +2,7 @@
 pub enum Event {
     NewCharacter(char),
     DeleteCharacter,
+    Quit,
     Select,
     Up,
     Down,

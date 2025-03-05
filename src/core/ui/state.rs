@@ -60,7 +60,7 @@ fn next_list(
             let pokemon = repository.fetch(id).expect("Failed to create DetailPage");
             Ok(PageState::Detail(DetailPage::new(pokemon)?))
         }
-        Event::Noop => Ok(PageState::List(page.clone())),
+        _ => Ok(PageState::List(page.clone())),
     }
 }
 

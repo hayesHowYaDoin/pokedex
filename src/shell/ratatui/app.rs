@@ -65,5 +65,5 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
 }
 
 fn should_quit(event: &Event) -> bool {
-    event == &Event::NewCharacter('q')
+    event == &Event::Quit
 }

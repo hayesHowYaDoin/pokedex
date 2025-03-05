@@ -117,7 +117,7 @@ impl DetailPage {
 
             // Footer
             frame.render_widget(
-                Paragraph::new("Press 'backspace' to return, 'q' to quit").fg(Color::DarkGray),
+                Paragraph::new("Press 'backspace' to return, 'esc' to quit").fg(Color::DarkGray),
                 outer_vertical_layout[4],
             );
         })?;

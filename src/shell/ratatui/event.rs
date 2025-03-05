@@ -12,10 +12,10 @@ impl From<Option<TuiEvent>> for Event {
                 KeyCode::Char(c) => Event::NewCharacter(c),
                 KeyCode::Backspace => Event::DeleteCharacter,
                 KeyCode::Enter => Event::Select,
+                KeyCode::Esc => Event::Quit,
                 _ => Event::Noop,
             },
-            Some(_) => Event::Noop,
-            None => Event::Noop,
+            _ => Event::Noop,
         }
     }
 }

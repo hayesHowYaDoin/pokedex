@@ -41,8 +41,8 @@ impl ListPage {
             let mut list = TuiPokemonTable::new(self.list_widget.clone(), Block::bordered());
             list.render_mut(frame, &layout[1]);
 
-            let widget =
-                Paragraph::new("Press 'enter' for detailed view, 'q' to quit").fg(Color::DarkGray);
+            let widget = Paragraph::new("Press 'enter' for detailed view, 'esc' to quit")
+                .fg(Color::DarkGray);
 
             frame.render_widget(widget, layout[2]);
         })?;
