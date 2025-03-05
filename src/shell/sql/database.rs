@@ -162,12 +162,13 @@ impl PokemonTypeTableRepository for Database {
             })
             .expect("Failed to execute query map")
             .filter_map(|t| t.ok())
-            .fold(HashMap::new(), |mut acc, (pokemon_id, pokemon_type)| {
-                acc.entry(pokemon_id)
-                    .or_insert_with(Vec::new)
-                    .push(pokemon_type);
-                acc
-            });
+            .fold(
+                HashMap::new(),
+                |mut acc: HashMap<_, Vec<PokemonTypeDTO>>, (pokemon_id, pokemon_type)| {
+                    acc.entry(pokemon_id).or_default().push(pokemon_type);
+                    acc
+                },
+            );
 
         Ok(pokemon_types)
     }

@@ -1,31 +1,28 @@
-
 #![allow(dead_code)]
 
-mod shell;
 mod core;
+mod shell;
 
 use color_eyre::eyre::Result;
 
-use crate::shell::sql::DatabaseMapper;
 use crate::shell::ratatui::app::App;
+use crate::shell::sql::DatabaseMapper;
 
 async fn tokio_main() -> Result<()> {
-    let db = DatabaseMapper::new("./data/pokedex.sqlite")
-        .expect("Failed to create database connection");
+    let db = DatabaseMapper::new().expect("Failed to create database connection");
 
     let mut app = App::new(Box::new(db)).expect("Failed to create application");
     app.run().await?;
-  
+
     Ok(())
-  }
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
     if let Err(e) = tokio_main().await {
         eprintln!("{} error: Something went wrong", env!("CARGO_PKG_NAME"));
         Err(e)
-    } 
-    else {
+    } else {
         Ok(())
     }
 }

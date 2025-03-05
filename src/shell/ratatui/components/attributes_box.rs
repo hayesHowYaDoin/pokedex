@@ -1,9 +1,11 @@
 use ratatui::{
-    prelude::Rect, widgets::{Block, Paragraph, Wrap}, Frame
+    prelude::Rect,
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
 };
 
-use crate::core::ui::components::AttributesBox;
 use super::TuiComponent;
+use crate::core::ui::components::AttributesBox;
 
 pub struct TuiAttributesBox<'a> {
     attributes_box: AttributesBox,
@@ -12,7 +14,10 @@ pub struct TuiAttributesBox<'a> {
 
 impl<'a> TuiAttributesBox<'a> {
     pub fn new(attributes_box: AttributesBox, block: Block<'a>) -> Self {
-        Self { attributes_box, block }
+        Self {
+            attributes_box,
+            block,
+        }
     }
 }
 

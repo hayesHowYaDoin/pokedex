@@ -19,9 +19,9 @@ impl ToSql for PokemonID {
     }
 }
 
-impl Into<u32> for PokemonID {
-    fn into(self) -> u32 {
-        self.0
+impl From<PokemonID> for u32 {
+    fn from(val: PokemonID) -> Self {
+        val.0
     }
 }
 
@@ -36,9 +36,9 @@ impl ToSql for TypeID {
     }
 }
 
-impl Into<u32> for TypeID {
-    fn into(self) -> u32 {
-        self.0
+impl From<TypeID> for u32 {
+    fn from(val: TypeID) -> Self {
+        val.0
     }
 }
 
@@ -53,16 +53,14 @@ impl ToSql for StatID {
     }
 }
 
-impl Into<u32> for StatID {
-    fn into(self) -> u32 {
-        self.0
+impl From<StatID> for u32 {
+    fn from(val: StatID) -> Self {
+        val.0
     }
 }
 
-
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AbilitySlot(pub u32);
-
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct AbilityID(pub u32);
@@ -249,12 +247,15 @@ pub struct PokemonAbilitiesDTO {
 
 impl PokemonAbilitiesDTO {
     pub fn new(id: AbilityID) -> PokemonAbilitiesDTO {
-        PokemonAbilitiesDTO {id}
+        PokemonAbilitiesDTO { id }
     }
 }
 
 pub trait PokemonAbilitiesRepository {
-    fn fetch(&self, id: &PokemonID) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
+    fn fetch(
+        &self,
+        id: &PokemonID,
+    ) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
 }
 
 // ============================================================================
@@ -263,17 +264,17 @@ pub trait PokemonAbilitiesRepository {
 
 #[derive(Debug)]
 pub struct PokemonSpeciesNamesDTO {
-  pub genus: String,
+    pub genus: String,
 }
 
 impl PokemonSpeciesNamesDTO {
-  pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
-    PokemonSpeciesNamesDTO { genus }
-  }
+    pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
+        PokemonSpeciesNamesDTO { genus }
+    }
 }
 
 pub trait PokemonSpeciesNamesRepository {
-  fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
 }
 
 // ============================================================================
@@ -282,15 +283,15 @@ pub trait PokemonSpeciesNamesRepository {
 
 #[derive(Debug)]
 pub struct PokemonGenderDTO {
-  pub rate: i32,
+    pub rate: i32,
 }
 
 impl PokemonGenderDTO {
-  pub fn new(rate: i32) -> PokemonGenderDTO {
-    PokemonGenderDTO { rate }
-  }
+    pub fn new(rate: i32) -> PokemonGenderDTO {
+        PokemonGenderDTO { rate }
+    }
 }
 
 pub trait PokemonGenderRepository {
-  fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
+    fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
 }

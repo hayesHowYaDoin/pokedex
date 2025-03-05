@@ -1,9 +1,15 @@
 [package]
-name = "pokedex"
+name = "rich_pokedex"
+description = "A modern Pokedex TUI application which appeals to the senses."
+authors = ["Jordan Hayes <jordanhayes98@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+repository = "https://github.com/hayesHowYaDoin/pokedex"
+license-file = "LICENSE"
+readme = "README.md"
+include = ["src/**", "data/pokedex.sqlite", "data/assets/**"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+keywords = ["pokedex", "pokemon", "ratatui", "tui"]
 
 [dependencies]
 ansi-to-tui = "7.0.0"
@@ -26,3 +32,12 @@ signal-hook = "0.3.17"
 thiserror = "1.0.61"
 tokio = { version = "1.38.0", features = ["sync", "rt", "macros", "time", "rt-multi-thread"] }
 tokio-util = "0.7.11"
+
+[package.metadata.deb]
+assets = [
+  # Binary
+  ["target/release/rich_pokedex", "usr/bin/rich_pokedex", "755"],
+  # Assets
+  ["data/pokedex.sqlite", "usr/share/rich_pokedex/pokedex.sqlite", "644"],
+  ["data/assets/**/*", "usr/share/rich_pokedex/assets/", "644"],
+]

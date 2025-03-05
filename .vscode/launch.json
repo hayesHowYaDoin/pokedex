@@ -11,11 +11,11 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=pokedex",
-                    "--package=pokedex"
+                    "--bin=rich_pokedex",
+                    "--package=rich_pokedex"
                 ],
                 "filter": {
-                    "name": "pokedex",
+                    "name": "rich_pokedex",
                     "kind": "bin"
                 }
             },
@@ -30,11 +30,11 @@
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=pokedex",
-                    "--package=pokedex"
+                    "--bin=rich_pokedex",
+                    "--package=rich_pokedex"
                 ],
                 "filter": {
-                    "name": "pokedex",
+                    "name": "rich_pokedex",
                     "kind": "bin"
                 }
             },

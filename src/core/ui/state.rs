@@ -60,7 +60,7 @@ fn next_list(
             let pokemon = repository.fetch(id).expect("Failed to create DetailPage");
             Ok(PageState::Detail(DetailPage::new(pokemon)?))
         }
-        Event::Noop => Ok(PageState::List(page.clone())),
+        _ => Ok(PageState::List(page.clone())),
     }
 }
 
@@ -91,17 +91,16 @@ impl From<&ListPagePokemon> for PokemonTableEntry {
 
 #[cfg(test)]
 mod test {
-    use std::{
-        collections::HashSet,
-        sync::LazyLock,
-    };
+    use std::sync::LazyLock;
 
     use cascade::cascade;
     use image::DynamicImage;
 
     use super::*;
     use crate::core::{
-        pokemon::{PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats, PokemonTypes, Type},
+        pokemon::{
+            PokemonAttributes, PokemonCry, PokemonDescription, PokemonStats, PokemonTypes, Type,
+        },
         ui::pages::{DetailPagePokemon, ListPagePokemon},
     };
 

@@ -8,7 +8,7 @@ pub fn capitalize(s: &str) -> String {
 
 pub fn capitalize_words(s: &str) -> String {
     s.split_whitespace()
-        .map(|w| capitalize(w))
+        .map(capitalize)
         .collect::<Vec<String>>()
         .join(" ")
 }
@@ -28,7 +28,10 @@ mod tests {
     #[test]
     fn test_capitalize_words() {
         assert_eq!(capitalize_words("hello world"), "Hello World");
-        assert_eq!(capitalize_words("rust programming language"), "Rust Programming Language");
+        assert_eq!(
+            capitalize_words("rust programming language"),
+            "Rust Programming Language"
+        );
         assert_eq!(capitalize_words(""), "");
         assert_eq!(capitalize_words("rUST is fUN"), "RUST Is FUN");
     }

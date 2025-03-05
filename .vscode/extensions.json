@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "rust-lang.rust-analyzer",
+        "jnoortheen.nix-ide",
+        "mkhl.direnv",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi",
+        "vadimcn.vscode-lldb",
+        "yzhang.markdown-all-in-one",
+        "swellaby.vscode-rust-test-adapter",
+    ]
+}

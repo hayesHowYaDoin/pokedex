@@ -1,9 +1,11 @@
 use ratatui::{
-    prelude::Rect, widgets::{Block, Paragraph, Wrap}, Frame
+    prelude::Rect,
+    widgets::{Block, Paragraph, Wrap},
+    Frame,
 };
 
-use crate::core::ui::components::TextBox;
 use super::TuiComponent;
+use crate::core::ui::components::TextBox;
 
 pub struct TuiTextBox<'a> {
     text_box: TextBox,

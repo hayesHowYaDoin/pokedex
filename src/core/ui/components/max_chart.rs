@@ -1,15 +1,16 @@
-use color_eyre::{
-    eyre::bail,
-    Result,
-};
+use color_eyre::{eyre::bail, Result};
 use num_traits::bounds::Bounded;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ChartFieldValue<const M: u32>(u32);
 
 impl<const M: u32> Bounded for ChartFieldValue<M> {
-    fn min_value() -> Self { ChartFieldValue(0) }
-    fn max_value() -> Self { ChartFieldValue(M) }
+    fn min_value() -> Self {
+        ChartFieldValue(0)
+    }
+    fn max_value() -> Self {
+        ChartFieldValue(M)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -39,14 +40,16 @@ impl<const M: u32> MaxChart<M> {
             bail!("values and labels must have the same length");
         }
 
-        let fields = values.iter().zip(labels.iter()).map(|(value, label)| {
-            ChartField {
+        let fields = values
+            .iter()
+            .zip(labels.iter())
+            .map(|(value, label)| ChartField {
                 value: ChartFieldValue(*value),
                 label: label.to_string(),
-            }
-        }).collect();
+            })
+            .collect();
 
-        Ok(MaxChart{ fields })
+        Ok(MaxChart { fields })
     }
 
     pub fn get_fields(&self) -> &[ChartField<M>] {

@@ -136,11 +136,7 @@ pub struct ListPagePokemon {
 }
 
 impl ListPagePokemon {
-    pub fn new(
-        number: u32,
-        name: String,
-        types: PokemonTypes,
-    ) -> Self {
+    pub fn new(number: u32, name: String, types: PokemonTypes) -> Self {
         ListPagePokemon {
             number,
             name,
