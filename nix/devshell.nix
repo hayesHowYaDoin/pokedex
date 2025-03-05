@@ -12,19 +12,20 @@
       ];
 
       buildInputs = with pkgs; [
-        alsa-lib
-        alsa-utils
+        alsa-lib.dev
         bacon
         cargo
         cargo-deb
         clippy
-        rustc
-        rustup
         just
         nixd
+        rustc
+        rustfmt
+        rustup
         sqlite
-        wget
+        udev.dev
         unzip
+        wget
       ];
 
       LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
@@ -35,6 +36,9 @@
 
         rustup target add aarch64-unknown-linux-gnu
         rustup target add x86_64-unknown-linux-gnu
+
+        rustup component add rust-analyzer
+        rust componenst add rust-src
       '';
     };
   };
