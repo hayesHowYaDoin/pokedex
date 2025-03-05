@@ -7,6 +7,8 @@
 This application is intended to serve as a method of browsing the various 
 statistics of the various Pokemon™ from the hit game series Pokemon™.
 
+https://github.com/user-attachments/assets/3e569b5b-a2ff-44e1-85cd-3343647c31ef
+
 ## Project Goals
 
 The primary goal of this project is to gain more experience with the Rust 
