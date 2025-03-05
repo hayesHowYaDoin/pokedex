@@ -81,6 +81,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
+      - run: |
+          VERSION=${{ github.ref }}
+          echo "VERSION=${VERSION:1}" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -99,8 +102,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./amd64-linux-deb/rich-pokedex_${{ github.ref }}-1_amd64.deb
-          asset_name: rich-pokedex_${{ github.ref }}-1_amd64.deb
+          asset_path: ./amd64-linux-deb/rich-pokedex_${VERSION}-1_amd64.deb
+          asset_name: rich-pokedex_${VERSION}-1_amd64.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Upload amd64 Linux Binaries
@@ -119,8 +122,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./arm64-linux-deb/rich-pokedex_${{ github.ref }}-1_arm64.deb
-          asset_name: rich-pokedex_${{ github.ref }}-1_arm64.deb
+          asset_path: ./arm64-linux-deb/rich-pokedex_${VERSION}-1_arm64.deb
+          asset_name: rich-pokedex_${VERSION}-1_arm64.deb
           asset_content_type: application/zip
 
       - name: Upload arm64 Linux Binaries
