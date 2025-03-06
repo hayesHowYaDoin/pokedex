@@ -26,6 +26,15 @@ At this time, there are only releases for x86 (AMD64) and ARM64 Linux. The
 binaries for each, along with a Debian installer, can be found in the releases
 section.
 
+Installing the appropriate binary release for your system can be done without
+cloning the repo with the following command:
+
+```
+bash <(curl -s https://raw.githubusercontent.com/hayesHowYaDoin/pokedex/main/install.sh) latest
+```
+
+Feel free to alter the version to the appropriate release for your use case.
+
 ## Development
 
 The following sections outline the process for setting up the and using the 
