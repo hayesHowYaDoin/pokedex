@@ -9,6 +9,8 @@ use crate::shell::ratatui::app::App;
 use crate::shell::sql::DatabaseMapper;
 
 async fn tokio_main() -> Result<()> {
+    color_eyre::install()?; // Enable colorized error output
+
     let db = DatabaseMapper::new().expect("Failed to create database connection");
 
     let mut app = App::new(Box::new(db)).expect("Failed to create application");
