@@ -32,7 +32,8 @@ impl<'a> TuiPokemonTable<'a> {
 
 impl TuiStatefulComponent for TuiPokemonTable<'_> {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
-        let table = Table::new(self.pokemon_table.get_pokemon().to_owned(), WIDTHS)
+        let rows = self.pokemon_table.get_pokemon().into_iter().map(|p| into_row(p.to_owned()));
+        let table = Table::new(rows, WIDTHS)
             .column_spacing(1)
             .header(
                 Row::new(vec!["#", "Name", "Type 1", "Type 2"])
@@ -49,17 +50,15 @@ impl TuiStatefulComponent for TuiPokemonTable<'_> {
     }
 }
 
-impl From<PokemonTableEntry> for Row<'_> {
-    fn from(entry: PokemonTableEntry) -> Self {
-        let color = type_color_medium(&entry.primary_type);
-        Row::new(vec![
-            entry.number.to_string(),
-            entry.name,
-            entry.primary_type.to_string(),
-            entry
-                .secondary_type
-                .map_or("".to_string(), |t| t.to_string()),
-        ])
-        .fg(color)
-    }
+fn into_row<'a>(entry: PokemonTableEntry) -> Row<'a> {
+    let color = type_color_medium(&entry.primary_type);
+    Row::new(vec![
+        entry.number.to_string(),
+        entry.name,
+        entry.primary_type.to_string(),
+        entry
+            .secondary_type
+            .map_or("".to_string(), |t| t.to_string()),
+    ])
+    .fg(color)
 }
