@@ -1,0 +1,15 @@
+[package]
+name = "database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Crate
+pokemon = { path = "../pokemon" }
+string = { path = "../string" }
+ui-core = { path = "../ui-core" }
+# External
+color-eyre = "0.6.3"
+image = "0.25.5"
+rusqlite = { version = "0.31.0", features = ["bundled"] }
+thiserror = "1.0.61"
