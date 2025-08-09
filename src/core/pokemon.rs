@@ -58,7 +58,7 @@ impl std::fmt::Display for Type {
             Type::Steel => "Steel",
             Type::Fairy => "Fairy",
         };
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 
