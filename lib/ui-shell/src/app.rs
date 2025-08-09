@@ -7,6 +7,7 @@ use ui_core::{
     Event, PageState,
 };
 use crate::{
+    event::FromTuiEvent,
     state::TuiState,
     tui::Tui,
 };
@@ -33,7 +34,7 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
         tui.start();
 
         loop {
-            let event = Event::from(tui.next().await);
+            let event = Event::from_tui_event(tui.next().await);
             if should_quit(&event) {
                 break;
             }
