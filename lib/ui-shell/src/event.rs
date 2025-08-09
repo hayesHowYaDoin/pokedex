@@ -3,8 +3,12 @@ use crossterm::event::KeyCode;
 use ui_core::Event;
 use crate::tui::TuiEvent;
 
-impl From<Option<TuiEvent>> for Event {
-    fn from(tui_event: Option<TuiEvent>) -> Self {
+pub trait FromTuiEvent {
+    fn from_tui_event(tui_event: Option<TuiEvent>) -> Self;
+}
+
+impl FromTuiEvent for Event {
+    fn from_tui_event(tui_event: Option<TuiEvent>) -> Self {
         match tui_event {
             Some(TuiEvent::Key(key_event)) => match key_event.code {
                 KeyCode::Up => Event::Up,
