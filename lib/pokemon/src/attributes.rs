@@ -16,6 +16,33 @@ impl PokemonGenderRates {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct PokemonAttributes {
+    pub height_m: String,
+    pub weight_kg: String,
+    pub category: String,
+    pub abilities: Vec<String>,
+    pub genders: Option<PokemonGenderRates>,
+}
+
+impl PokemonAttributes {
+    pub fn new(
+        height: String,
+        weight: String,
+        category: String,
+        abilities: Vec<String>,
+        genders: Option<PokemonGenderRates>,
+    ) -> Self {
+        PokemonAttributes {
+            height_m: height,
+            weight_kg: weight,
+            category,
+            abilities,
+            genders,
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

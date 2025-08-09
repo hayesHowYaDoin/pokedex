@@ -1,0 +1,15 @@
+[package]
+name = "ui-core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Crate
+pokemon = { path = "../pokemon" }
+string = { path = "../string" }
+# External
+cascade = "1.0.1"
+color-eyre = "0.6.3"
+image = "0.25.5"
+num-traits = "0.2.19"
+thiserror = "1.0.61"
