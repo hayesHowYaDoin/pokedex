@@ -21,15 +21,19 @@
         buildInputs = with rpkgs; [
           alsa-lib.dev
           bacon
-          cargo-deb
-          clippy
           just
           nixd
           sqlite
           udev.dev
           unzip
           wget
-          rust-bin.stable.latest.default
+          (rust-bin.stable."1.88.0".default.override {
+            extensions = [ "rust-src" "rust-analyzer" ];
+            targets = [
+              "aarch64-unknown-linux-gnu"
+              "x86_64-unknown-linux-gnu"
+            ];
+          })
         ];
 
         LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
@@ -37,6 +41,9 @@
         shellHook = ''
           export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.sqlite"
           export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
+          export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/sbin
+
+          cargo install cargo-deb
         '';
       };
     };
