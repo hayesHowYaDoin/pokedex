@@ -91,6 +91,8 @@ impl From<&ListPagePokemon> for PokemonTableEntry {
 
 #[cfg(test)]
 mod test {
+    use std::future::Future;
+    use std::pin::Pin;
     use std::sync::LazyLock;
 
     use cascade::cascade;
@@ -134,14 +136,17 @@ mod test {
     struct TestRepository();
 
     impl ListPagePokemonRepository for TestRepository {
-        async fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
-            Ok(LIST_POKEMON.clone())
+        fn fetch_all(&self) -> Pin<Box<dyn Future<Output = Result<Vec<ListPagePokemon>>> + Send>> {
+            Box::pin(async { Ok(LIST_POKEMON.clone()) })
         }
     }
 
     impl DetailPagePokemonRepository for TestRepository {
-        async fn fetch(&self, _id: u32) -> Result<DetailPagePokemon> {
-            Ok(DETAIL_POKEMON.clone())
+        fn fetch(
+            &self,
+            _id: u32,
+        ) -> Pin<Box<dyn Future<Output = Result<DetailPagePokemon>> + Send>> {
+            Box::pin(async { Ok(DETAIL_POKEMON.clone()) })
         }
     }
 

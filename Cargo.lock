@@ -624,12 +624,12 @@ dependencies = [
 [[package]]
 name = "crud-core"
 version = "0.1.0"
-source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#6b138847826d04285d4a285489863c3ba4530a30"
+source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#de093a0ee480ac2847dabdc0d9616692e069abdf"
 
 [[package]]
 name = "crud-macro"
 version = "0.1.0"
-source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#6b138847826d04285d4a285489863c3ba4530a30"
+source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#de093a0ee480ac2847dabdc0d9616692e069abdf"
 dependencies = [
  "async-stream",
  "crud-core",
@@ -643,7 +643,7 @@ dependencies = [
 [[package]]
 name = "crud-macro-core"
 version = "0.1.0"
-source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#6b138847826d04285d4a285489863c3ba4530a30"
+source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#de093a0ee480ac2847dabdc0d9616692e069abdf"
 dependencies = [
  "syn 2.0.104",
 ]
@@ -738,15 +738,14 @@ dependencies = [
 name = "database"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "color-eyre",
  "derive-crud",
+ "futures",
  "image",
  "log",
  "pokemon",
  "sqlx",
  "string",
- "thiserror 1.0.69",
  "ui-core",
 ]
 
@@ -773,7 +772,7 @@ dependencies = [
 [[package]]
 name = "derive-crud"
 version = "0.1.0"
-source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#6b138847826d04285d4a285489863c3ba4530a30"
+source = "git+https://github.com/hayesHowYaDoin/derive-crud?branch=main#de093a0ee480ac2847dabdc0d9616692e069abdf"
 dependencies = [
  "async-stream",
  "crud-core",
@@ -3531,7 +3530,6 @@ dependencies = [
  "image",
  "num-traits",
  "pokemon",
- "thiserror 1.0.69",
  "tokio",
 ]
 

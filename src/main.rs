@@ -18,7 +18,9 @@ pub static LOG_PATH: LazyLock<PathBuf> =
 
 async fn tokio_main() -> Result<()> {
     log::trace!("Connecting to database...");
-    let db = DatabaseMapper::new().expect("Failed to create database connection");
+    let db = DatabaseMapper::new()
+        .await
+        .expect("Failed to create database connection");
 
     log::trace!("Starting application...");
     let mut app = App::new(Box::new(db))
