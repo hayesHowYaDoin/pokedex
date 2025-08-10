@@ -9,8 +9,10 @@ pokemon = { workspace = true }
 string = { workspace = true }
 ui-core = { workspace = true }
 # External
+anyhow = { workspace = true }
 color-eyre = { workspace = true }
+derive-crud = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }
-rusqlite = { workspace = true }
+sqlx = { version = "0.8.6", features = [ "runtime-tokio", "sqlite" ] }
 thiserror = { workspace = true }

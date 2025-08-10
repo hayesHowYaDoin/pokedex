@@ -1,18 +1,11 @@
 use std::collections::HashMap;
+use std::future::Future;
 
 use color_eyre::{eyre::eyre, Result};
 
 use crate::{
     file::{ASSETS_PATH, DATABASE_PATH},
-    tables::{
-        AbilitiesRepository, AbilityDTO, AbilityID, AbilitySlot, PokemonAbilitiesDTO,
-        PokemonAbilitiesRepository, PokemonDescriptionDTO, PokemonDescriptionsRepository,
-        PokemonGenderDTO, PokemonGenderRepository, PokemonID, PokemonSizeDTO,
-        PokemonSizeTableRepository, PokemonSpeciesNamesDTO, PokemonSpeciesNamesRepository,
-        PokemonStatsDTO, PokemonStatsRepository, PokemonTableRepository, PokemonTypeDTO,
-        PokemonTypeTableRepository, StatID, TypeID, TypesDTO, TypesTableRepository,
-    },
-    Database, DatabaseError,
+    tables::*,
 };
 use pokemon::{
     PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats,
@@ -27,25 +20,23 @@ use ui_core::{
 };
 
 pub struct DatabaseMapper {
-    database: Database,
+    pool: sqlx::SqlitePool,
 }
 
 impl DatabaseMapper {
-    pub fn new() -> Result<Self> {
-        let database_path = DATABASE_PATH.as_path();
-        log::trace!("DATABASE_PATH: {:?}", database_path);
-
-        Ok(DatabaseMapper {
-            database: Database::new(database_path)?,
-        })
+    pub async fn new() -> Result<Self> {
+        let pool = sqlx::SqlitePool::connect(&format!("sqlite://{}", DATABASE_PATH.display()))
+            .await
+            .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
+        Ok(Self { pool })
     }
 }
 
 impl ListPagePokemonRepository for DatabaseMapper {
-    fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
-        let pokemon = PokemonTableRepository::fetch_all(&self.database)?;
-        let pokemon_types = PokemonTypeTableRepository::fetch_all(&self.database)?;
-        let types = TypesTableRepository::fetch_all(&self.database)?;
+    fn fetch_all(&self) -> impl Future<Result<Vec<ListPagePokemon>>> + Send {
+        let pokemon = PokemonDTO::read_all(&self.pool).await?;
+        let pokemon_types = PokemonTypeDTO::read_all(&self.pool).await?;
+        let types = TypeDTO::read_all(&self.pool).await?;
 
         let list_page_pokemon = pokemon
             .into_iter()
@@ -87,23 +78,22 @@ impl From<DatabaseError> for ListPagePokemonRepositoryError {
 }
 
 impl DetailPagePokemonRepository for DatabaseMapper {
-    fn fetch(&self, number: u32) -> Result<DetailPagePokemon> {
-        let id = PokemonID(number);
-        let pokemon = PokemonTableRepository::fetch(&self.database, &id)?;
-        let pokemon_types = PokemonTypeTableRepository::fetch(&self.database, &id)?;
-        let pokemon_size = PokemonSizeTableRepository::fetch(&self.database, &id)?;
-        let pokemon_stats_dto = PokemonStatsRepository::fetch(&self.database, &id)?;
-        let types = TypesTableRepository::fetch_all(&self.database)?;
-        let pokemon_description = PokemonDescriptionsRepository::fetch(&self.database, &id)?;
-        let abilities = AbilitiesRepository::fetch_all(&self.database)?;
-        let pokemon_abilities = PokemonAbilitiesRepository::fetch(&self.database, &id)?;
-        let pokemon_species = PokemonSpeciesNamesRepository::fetch(&self.database, &id)?;
-        let pokemon_gender = PokemonGenderRepository::fetch(&self.database, &id)?;
+    async fn fetch(&self, number: u32) -> impl Future<Result<DetailPagePokemon>> + Send {
+        let pokemon = PokemonDTO::read(&self.pool, number as i64).await?;
+        let pokemon_types = PokemonTypeDTO::read(&self.pool, number as i64).await?;
+        let pokemon_size = PokemonSizeDTO::read(&self.pool, number as i64).await?;
+        let pokemon_stats_dto = PokemonStatsDTO::read(&self.pool, number as i64).await?;
+        let types = TypeDTO::read_all(&self.pool).await?;
+        let pokemon_description = PokemonDescriptionDTO::read(&self.pool, number as i64).await?;
+        let abilities = AbilityDTO::read_all(&self.pool).await?;
+        let pokemon_abilities = PokemonAbilitiesDTO::read(&self.pool, number as i64).await?;
+        let pokemon_species = PokemonSpeciesNamesDTO::read(&self.pool, number as i64).await?;
+        let pokemon_gender = PokemonGenderDTO::read(&self.pool, number as i64).await?;
 
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
             capitalize(&pokemon.identifier),
-            build_image(id)?,
+            build_image(number)?,
             build_types(pokemon_types, types)?,
             build_description(pokemon_description),
             build_attributes(
@@ -114,27 +104,27 @@ impl DetailPagePokemonRepository for DatabaseMapper {
                 pokemon_gender,
             )?,
             build_stats(pokemon_stats_dto),
-            build_cry(id)?,
+            build_cry(number)?,
         );
 
         Ok(detail_page_pokemon)
     }
 }
 
-fn build_image(id: PokemonID) -> Result<image::DynamicImage> {
+fn build_image(id: u32) -> Result<image::DynamicImage> {
     let image_path = ASSETS_PATH.join(format!("{}/bw_front.png", Into::<u32>::into(id)));
     Ok(image::ImageReader::open(image_path)
         .expect("Unable to open image.")
         .decode()?)
 }
 
-fn build_cry(id: PokemonID) -> Result<PokemonCry> {
+fn build_cry(id: u32) -> Result<PokemonCry> {
     let cry_path = ASSETS_PATH.join(format!("{}/cry.wav", Into::<u32>::into(id)));
     let cry_bytes = std::fs::read(cry_path)?;
     Ok(PokemonCry::new(cry_bytes))
 }
 
-fn build_stats(pokemon_stats_dto: HashMap<StatID, PokemonStatsDTO>) -> PokemonStats {
+fn build_stats(pokemon_stats_dto: PokemonStatsDTO) -> PokemonStats {
     PokemonStats::new(
         pokemon_stats_dto.get(&StatID(1)).map_or(0, |s| s.base_stat),
         pokemon_stats_dto.get(&StatID(2)).map_or(0, |s| s.base_stat),

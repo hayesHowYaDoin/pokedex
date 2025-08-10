@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use color_eyre::Result;
 use thiserror::Error;
 
@@ -8,7 +10,7 @@ use crate::pages::{DetailPagePokemon, ListPagePokemon};
 pub struct ListPagePokemonRepositoryError(pub String);
 
 pub trait ListPagePokemonRepository {
-    fn fetch_all(&self) -> Result<Vec<ListPagePokemon>>;
+    fn fetch_all(&self) -> impl Future<Output = Result<Vec<ListPagePokemon>>> + Send;
 }
 
 #[derive(Debug, Error)]
@@ -16,5 +18,5 @@ pub trait ListPagePokemonRepository {
 pub struct DetailPagePokemonRepositoryError(pub String);
 
 pub trait DetailPagePokemonRepository {
-    fn fetch(&self, number: u32) -> Result<DetailPagePokemon>;
+    fn fetch(&self, number: u32) -> impl Future<Output = Result<DetailPagePokemon>> + Send;
 }

@@ -21,7 +21,9 @@ async fn tokio_main() -> Result<()> {
     let db = DatabaseMapper::new().expect("Failed to create database connection");
 
     log::trace!("Starting application...");
-    let mut app = App::new(Box::new(db)).expect("Failed to create application");
+    let mut app = App::new(Box::new(db))
+        .await
+        .expect("Failed to create application");
     app.run().await?;
 
     Ok(())
