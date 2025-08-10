@@ -1,3 +1,6 @@
+// Members are necessary to define tables, but may be unused outside of macro.
+#![allow(dead_code)]
+
 use derive_crud::Read;
 
 #[derive(Debug, Read)]

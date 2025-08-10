@@ -56,7 +56,6 @@ ratatui-image = "4.2.0"
 signal-hook = "0.3.17"
 simplelog = { version = "0.12.2", features = ["paris"] }
 sqlx = "0.8.6"
-thiserror = "1.0.61"
 tokio = { version = "1.38.0", features = ["full"] }
 tokio-util = "0.7.11"
 

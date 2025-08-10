@@ -30,3 +30,6 @@ target/
 .direnv
 .pre-commit-config.yaml
 result
+
+# Logging
+*.log
