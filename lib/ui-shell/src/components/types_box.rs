@@ -6,9 +6,9 @@ use ratatui::{
     Frame,
 };
 
-use ui_core::components::TypesBox;
-use crate::palette::{type_color_dark, type_color_light};
 use super::TuiComponent;
+use crate::palette::{type_color_dark, type_color_light};
+use ui_core::components::TypesBox;
 
 pub struct TuiTypesBox<'a> {
     types_box: TypesBox,

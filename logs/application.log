@@ -1,0 +1,8 @@
+02:24:24 [TRACE] (1) rich_pokedex: [src/main.rs:20] Connecting to database...
+02:24:24 [TRACE] (1) database::mapper: [lib/database/src/mapper.rs:36] DATABASE_PATH: "/home/jordan/repos/pokedex/data/pokedex.sqlite"
+02:24:24 [TRACE] (1) rich_pokedex: [src/main.rs:23] Starting application...
+02:24:24 [TRACE] (15) mio::poll: [/home/jordan/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-0.8.11/src/poll.rs:551] registering event source with poller: token=Token(0), interests=READABLE
+02:24:24 [TRACE] (15) mio::poll: [/home/jordan/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/mio-0.8.11/src/poll.rs:551] registering event source with poller: token=Token(1), interests=READABLE
+02:24:28 [TRACE] (1) ui_shell::pages::list: [lib/ui-shell/src/pages/list.rs:36] Entering ListPage
+02:24:28 [TRACE] (1) ui_shell::pages::detail: [lib/ui-shell/src/pages/detail.rs:60] Entering DetailPage for Pokémon: #1 | Bulbasaur
+02:24:28 [WARN] Failed to play sound effect: Failed to initialize sound engine: No such device or address

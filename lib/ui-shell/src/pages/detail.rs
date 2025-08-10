@@ -8,16 +8,16 @@ use ratatui::{
 };
 use ratatui_image::picker::Picker;
 
-use ui_core::pages::DetailPage;
+use super::page::TuiPage;
 use crate::{
     components::{
         attributes_box::TuiAttributesBox, image_box::TuiImageBox, sound::play_sound,
-        stat_chart::TuiPokemonStatChart, text_box::TuiTextBox, types_box::TuiTypesBox, TuiComponent,
-        TuiStatefulComponent,
+        stat_chart::TuiPokemonStatChart, text_box::TuiTextBox, types_box::TuiTypesBox,
+        TuiComponent, TuiStatefulComponent,
     },
     tui::Terminal,
 };
-use super::page::TuiPage;
+use ui_core::pages::DetailPage;
 
 static OUTERMOST_VERTICAL: LazyLock<Layout> = LazyLock::new(|| {
     Layout::default()
@@ -57,21 +57,27 @@ static INNER_RIGHT_VERTICAL: LazyLock<Layout> = LazyLock::new(|| {
 
 impl TuiPage for DetailPage {
     fn on_enter(&mut self) {
+        log::trace!(
+            "Entering DetailPage for Pokémon: {}",
+            self.get_title_box().text()
+        );
+
         let sound = self.get_launch_sound().clone();
         tokio::spawn(async move {
-            play_sound(sound);
+            if let Err(err) = play_sound(sound) {
+                log::warn!("Failed to play sound effect: {}", err);
+            }
         });
     }
 
     fn on_exit(&mut self) {
-        // Intentionally left blank.
+        log::trace!(
+            "Exiting DetailPage for Pokémon: {}",
+            self.get_title_box().text()
+        );
     }
 
-    fn render(
-        &mut self,
-        terminal: &mut Terminal,
-        picker: &mut Picker,
-    ) -> Result<()> {
+    fn render(&mut self, terminal: &mut Terminal, picker: &mut Picker) -> Result<()> {
         terminal.draw(|frame: &mut ratatui::Frame<'_>| {
             let outer_vertical_layout = OUTERMOST_VERTICAL.split(frame.area());
             let inner_first_horizontal_layout =

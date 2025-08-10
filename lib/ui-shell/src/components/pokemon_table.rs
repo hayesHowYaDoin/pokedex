@@ -5,9 +5,9 @@ use ratatui::{
     Frame,
 };
 
-use ui_core::components::{PokemonTable, PokemonTableEntry};
-use crate::palette::type_color_medium;
 use super::TuiStatefulComponent;
+use crate::palette::type_color_medium;
+use ui_core::components::{PokemonTable, PokemonTableEntry};
 
 const WIDTHS: [Constraint; 4] = [
     Constraint::Length(5),
@@ -32,7 +32,11 @@ impl<'a> TuiPokemonTable<'a> {
 
 impl TuiStatefulComponent for TuiPokemonTable<'_> {
     fn render_mut(&mut self, frame: &mut Frame, layout: &Rect) {
-        let rows = self.pokemon_table.get_pokemon().into_iter().map(|p| into_row(p.to_owned()));
+        let rows = self
+            .pokemon_table
+            .get_pokemon()
+            .into_iter()
+            .map(|p| into_row(p.to_owned()));
         let table = Table::new(rows, WIDTHS)
             .column_spacing(1)
             .header(

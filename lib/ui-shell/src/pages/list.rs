@@ -8,14 +8,14 @@ use ratatui::{
 };
 use ratatui_image::picker::Picker;
 
-use ui_core::pages::ListPage;
+use super::page::TuiPage;
 use crate::{
     components::{
         input_box::TuiInputBox, pokemon_table::TuiPokemonTable, TuiComponent, TuiStatefulComponent,
     },
     tui::Terminal,
 };
-use super::page::TuiPage;
+use ui_core::pages::ListPage;
 
 static LAYOUT: LazyLock<Layout> = LazyLock::new(|| {
     Layout::default()
@@ -29,18 +29,14 @@ static LAYOUT: LazyLock<Layout> = LazyLock::new(|| {
 
 impl TuiPage for ListPage {
     fn on_enter(&mut self) {
-        // Intentionally left blank.
+        log::trace!("Entering ListPage");
     }
 
     fn on_exit(&mut self) {
-        // Intentionally left blank.
+        log::trace!("Entering ListPage");
     }
 
-    fn render(
-        &mut self,
-        terminal: &mut Terminal,
-        _picker: &mut Picker,
-    ) -> Result<()> {
+    fn render(&mut self, terminal: &mut Terminal, _picker: &mut Picker) -> Result<()> {
         terminal.draw(|frame| {
             let layout = LAYOUT.split(frame.area());
 

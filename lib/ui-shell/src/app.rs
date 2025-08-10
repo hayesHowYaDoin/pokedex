@@ -1,15 +1,11 @@
 use color_eyre::eyre::Result;
 
+use crate::{event::FromTuiEvent, state::TuiState, tui::Tui};
 use ui_core::{
     next_state,
     pages::ListPage,
     repository::{DetailPagePokemonRepository, ListPagePokemonRepository},
     Event, PageState,
-};
-use crate::{
-    event::FromTuiEvent,
-    state::TuiState,
-    tui::Tui,
 };
 
 pub struct App<R: ListPagePokemonRepository + DetailPagePokemonRepository> {
@@ -33,30 +29,33 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
         tui.enter()?;
         tui.start();
 
-        loop {
+        let result = loop {
             let event = Event::from_tui_event(tui.next().await);
             if should_quit(&event) {
-                break;
+                break Ok(());
             }
 
-            self.transition(&event, &mut tui)?;
-        }
+            if let Err(err) = self.transition(&event, &mut tui) {
+                break Err(err);
+            }
+        };
 
         tui.exit()?;
-        Ok(())
+        result
     }
 
     fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self> {
         let mut next_state = next_state(&self.current_state, event, self.repository.as_ref())?;
-        let state_changed = next_state != self.current_state;
+        let state_changed =
+            std::mem::discriminant(&self.current_state) != std::mem::discriminant(&next_state);
 
-        let page = next_state.as_tui_page_mut();
+        let next_page = next_state.as_tui_page_mut();
 
-        page.render(&mut tui.terminal, &mut tui.picker)?;
+        next_page.render(&mut tui.terminal, &mut tui.picker)?;
         if state_changed {
             self.current_state.as_tui_page_mut().on_exit();
+            next_page.on_enter();
         }
-        page.on_enter();
 
         self.current_state = next_state;
         Ok(self)

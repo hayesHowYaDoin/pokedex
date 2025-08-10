@@ -1,7 +1,7 @@
 use crossterm::event::KeyCode;
 
-use ui_core::Event;
 use crate::tui::TuiEvent;
+use ui_core::Event;
 
 pub trait FromTuiEvent {
     fn from_tui_event(tui_event: Option<TuiEvent>) -> Self;

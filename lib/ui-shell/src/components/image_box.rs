@@ -1,8 +1,8 @@
 use ratatui::{prelude::Rect, Frame};
 use ratatui_image::{picker::Picker, StatefulImage};
 
-use ui_core::components::ImageBox;
 use super::TuiStatefulComponent;
+use ui_core::components::ImageBox;
 
 pub struct TuiImageBox<'a> {
     image_box: &'a ImageBox,
