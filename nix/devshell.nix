@@ -41,6 +41,7 @@
         shellHook = ''
           export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.sqlite"
           export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
+          export POKEDEX_LOG_PATH="''$(${lib.getExe config.flake-root.package})/logs/application.log"
           export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/sbin
 
           cargo install cargo-deb

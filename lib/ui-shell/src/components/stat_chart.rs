@@ -6,8 +6,8 @@ use ratatui::{
     Frame,
 };
 
-use ui_core::components::PokemonStatChart;
 use super::TuiComponent;
+use ui_core::components::PokemonStatChart;
 
 fn center(area: Rect, horizontal: Constraint, vertical: Constraint) -> Rect {
     let [area] = Layout::horizontal([horizontal])

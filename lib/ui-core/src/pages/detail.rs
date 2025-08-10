@@ -3,11 +3,11 @@ use std::collections::HashSet;
 use color_eyre::Result;
 use image::DynamicImage;
 
-use pokemon::{
-        type_defense_strengths, type_defense_weaknesses, PokemonAttributes, PokemonCry,
-        PokemonDescription, PokemonStats, PokemonTypes, Type,
-    };
 use crate::components::{AttributesBox, ImageBox, PokemonStatChart, Sound, TextBox, TypesBox};
+use pokemon::{
+    type_defense_strengths, type_defense_weaknesses, PokemonAttributes, PokemonCry,
+    PokemonDescription, PokemonStats, PokemonTypes, Type,
+};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct DetailPage {

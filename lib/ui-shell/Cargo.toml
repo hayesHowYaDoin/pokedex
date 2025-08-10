@@ -4,25 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# Crate
-pokemon = { path = "../pokemon" }
-string = { path = "../string" }
-ui-core = { path = "../ui-core" }
+# Internal
+pokemon = { workspace = true }
+string = { workspace = true }
+ui-core = { workspace = true }
 # External
-color-eyre = "0.6.3"
-colors-transform = "0.2.11"
-crossterm = { version = "0.27.0", features = ["event-stream"] }
-futures = "0.3.30"
-fyrox-sound = "0.35.0"
-log = "0.4.21"
-ratatui = "0.29.0"
-ratatui-image = "4.2.0"
-signal-hook = "0.3.17"
-tokio = { version = "1.38.0", features = [
-  "sync",
-  "rt",
-  "macros",
-  "time",
-  "rt-multi-thread",
-] }
-tokio-util = "0.7.11"
+color-eyre = { workspace = true }
+colors-transform = { workspace = true }
+crossterm = { workspace = true }
+futures = { workspace = true }
+fyrox-sound = { workspace = true }
+log = { workspace = true }
+ratatui = { workspace = true }
+ratatui-image = { workspace = true }
+signal-hook = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }

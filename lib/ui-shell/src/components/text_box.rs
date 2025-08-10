@@ -4,8 +4,8 @@ use ratatui::{
     Frame,
 };
 
-use ui_core::components::TextBox;
 use super::TuiComponent;
+use ui_core::components::TextBox;
 
 pub struct TuiTextBox<'a> {
     text_box: TextBox,

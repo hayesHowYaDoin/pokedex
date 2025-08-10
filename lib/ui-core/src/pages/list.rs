@@ -2,8 +2,8 @@ use std::collections::HashSet;
 
 use cascade::cascade;
 
-use pokemon::PokemonTypes;
 use crate::components::{InputBox, PokemonTable, PokemonTableEntry};
+use pokemon::PokemonTypes;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ListPage {

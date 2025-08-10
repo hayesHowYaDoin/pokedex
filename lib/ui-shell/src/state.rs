@@ -1,5 +1,5 @@
-use ui_core::PageState;
 use crate::pages::TuiPage;
+use ui_core::PageState;
 
 pub trait TuiState {
     fn as_tui_page_mut(&mut self) -> &mut dyn TuiPage;

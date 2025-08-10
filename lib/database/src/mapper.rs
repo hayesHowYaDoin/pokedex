@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use color_eyre::{eyre, Result};
+use color_eyre::{eyre::eyre, Result};
 
 use crate::{
     file::{ASSETS_PATH, DATABASE_PATH},
@@ -32,8 +32,11 @@ pub struct DatabaseMapper {
 
 impl DatabaseMapper {
     pub fn new() -> Result<Self> {
+        let database_path = DATABASE_PATH.as_path();
+        log::trace!("DATABASE_PATH: {:?}", database_path);
+
         Ok(DatabaseMapper {
-            database: Database::new(DATABASE_PATH.as_path())?,
+            database: Database::new(database_path)?,
         })
     }
 }
@@ -100,7 +103,7 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         let detail_page_pokemon = DetailPagePokemon::new(
             pokemon.species_id,
             capitalize(&pokemon.identifier),
-            build_image(id),
+            build_image(id)?,
             build_types(pokemon_types, types)?,
             build_description(pokemon_description),
             build_attributes(
@@ -111,25 +114,24 @@ impl DetailPagePokemonRepository for DatabaseMapper {
                 pokemon_gender,
             )?,
             build_stats(pokemon_stats_dto),
-            build_cry(id),
+            build_cry(id)?,
         );
 
         Ok(detail_page_pokemon)
     }
 }
 
-fn build_image(id: PokemonID) -> image::DynamicImage {
+fn build_image(id: PokemonID) -> Result<image::DynamicImage> {
     let image_path = ASSETS_PATH.join(format!("{}/bw_front.png", Into::<u32>::into(id)));
-    image::ImageReader::open(image_path)
+    Ok(image::ImageReader::open(image_path)
         .expect("Unable to open image.")
-        .decode()
-        .unwrap()
+        .decode()?)
 }
 
-fn build_cry(id: PokemonID) -> PokemonCry {
+fn build_cry(id: PokemonID) -> Result<PokemonCry> {
     let cry_path = ASSETS_PATH.join(format!("{}/cry.wav", Into::<u32>::into(id)));
-    let cry_bytes = std::fs::read(cry_path).expect("Unable to locate cry resource.");
-    PokemonCry::new(cry_bytes)
+    let cry_bytes = std::fs::read(cry_path)?;
+    Ok(PokemonCry::new(cry_bytes))
 }
 
 fn build_stats(pokemon_stats_dto: HashMap<StatID, PokemonStatsDTO>) -> PokemonStats {
@@ -161,12 +163,19 @@ fn build_types(
     }
 
     Ok(PokemonTypes::new(
-        pokemon_types_names.first().unwrap().to_owned().into(),
+        pokemon_types_names
+            .first()
+            .ok_or(DatabaseError::FetchError(
+                "Pokemon must have a primary type.".to_string(),
+            ))?
+            .to_owned()
+            .into(),
         pokemon_types_names.get(1).map(|t| t.to_owned().into()),
     ))
 }
 
 fn build_description(description: PokemonDescriptionDTO) -> PokemonDescription {
+    // Correct malformed database rows
     PokemonDescription::new(description.text.replace("\n", " ").replace("", " "))
 }
 
@@ -178,7 +187,7 @@ fn build_attributes(
     pokemon_gender: PokemonGenderDTO,
 ) -> Result<PokemonAttributes> {
     if !pokemon_abilities.contains_key(&AbilitySlot(1)) {
-        return Err(eyre::eyre!(
+        return Err(eyre!(
             "Failed to build attributes: no ability in first slot".to_string()
         ));
     }
@@ -193,7 +202,7 @@ fn build_attributes(
     .collect();
 
     if !abilities_vec.len() == 0 {
-        return Err(eyre::eyre!(
+        return Err(eyre!(
             "Failed to build attributes: no abilities found".to_string()
         ));
     }
