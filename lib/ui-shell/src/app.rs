@@ -14,8 +14,8 @@ pub struct App<R: ListPagePokemonRepository + DetailPagePokemonRepository> {
 }
 
 impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
-    pub fn new(repository: Box<R>) -> Result<Self> {
-        let pokemon = repository.fetch_all()?;
+    pub async fn new(repository: Box<R>) -> Result<Self> {
+        let pokemon = repository.fetch_all().await?;
         let current_state = PageState::List(ListPage::new(pokemon, "".to_string()));
 
         Ok(App {
@@ -44,8 +44,9 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
         result
     }
 
-    fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self> {
-        let mut next_state = next_state(&self.current_state, event, self.repository.as_ref())?;
+    async fn transition(&mut self, event: &Event, tui: &mut Tui) -> Result<&Self> {
+        let mut next_state =
+            next_state(&self.current_state, event, self.repository.as_ref()).await?;
         let state_changed =
             std::mem::discriminant(&self.current_state) != std::mem::discriminant(&next_state);
 

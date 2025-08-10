@@ -13,22 +13,22 @@ pub enum PageState {
     Detail(DetailPage),
 }
 
-pub fn next_state<R>(state: &PageState, event: &Event, repository: &R) -> Result<PageState>
+pub async fn next_state<R>(state: &PageState, event: &Event, repository: &R) -> Result<PageState>
 where
     R: ListPagePokemonRepository + DetailPagePokemonRepository,
 {
     let next_page = match state {
-        PageState::List(page) => next_list(page, event, repository)?,
-        PageState::Detail(page) => next_detail(page, event, repository)?,
+        PageState::List(page) => next_list(page, event, repository).await?,
+        PageState::Detail(page) => next_detail(page, event, repository).await?,
     };
 
     Ok(next_page)
 }
 
-fn next_list(
+async fn next_list(
     page: &ListPage,
     event: &Event,
-    repository: &dyn DetailPagePokemonRepository,
+    repository: &impl DetailPagePokemonRepository,
 ) -> Result<PageState> {
     match event {
         Event::NewCharacter(c) => {
@@ -57,21 +57,21 @@ fn next_list(
         }
         Event::Select => {
             let id = page.list_widget.get_selected().map_or(0, |p| p.number);
-            let pokemon = repository.fetch(id).expect("Failed to create DetailPage");
+            let pokemon = repository.fetch(id).await?;
             Ok(PageState::Detail(DetailPage::new(pokemon)?))
         }
         _ => Ok(PageState::List(page.clone())),
     }
 }
 
-fn next_detail(
+async fn next_detail(
     page: &DetailPage,
     event: &Event,
-    repository: &dyn ListPagePokemonRepository,
+    repository: &impl ListPagePokemonRepository,
 ) -> Result<PageState> {
     match event {
         Event::DeleteCharacter => {
-            let pokemon = repository.fetch_all()?;
+            let pokemon = repository.fetch_all().await?;
             Ok(PageState::List(ListPage::new(pokemon, "".to_string())))
         }
         _ => Ok(PageState::Detail(page.clone())),
@@ -134,21 +134,24 @@ mod test {
     struct TestRepository();
 
     impl ListPagePokemonRepository for TestRepository {
-        fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
+        async fn fetch_all(&self) -> Result<Vec<ListPagePokemon>> {
             Ok(LIST_POKEMON.clone())
         }
     }
 
     impl DetailPagePokemonRepository for TestRepository {
-        fn fetch(&self, _id: u32) -> Result<DetailPagePokemon> {
+        async fn fetch(&self, _id: u32) -> Result<DetailPagePokemon> {
             Ok(DETAIL_POKEMON.clone())
         }
     }
 
-    #[test]
-    fn test_next_list_new_character_other() {
+    #[tokio::test]
+    async fn test_next_list_new_character_other() {
         let repository = TestRepository();
-        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let pokemon = repository
+            .fetch_all()
+            .await
+            .expect("Failed to fetch all pokemon");
         let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let next_list_page: PageState = next_state(
@@ -156,6 +159,7 @@ mod test {
             &Event::NewCharacter('a'),
             &repository,
         )
+        .await
         .unwrap();
 
         list_page.search_widget.push_char('a');
@@ -163,10 +167,13 @@ mod test {
         assert_eq!(next_list_page, PageState::List(list_page));
     }
 
-    #[test]
-    fn test_next_list_delete_character() {
+    #[tokio::test]
+    async fn test_next_list_delete_character() {
         let repository = TestRepository();
-        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let pokemon = repository
+            .fetch_all()
+            .await
+            .expect("Failed to fetch all pokemon");
         let mut list_page = ListPage::new(pokemon, "a".to_string());
 
         let next_page = next_state(
@@ -174,6 +181,7 @@ mod test {
             &Event::DeleteCharacter,
             &repository,
         )
+        .await
         .unwrap();
 
         list_page.search_widget.pop_char();
@@ -181,10 +189,13 @@ mod test {
         assert_eq!(next_page, PageState::List(list_page));
     }
 
-    #[test]
-    fn test_next_list_down() {
+    #[tokio::test]
+    async fn test_next_list_down() {
         let repository = TestRepository();
-        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let pokemon = repository
+            .fetch_all()
+            .await
+            .expect("Failed to fetch all pokemon");
         let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let next_page = next_state(
@@ -192,6 +203,7 @@ mod test {
             &Event::Down,
             &repository,
         )
+        .await
         .unwrap();
 
         list_page.list_widget.down();
@@ -199,10 +211,13 @@ mod test {
         assert_eq!(next_page, PageState::List(list_page));
     }
 
-    #[test]
-    fn test_next_list_up() {
+    #[tokio::test]
+    async fn test_next_list_up() {
         let repository = TestRepository();
-        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let pokemon = repository
+            .fetch_all()
+            .await
+            .expect("Failed to fetch all pokemon");
         let mut list_page = ListPage::new(pokemon, "".to_string());
 
         let mut next_page = next_state(
@@ -210,9 +225,14 @@ mod test {
             &Event::Down,
             &repository,
         )
+        .await
         .unwrap();
-        next_page = next_state(&next_page, &Event::Down, &repository).unwrap();
-        next_page = next_state(&next_page, &Event::Up, &repository).unwrap();
+        next_page = next_state(&next_page, &Event::Down, &repository)
+            .await
+            .unwrap();
+        next_page = next_state(&next_page, &Event::Up, &repository)
+            .await
+            .unwrap();
 
         list_page.list_widget = cascade! {
             list_page.list_widget;
@@ -224,28 +244,34 @@ mod test {
         assert_eq!(next_page, PageState::List(list_page));
     }
 
-    #[test]
-    fn test_next_list_noop() {
+    #[tokio::test]
+    async fn test_next_list_noop() {
         let repository = TestRepository();
-        let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+        let pokemon = repository
+            .fetch_all()
+            .await
+            .expect("Failed to fetch all pokemon");
 
         let previous_state = next_state(
             &PageState::List(ListPage::new(pokemon, "".to_string())),
             &Event::Up,
             &repository,
         )
+        .await
         .unwrap();
 
-        let next_state = next_state(&previous_state, &Event::Up, &repository).unwrap();
+        let next_state = next_state(&previous_state, &Event::Up, &repository)
+            .await
+            .unwrap();
 
         assert_eq!(next_state, previous_state);
     }
 
     // TODO: Implement tests for detail page logic.
-    // #[test]
-    // fn test_next_list_select() {
+    // #[tokio::test]
+    // async fn test_next_list_select() {
     // let repository = TestRepository();
-    // let pokemon = repository.fetch_all().expect("Failed to fetch all pokemon");
+    // let pokemon = repository.fetch_all().await.expect("Failed to fetch all pokemon");
     // let list_page = ListPage::new(&pokemon, "");
 
     // let next_page = next_state(

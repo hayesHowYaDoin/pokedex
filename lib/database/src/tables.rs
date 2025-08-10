@@ -1,297 +1,103 @@
-use std::collections::HashMap;
+use derive_crud::Read;
 
-use rusqlite::ToSql;
-
-use crate::database::DatabaseError;
-
-// ============================================================================
-// - TABLE KEYS ---------------------------------------------------------------
-// ============================================================================
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct PokemonID(pub u32);
-
-impl ToSql for PokemonID {
-    fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(
-            rusqlite::types::Value::Integer(self.0.into()),
-        ))
-    }
-}
-
-impl From<PokemonID> for u32 {
-    fn from(val: PokemonID) -> Self {
-        val.0
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TypeID(pub u32);
-
-impl ToSql for TypeID {
-    fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(
-            rusqlite::types::Value::Integer(self.0.into()),
-        ))
-    }
-}
-
-impl From<TypeID> for u32 {
-    fn from(val: TypeID) -> Self {
-        val.0
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct StatID(pub u32);
-
-impl ToSql for StatID {
-    fn to_sql(&self) -> rusqlite::Result<rusqlite::types::ToSqlOutput<'_>> {
-        Ok(rusqlite::types::ToSqlOutput::Owned(
-            rusqlite::types::Value::Integer(self.0.into()),
-        ))
-    }
-}
-
-impl From<StatID> for u32 {
-    fn from(val: StatID) -> Self {
-        val.0
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AbilitySlot(pub u32);
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AbilityID(pub u32);
-
-// ============================================================================
-// - POKEMON TABLE ------------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon")]
 pub struct PokemonDTO {
-    pub species_id: u32,
+    #[crud_id]
+    pub id: i64,
+    pub species_id: i64,
     pub identifier: String,
 }
 
-impl PokemonDTO {
-    pub fn new(species_id: u32, identifier: String) -> Self {
-        PokemonDTO {
-            species_id,
-            identifier,
-        }
-    }
-}
-
-pub trait PokemonTableRepository {
-    #[allow(dead_code)]
-    fn fetch(&self, id: &PokemonID) -> Result<PokemonDTO, DatabaseError>;
-    fn fetch_all(&self) -> Result<HashMap<PokemonID, PokemonDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - TYPES TABLE --------------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
-pub struct TypesDTO {
+#[derive(Debug, Read)]
+#[crud_table("types")]
+pub struct TypeDTO {
+    #[crud_id]
+    pub id: i64,
     pub identifier: String,
 }
 
-impl TypesDTO {
-    pub fn new(identifier: String) -> Self {
-        TypesDTO { identifier }
-    }
-}
-
-pub trait TypesTableRepository {
-    #[allow(dead_code)]
-    fn fetch(&self, id: &TypeID) -> Result<TypesDTO, DatabaseError>;
-    fn fetch_all(&self) -> Result<HashMap<TypeID, TypesDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON TYPE TABLE -------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_types")]
 pub struct PokemonTypeDTO {
-    pub id: TypeID,
-    pub slot: u32,
+    #[crud_id]
+    pub pokemon_id: i64,
+    pub type_id: i64,
+    pub slot: i64,
 }
 
-impl PokemonTypeDTO {
-    pub fn new(id: TypeID, slot: u32) -> Self {
-        PokemonTypeDTO { id, slot }
-    }
-}
-
-pub trait PokemonTypeTableRepository {
-    #[allow(dead_code)]
-    fn fetch(&self, id: &PokemonID) -> Result<Vec<PokemonTypeDTO>, DatabaseError>;
-    fn fetch_all(&self) -> Result<HashMap<PokemonID, Vec<PokemonTypeDTO>>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON SIZE TABLE -------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_sizes")]
 pub struct PokemonSizeDTO {
-    pub height_dm: u32,
-    pub weight_hg: u32,
+    #[crud_id]
+    pub id: i64,
+    pub height_dm: i64,
+    pub weight_dg: i64,
 }
 
-impl PokemonSizeDTO {
-    pub fn new(height_dm: u32, weight_hg: u32) -> Self {
-        PokemonSizeDTO {
-            height_dm,
-            weight_hg,
-        }
-    }
-}
-
-pub trait PokemonSizeTableRepository {
-    fn fetch(&self, id: &PokemonID) -> Result<PokemonSizeDTO, DatabaseError>;
-}
-
-// ============================================================================
-// - STATS NAMES TABLE --------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("stat_names")]
 pub struct StatNamesDTO {
+    #[crud_id]
+    pub stat_id: i64,
+    pub local_language_id: i64,
     pub name: String,
 }
 
-impl StatNamesDTO {
-    pub fn new(name: String) -> StatNamesDTO {
-        StatNamesDTO { name }
-    }
-}
-
-pub trait StatNamesRepository {
-    fn fetch_all(&self) -> Result<HashMap<StatID, StatNamesDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON STATS TABLE ------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_stats")]
 pub struct PokemonStatsDTO {
-    pub base_stat: u32,
-    pub effort: u32,
+    #[crud_id]
+    pub pokemon_id: i64,
+    pub stat_id: i64,
+    pub base_stat: i64,
+    pub effort: i64,
 }
 
-impl PokemonStatsDTO {
-    pub fn new(base_stat: u32, effort: u32) -> PokemonStatsDTO {
-        PokemonStatsDTO { base_stat, effort }
-    }
-}
-
-pub trait PokemonStatsRepository {
-    fn fetch(
-        &self,
-        pokemon_id: &PokemonID,
-    ) -> Result<HashMap<StatID, PokemonStatsDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON DESCRIPTION TABLE ------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_descriptions")]
 pub struct PokemonDescriptionDTO {
-    pub text: String,
+    #[crud_id]
+    pub species_id: i64,
+    pub version_id: i64,
+    pub language_id: i64,
+    pub flavor_text: String,
 }
 
-impl PokemonDescriptionDTO {
-    pub fn new(text: String) -> PokemonDescriptionDTO {
-        PokemonDescriptionDTO { text }
-    }
-}
-
-pub trait PokemonDescriptionsRepository {
-    fn fetch(&self, pokemon_id: &PokemonID) -> Result<PokemonDescriptionDTO, DatabaseError>;
-}
-
-// ============================================================================
-// - ABILITIES TABLE ----------------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("abilities")]
 pub struct AbilityDTO {
+    #[crud_id]
+    pub id: i64,
     pub identifier: String,
+    pub generation_id: i64,
+    pub is_main_series: i64,
 }
 
-impl AbilityDTO {
-    pub fn new(identifier: String) -> AbilityDTO {
-        AbilityDTO { identifier }
-    }
-}
-
-pub trait AbilitiesRepository {
-    fn fetch_all(&self) -> Result<HashMap<AbilityID, AbilityDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON ABILITIES TABLE --------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_abilities")]
 pub struct PokemonAbilitiesDTO {
-    pub id: AbilityID,
+    #[crud_id]
+    pub pokemon_id: i64,
+    pub ability_id: i64,
+    pub is_hidden: i64,
+    pub slot: i64,
 }
 
-impl PokemonAbilitiesDTO {
-    pub fn new(id: AbilityID) -> PokemonAbilitiesDTO {
-        PokemonAbilitiesDTO { id }
-    }
-}
-
-pub trait PokemonAbilitiesRepository {
-    fn fetch(
-        &self,
-        id: &PokemonID,
-    ) -> Result<HashMap<AbilitySlot, PokemonAbilitiesDTO>, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON SPECIES NAMES TABLE ----------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_species_names")]
 pub struct PokemonSpeciesNamesDTO {
+    #[crud_id]
+    pub pokemon_species_id: i64,
+    pub local_language_id: i64,
+    pub name: String,
     pub genus: String,
 }
 
-impl PokemonSpeciesNamesDTO {
-    pub fn new(genus: String) -> PokemonSpeciesNamesDTO {
-        PokemonSpeciesNamesDTO { genus }
-    }
-}
-
-pub trait PokemonSpeciesNamesRepository {
-    fn fetch(&self, id: &PokemonID) -> Result<PokemonSpeciesNamesDTO, DatabaseError>;
-}
-
-// ============================================================================
-// - POKEMON GENDER TABLE -----------------------------------------------------
-// ============================================================================
-
-#[derive(Debug)]
+#[derive(Debug, Read)]
+#[crud_table("pokemon_genders")]
 pub struct PokemonGenderDTO {
-    pub rate: i32,
-}
-
-impl PokemonGenderDTO {
-    pub fn new(rate: i32) -> PokemonGenderDTO {
-        PokemonGenderDTO { rate }
-    }
-}
-
-pub trait PokemonGenderRepository {
-    fn fetch(&self, id: &PokemonID) -> Result<PokemonGenderDTO, DatabaseError>;
+    #[crud_id]
+    pub id: i64,
+    pub gender_rate: i64,
 }

@@ -13,7 +13,6 @@ repository = "https://github.com/hayesHowYaDoin/pokedex"
 authors = ["Jordan Hayes <jordanhayes98@gmail.com>"]
 version = "1.1.0"
 edition = "2021"
-license = "BSD-3-Clause"
 license-file = "LICENSE"
 keywords = ["pokedex", "pokemon", "ratatui", "tui"]
 categories = ["command-line-utilities", "games"]
@@ -25,10 +24,9 @@ repository.workspace = true
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
-license.workspace = true
 license-file.workspace = true
 readme = "README.md"
-include = ["src/**", "data/pokedex.sqlite", "data/assets/**"]
+include = ["src/**", "data/pokedex.db", "data/assets/**"]
 
 [workspace.dependencies]
 # Internal
@@ -39,11 +37,13 @@ ui-core = { path = "lib/ui-core" }
 ui-shell = { path = "lib/ui-shell" }
 # External
 ansi-to-tui = "7.0.0"
+anyhow = "1.0.98" # Remove when derive-crud is updated
 cascade = "1.0.1"
 color-eyre = "0.6.3"
 colors-transform = "0.2.11"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 derivative = "2.2.0"
+derive-crud = { git = "https://github.com/hayesHowYaDoin/derive-crud", branch = "main" }
 derive_more = "0.99.18"
 futures = "0.3.30"
 fyrox-resource = "0.12.0"
@@ -53,17 +53,11 @@ log = "0.4.21"
 num-traits = "0.2.19"
 ratatui = "0.29.0"
 ratatui-image = "4.2.0"
-rusqlite = { version = "0.31.0", features = ["bundled"] }
 signal-hook = "0.3.17"
 simplelog = { version = "0.12.2", features = ["paris"] }
+sqlx = "0.8.6"
 thiserror = "1.0.61"
-tokio = { version = "1.38.0", features = [
-  "sync",
-  "rt",
-  "macros",
-  "time",
-  "rt-multi-thread",
-] }
+tokio = { version = "1.38.0", features = ["full"] }
 tokio-util = "0.7.11"
 
 [dependencies]
@@ -81,6 +75,6 @@ assets = [
   # Binary
   ["target/release/rich_pokedex", "usr/bin/rich_pokedex", "755"],
   # Assets
-  ["data/pokedex.sqlite", "usr/share/rich_pokedex/pokedex.sqlite", "644"],
+  ["data/pokedex.db", "usr/share/rich_pokedex/pokedex.db", "644"],
   ["data/assets/**/*", "usr/share/rich_pokedex/assets/", "644"],
 ]

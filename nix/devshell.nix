@@ -39,10 +39,11 @@
         LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 
         shellHook = ''
-          export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.sqlite"
+          export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.db"
           export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
           export POKEDEX_LOG_PATH="''$(${lib.getExe config.flake-root.package})/logs/application.log"
-          export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/sbin
+          
+          export DATABASE_URL="sqlite://$POKEDEX_DATABASE_PATH"
 
           cargo install cargo-deb
         '';

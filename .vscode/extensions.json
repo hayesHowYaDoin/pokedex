@@ -8,5 +8,6 @@
         "vadimcn.vscode-lldb",
         "yzhang.markdown-all-in-one",
         "swellaby.vscode-rust-test-adapter",
+        "qwtel.sqlite-viewer",
     ]
 }
