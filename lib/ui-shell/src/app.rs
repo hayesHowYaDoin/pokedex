@@ -35,7 +35,7 @@ impl<R: ListPagePokemonRepository + DetailPagePokemonRepository> App<R> {
                 break Ok(());
             }
 
-            if let Err(err) = self.transition(&event, &mut tui) {
+            if let Err(err) = self.transition(&event, &mut tui).await {
                 break Err(err);
             }
         };
