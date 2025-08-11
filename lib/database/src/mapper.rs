@@ -4,14 +4,12 @@ use std::pin::Pin;
 use color_eyre::{eyre::eyre, Result};
 use futures::{Stream, StreamExt};
 
-use crate::{
-    file::{ASSETS_PATH, DATABASE_PATH},
-    tables::*,
-};
+use crate::tables::*;
 use pokemon::{
     PokemonAttributes, PokemonCry, PokemonDescription, PokemonGenderRates, PokemonStats,
     PokemonTypes,
 };
+use settings::Settings;
 use string::{capitalize, capitalize_words};
 use ui_core::{
     pages::{DetailPagePokemon, ListPagePokemon},
@@ -24,9 +22,12 @@ pub struct DatabaseMapper {
 
 impl DatabaseMapper {
     pub async fn new() -> Result<Self> {
-        let pool = sqlx::SqlitePool::connect(&format!("sqlite://{}", DATABASE_PATH.display()))
-            .await
-            .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
+        let pool = sqlx::SqlitePool::connect(&format!(
+            "sqlite://{}",
+            Settings::get_database_path().display()
+        ))
+        .await
+        .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
         Ok(Self { pool })
     }
 }
@@ -122,7 +123,8 @@ where
 }
 
 fn build_image(id: u32) -> Result<image::DynamicImage> {
-    let image_path = ASSETS_PATH.join(format!("{}/bw_front.png", Into::<u32>::into(id)));
+    let image_path =
+        Settings::get_assets_path().join(format!("{}/bw_front.png", Into::<u32>::into(id)));
     Ok(image::ImageReader::open(image_path)
         .expect("Unable to open image.")
         .decode()?)
@@ -276,7 +278,7 @@ async fn build_stats(number: i64, pool: &sqlx::SqlitePool) -> Result<PokemonStat
 }
 
 fn build_cry(id: u32) -> Result<PokemonCry> {
-    let cry_path = ASSETS_PATH.join(format!("{}/cry.wav", Into::<u32>::into(id)));
+    let cry_path = Settings::get_assets_path().join(format!("{}/cry.wav", Into::<u32>::into(id)));
     let cry_bytes = std::fs::read(cry_path)?;
     Ok(PokemonCry::new(cry_bytes))
 }
