@@ -24,4 +24,5 @@ watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
 
 generate-database:
+  chmod +x ./data/generate.sh
   ./data/generate.sh
