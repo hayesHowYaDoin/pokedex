@@ -3661,6 +3661,7 @@ dependencies = [
  "pokemon",
  "ratatui",
  "ratatui-image",
+ "settings",
  "signal-hook",
  "string",
  "tokio",
