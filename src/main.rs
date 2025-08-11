@@ -36,13 +36,13 @@ async fn main() -> Result<()> {
     color_eyre::install()?; // Enable colorized error output
 
     let cli = Cli::parse();
-    let settings = Settings::new(cli.silent);
+    Settings::init(cli.silent);
     CombinedLogger::init(vec![WriteLogger::new(
         LevelFilter::Trace,
         Config::default(),
         {
-            std::fs::create_dir_all(Settings::get_log_path().parent().unwrap()).unwrap();
-            File::create(Settings::get_log_path()).unwrap()
+            std::fs::create_dir_all(Settings::log_path().parent().unwrap()).unwrap();
+            File::create(Settings::log_path()).unwrap()
         },
     )])
     .unwrap();

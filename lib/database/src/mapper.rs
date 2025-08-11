@@ -22,12 +22,10 @@ pub struct DatabaseMapper {
 
 impl DatabaseMapper {
     pub async fn new() -> Result<Self> {
-        let pool = sqlx::SqlitePool::connect(&format!(
-            "sqlite://{}",
-            Settings::get_database_path().display()
-        ))
-        .await
-        .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
+        let pool =
+            sqlx::SqlitePool::connect(&format!("sqlite://{}", Settings::database_path().display()))
+                .await
+                .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
         Ok(Self { pool })
     }
 }
@@ -124,7 +122,7 @@ where
 
 fn build_image(id: u32) -> Result<image::DynamicImage> {
     let image_path =
-        Settings::get_assets_path().join(format!("{}/bw_front.png", Into::<u32>::into(id)));
+        Settings::assets_path().join(format!("{}/bw_front.png", Into::<u32>::into(id)));
     Ok(image::ImageReader::open(image_path)
         .expect("Unable to open image.")
         .decode()?)
@@ -278,7 +276,7 @@ async fn build_stats(number: i64, pool: &sqlx::SqlitePool) -> Result<PokemonStat
 }
 
 fn build_cry(id: u32) -> Result<PokemonCry> {
-    let cry_path = Settings::get_assets_path().join(format!("{}/cry.wav", Into::<u32>::into(id)));
+    let cry_path = Settings::assets_path().join(format!("{}/cry.wav", Into::<u32>::into(id)));
     let cry_bytes = std::fs::read(cry_path)?;
     Ok(PokemonCry::new(cry_bytes))
 }
