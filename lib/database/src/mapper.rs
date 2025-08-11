@@ -177,13 +177,10 @@ async fn build_description(pool: &sqlx::SqlitePool, number: i64) -> Result<Pokem
     ))
 }
 
-async fn build_attributes(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonAttributes> {
+async fn build_pokemon_abilities(pool: &sqlx::SqlitePool, number: i64) -> Result<Vec<String>> {
     let abilities = AbilityDTO::read_all(&pool).await?;
-    let pokemon_size = PokemonSizeDTO::read_one(&pool, number as i64).await?;
     let mut pokemon_abilities =
         stream_to_vec(PokemonAbilitiesDTO::read(&pool, number as i64)).await?;
-    let pokemon_species = PokemonSpeciesNamesDTO::read_one(&pool, number as i64).await?;
-    let pokemon_gender = PokemonGenderDTO::read_one(&pool, number as i64).await?;
 
     if 1 > pokemon_abilities.len() || pokemon_abilities.len() > 3 {
         return Err(eyre!(format!(
@@ -201,25 +198,63 @@ async fn build_attributes(pool: &sqlx::SqlitePool, number: i64) -> Result<Pokemo
         .collect();
 
     if !abilities_vec.len() == 0 {
-        return Err(eyre!(
+        Err(eyre!(
             "Failed to build attributes: no abilities found".to_string()
-        ));
+        ))
+    } else {
+        Ok(abilities_vec)
     }
+}
 
-    let gender_rate = match pokemon_gender.gender_rate {
-        -1 => None,
+async fn build_pokemon_genus(pool: &sqlx::SqlitePool, number: i64) -> Result<String> {
+    let pokemon_species = stream_to_vec(PokemonSpeciesNamesDTO::read(&pool, number as i64)).await?;
+    let genus = pokemon_species
+        .iter()
+        .filter(|ps| ps.local_language_id == 9) // English
+        .next()
+        .map_or(
+            Err(eyre!(
+                "Failed to build attributes: no English genus found".to_string()
+            )),
+            |ps| {
+                Ok(capitalize_words(
+                    &ps.genus.replace("Pokémon", "").trim().to_string(),
+                ))
+            },
+        )?;
+    Ok(genus)
+}
+
+async fn build_pokemon_gender_rate(
+    pool: &sqlx::SqlitePool,
+    number: i64,
+) -> Result<Option<PokemonGenderRates>> {
+    let pokemon_gender = PokemonGenderDTO::read_one(&pool, number as i64).await?;
+
+    match pokemon_gender.gender_rate {
+        -1 => Ok(None),
         _ => {
             let female_rate = pokemon_gender.gender_rate as f32 / 8.0;
-            Some(PokemonGenderRates::new(1.0 - female_rate, female_rate)?)
+            Ok(Some(PokemonGenderRates::new(
+                1.0 - female_rate,
+                female_rate,
+            )?))
         }
-    };
+    }
+}
+
+async fn build_attributes(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonAttributes> {
+    let abilities = build_pokemon_abilities(pool, number);
+    let pokemon_genus = build_pokemon_genus(pool, number);
+    let pokemon_gender_rate = build_pokemon_gender_rate(pool, number);
+    let pokemon_size = PokemonSizeDTO::read_one(&pool, number as i64).await?;
 
     Ok(PokemonAttributes::new(
         (pokemon_size.height_dm as f32 / 10.0).to_string(),
         (pokemon_size.weight_dg as f32 / 10.0).to_string(),
-        pokemon_species.genus,
-        abilities_vec,
-        gender_rate,
+        pokemon_genus.await?,
+        abilities.await?,
+        pokemon_gender_rate.await?,
     ))
 }
 
