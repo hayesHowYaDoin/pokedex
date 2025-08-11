@@ -13,5 +13,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: nicknovitski/nix-develop@v1
     - run: just generate-database
+    - run: ls -la data/pokedex.db
     - run: just lint
     - run: just test
