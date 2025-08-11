@@ -6,17 +6,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
+  ci:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
-    - run: nix develop --command just generate-database && just lint
-
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
     - uses: actions/checkout@v2
-    - uses: DeterminateSystems/nix-installer-action@main
-    - run: nix develop --command just generate-database && just test
+    - uses: nicknovitski/nix-develop@v1
+    - run: just generate-database
+    - run: just lint
+    - run: just test
