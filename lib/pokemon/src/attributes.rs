@@ -1,6 +1,6 @@
 use color_eyre::{eyre, Result};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct PokemonGenderRates {
     pub male: f32,
     pub female: f32,
@@ -16,7 +16,7 @@ impl PokemonGenderRates {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct PokemonAttributes {
     pub height_m: String,
     pub weight_kg: String,

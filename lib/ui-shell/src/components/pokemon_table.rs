@@ -35,7 +35,7 @@ impl TuiStatefulComponent for TuiPokemonTable<'_> {
         let rows = self
             .pokemon_table
             .get_pokemon()
-            .into_iter()
+            .iter()
             .map(|p| into_row(p.to_owned()));
         let table = Table::new(rows, WIDTHS)
             .column_spacing(1)

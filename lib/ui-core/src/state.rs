@@ -119,6 +119,7 @@ mod test {
             1,
             "".to_string(),
             DynamicImage::default(),
+            PokemonCry::new(vec![]),
             PokemonTypes::new(Type::Normal, None),
             PokemonDescription::new("".to_string()),
             PokemonAttributes::new(
@@ -129,7 +130,6 @@ mod test {
                 None,
             ),
             PokemonStats::new(0, 0, 0, 0, 0, 0),
-            PokemonCry::new(vec![]),
         )
     });
 

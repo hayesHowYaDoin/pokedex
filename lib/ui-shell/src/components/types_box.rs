@@ -30,7 +30,7 @@ impl TuiComponent for TuiTypesBox<'_> {
             .flat_map(|t| {
                 vec![
                     Span::styled(
-                        format!(" {} ", t),
+                        format!(" {t} "),
                         Style::default()
                             .fg(type_color_dark(t))
                             .bg(type_color_light(t)),
