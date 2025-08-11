@@ -11,9 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
-    - name: Generate Database
-      run: nix develop --command ./data/database.sh
-    - run: nix develop --command just lint
+    - run: nix develop --command just generate-database && just lint
 
   test:
     needs: lint
@@ -21,6 +19,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
-    - name: Generate Database
-      run: nix develop --command ./data/database.sh
-    - run: nix develop --command just test
+    - run: nix develop --command just generate-database && just test

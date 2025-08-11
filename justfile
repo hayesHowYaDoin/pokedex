@@ -22,3 +22,6 @@ run *ARGS:
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
+
+generate-database:
+  ./data/generate.sh
