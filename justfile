@@ -11,7 +11,7 @@ build-deb *ARGS:
   cargo deb {{ARGS}}
 
 run *ARGS:
-  cargo run {{ARGS}}
+  ./target/debug/rich_pokedex {{ARGS}}
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
