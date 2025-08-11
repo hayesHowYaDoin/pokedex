@@ -172,23 +172,23 @@ mod tests {
 
     #[test]
     fn test_index_new_valid() {
-        let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
+        let table = PokemonTable::new(POKEMON.as_slice(), POKEMON.len() - 1);
         assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
 
-        let table = PokemonTable::new(&POKEMON.as_slice(), 0);
+        let table = PokemonTable::new(POKEMON.as_slice(), 0);
         assert_eq!(table.get_selected_index(), Some(0));
     }
 
     #[test]
     fn test_index_out_of_bounds() {
-        let table = PokemonTable::new(&POKEMON.as_slice(), POKEMON.len());
+        let table = PokemonTable::new(POKEMON.as_slice(), POKEMON.len());
         assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
     }
 
     #[test]
     fn test_up() {
         let table = cascade! {
-            PokemonTable::new(&POKEMON.as_slice(), 1);
+            PokemonTable::new(POKEMON.as_slice(), 1);
             ..up();
         };
         assert_eq!(table.get_selected_index(), Some(0));
@@ -197,7 +197,7 @@ mod tests {
     #[test]
     fn test_up_limit() {
         let table = cascade! {
-            PokemonTable::new(&POKEMON.as_slice(), 0);
+            PokemonTable::new(POKEMON.as_slice(), 0);
             ..up();
         };
         assert_eq!(table.get_selected_index(), Some(0));
@@ -206,7 +206,7 @@ mod tests {
     #[test]
     fn test_down() {
         let table = cascade! {
-            PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 2);
+            PokemonTable::new(POKEMON.as_slice(), POKEMON.len() - 2);
             ..down();
         };
         assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
@@ -215,7 +215,7 @@ mod tests {
     #[test]
     fn test_down_limit() {
         let table = cascade! {
-            PokemonTable::new(&POKEMON.as_slice(), POKEMON.len() - 1);
+            PokemonTable::new(POKEMON.as_slice(), POKEMON.len() - 1);
             ..down();
         };
         assert_eq!(table.get_selected_index(), Some(POKEMON.len() - 1));
@@ -224,7 +224,7 @@ mod tests {
     #[test]
     fn test_get_selected() {
         let table = cascade! {
-            PokemonTable::new(&POKEMON.as_slice(), 1);
+            PokemonTable::new(POKEMON.as_slice(), 1);
             ..down();
         };
         assert_eq!(table.get_selected(), Some(&POKEMON[2]));

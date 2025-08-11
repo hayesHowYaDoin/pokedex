@@ -16,9 +16,8 @@ jobs:
     - uses: DeterminateSystems/nix-installer-action@main
     - name: Generate Database
       run: ./database.sh
-    - run: nix develop --command cargo fmt --all -- --check
-    - run: nix develop --command cargo clippy -- -D warnings
-    - run: nix develop --command cargo test
+    - run: nix develop --command just lint
+    - run: nix develop --command just test
 
   build-amd64-linux:
     needs: quality

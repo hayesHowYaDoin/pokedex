@@ -13,8 +13,7 @@ jobs:
     - uses: DeterminateSystems/nix-installer-action@main
     - name: Generate Database
       run: ./data/database.sh
-    - run: nix develop --command cargo fmt --all -- --check
-    - run: nix develop --command cargo clippy -- -D warnings
+    - run: nix develop --command just lint
 
   test:
     needs: lint
@@ -23,4 +22,4 @@ jobs:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
     - run: ./database.sh
-    - run: nix develop --command cargo test
+    - run: nix develop --command just test
