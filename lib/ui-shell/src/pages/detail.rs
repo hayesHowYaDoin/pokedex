@@ -65,7 +65,7 @@ impl TuiPage for DetailPage {
         let sound = self.get_launch_sound().clone();
         tokio::spawn(async move {
             if let Err(err) = play_sound(sound) {
-                log::warn!("Failed to play sound effect: {}", err);
+                log::warn!("Failed to play sound effect: {err}");
             }
         });
     }

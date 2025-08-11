@@ -1,7 +1,8 @@
 use std::collections::HashSet;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub enum Type {
+    #[default]
     Normal,
     Fire,
     Water,
@@ -74,7 +75,7 @@ impl From<String> for Type {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct PokemonTypes {
     pub primary: Type,
     pub secondary: Option<Type>,

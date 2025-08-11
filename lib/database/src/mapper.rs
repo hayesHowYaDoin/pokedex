@@ -87,17 +87,24 @@ impl DetailPagePokemonRepository for DatabaseMapper {
     ) -> Pin<Box<dyn Future<Output = Result<DetailPagePokemon>> + Send>> {
         let pool = self.pool.clone();
         Box::pin(async move {
+            let image = build_image(number);
+            let types = build_types(&pool, number as i64);
+            let description = build_description(&pool, number as i64);
+            let attributes = build_attributes(&pool, number as i64);
+            let stats = build_stats(&pool, number as i64);
+            let cry = build_cry(number);
+
             let pokemon = PokemonDTO::read_one(&pool, number as i64).await?;
 
             let detail_page_pokemon = DetailPagePokemon::new(
                 pokemon.id as u32,
                 capitalize(&pokemon.identifier),
-                build_image(number)?,
-                build_types(&pool, number as i64).await?,
-                build_description(&pool, number as i64).await?,
-                build_attributes(&pool, number as i64).await?,
-                build_stats(number as i64, &pool).await?,
-                build_cry(number)?,
+                image?,
+                cry?,
+                types.await.unwrap_or_default(),
+                description.await.unwrap_or_default(),
+                attributes.await.unwrap_or_default(),
+                stats.await.unwrap_or_default(),
             );
 
             Ok(detail_page_pokemon)
@@ -129,8 +136,8 @@ fn build_image(id: u32) -> Result<image::DynamicImage> {
 }
 
 async fn build_types(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonTypes> {
-    let pokemon_types = stream_to_vec(PokemonTypeDTO::read(&pool, number)).await?;
-    let types = TypeDTO::read_all(&pool).await?;
+    let pokemon_types = stream_to_vec(PokemonTypeDTO::read(pool, number)).await?;
+    let types = TypeDTO::read_all(pool).await?;
 
     let pokemon_types_names: Vec<String> = pokemon_types
         .iter()
@@ -162,13 +169,11 @@ async fn build_types(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonType
 }
 
 async fn build_description(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonDescription> {
-    let pokemon_description =
-        stream_to_vec(PokemonDescriptionDTO::read(&pool, number as i64)).await?;
+    let pokemon_description = stream_to_vec(PokemonDescriptionDTO::read(pool, number)).await?;
     let description = pokemon_description
         .into_iter()
         .filter(|d| d.language_id == 9) // English
-        .filter(|d| d.version_id == 9) // Black/White
-        .next()
+        .find(|d| d.version_id == 17) // Black version
         .ok_or_else(|| eyre!("No English Black/White description found"))?;
 
     // Correct malformed database rows
@@ -178,11 +183,10 @@ async fn build_description(pool: &sqlx::SqlitePool, number: i64) -> Result<Pokem
 }
 
 async fn build_pokemon_abilities(pool: &sqlx::SqlitePool, number: i64) -> Result<Vec<String>> {
-    let abilities = AbilityDTO::read_all(&pool).await?;
-    let mut pokemon_abilities =
-        stream_to_vec(PokemonAbilitiesDTO::read(&pool, number as i64)).await?;
+    let abilities = AbilityDTO::read_all(pool).await?;
+    let mut pokemon_abilities = stream_to_vec(PokemonAbilitiesDTO::read(pool, number)).await?;
 
-    if 1 > pokemon_abilities.len() || pokemon_abilities.len() > 3 {
+    if pokemon_abilities.is_empty() || pokemon_abilities.len() > 3 {
         return Err(eyre!(format!(
             "Failed to build attributes: expected 1 or 2 abilities in database, found {}",
             pokemon_abilities.len()
@@ -207,20 +211,15 @@ async fn build_pokemon_abilities(pool: &sqlx::SqlitePool, number: i64) -> Result
 }
 
 async fn build_pokemon_genus(pool: &sqlx::SqlitePool, number: i64) -> Result<String> {
-    let pokemon_species = stream_to_vec(PokemonSpeciesNamesDTO::read(&pool, number as i64)).await?;
+    let pokemon_species = stream_to_vec(PokemonSpeciesNamesDTO::read(pool, number)).await?;
     let genus = pokemon_species
         .iter()
-        .filter(|ps| ps.local_language_id == 9) // English
-        .next()
+        .find(|ps| ps.local_language_id == 9) // English
         .map_or(
             Err(eyre!(
                 "Failed to build attributes: no English genus found".to_string()
             )),
-            |ps| {
-                Ok(capitalize_words(
-                    &ps.genus.replace("Pokémon", "").trim().to_string(),
-                ))
-            },
+            |ps| Ok(capitalize_words(ps.genus.replace("Pokémon", "").trim())),
         )?;
     Ok(genus)
 }
@@ -229,7 +228,7 @@ async fn build_pokemon_gender_rate(
     pool: &sqlx::SqlitePool,
     number: i64,
 ) -> Result<Option<PokemonGenderRates>> {
-    let pokemon_gender = PokemonGenderDTO::read_one(&pool, number as i64).await?;
+    let pokemon_gender = PokemonGenderDTO::read_one(pool, number).await?;
 
     match pokemon_gender.gender_rate {
         -1 => Ok(None),
@@ -247,7 +246,7 @@ async fn build_attributes(pool: &sqlx::SqlitePool, number: i64) -> Result<Pokemo
     let abilities = build_pokemon_abilities(pool, number);
     let pokemon_genus = build_pokemon_genus(pool, number);
     let pokemon_gender_rate = build_pokemon_gender_rate(pool, number);
-    let pokemon_size = PokemonSizeDTO::read_one(&pool, number as i64).await?;
+    let pokemon_size = PokemonSizeDTO::read_one(pool, number).await?;
 
     Ok(PokemonAttributes::new(
         (pokemon_size.height_dm as f32 / 10.0).to_string(),
@@ -258,8 +257,8 @@ async fn build_attributes(pool: &sqlx::SqlitePool, number: i64) -> Result<Pokemo
     ))
 }
 
-async fn build_stats(number: i64, pool: &sqlx::SqlitePool) -> Result<PokemonStats> {
-    let pokemon_stats = stream_to_vec(PokemonStatsDTO::read(pool, number as i64)).await?;
+async fn build_stats(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonStats> {
+    let pokemon_stats = stream_to_vec(PokemonStatsDTO::read(pool, number)).await?;
     let convert = |id: i64, ps: &[PokemonStatsDTO]| {
         ps.iter()
             .find(|s| s.stat_id == id)

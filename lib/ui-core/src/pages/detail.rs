@@ -109,12 +109,12 @@ pub struct DetailPagePokemon {
     pub number: u32,
     pub name: String,
     pub image: DynamicImage,
+    pub cry: PokemonCry,
     pub types: PokemonTypes,
     pub weaknesses: HashSet<Type>,
     pub description: PokemonDescription,
     pub attributes: PokemonAttributes,
     pub stats: PokemonStats,
-    pub cry: PokemonCry,
 }
 
 impl DetailPagePokemon {
@@ -123,11 +123,11 @@ impl DetailPagePokemon {
         number: u32,
         name: String,
         image: DynamicImage,
+        cry: PokemonCry,
         types: PokemonTypes,
         description: PokemonDescription,
         attributes: PokemonAttributes,
         stats: PokemonStats,
-        cry: PokemonCry,
     ) -> Self {
         let mut weaknesses = type_defense_weaknesses(&types.primary);
         if types.secondary.is_some() {
@@ -144,12 +144,12 @@ impl DetailPagePokemon {
             number,
             name,
             image,
+            cry,
             types,
             weaknesses,
             description,
             attributes,
             stats,
-            cry,
         }
     }
 }
