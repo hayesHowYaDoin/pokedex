@@ -736,7 +736,7 @@ dependencies = [
 
 [[package]]
 name = "database"
-version = "0.1.0"
+version = "1.1.0"
 dependencies = [
  "color-eyre",
  "derive-crud",
@@ -2247,7 +2247,7 @@ dependencies = [
 
 [[package]]
 name = "pokemon"
-version = "0.1.0"
+version = "1.1.0"
 dependencies = [
  "color-eyre",
 ]
@@ -3113,7 +3113,7 @@ checksum = "fe895eb47f22e2ddd4dabc02bce419d2e643c8e3b585c78158b349195bc24d82"
 
 [[package]]
 name = "string"
-version = "0.1.0"
+version = "1.1.0"
 
 [[package]]
 name = "stringprep"
@@ -3523,7 +3523,7 @@ checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
 
 [[package]]
 name = "ui-core"
-version = "0.1.0"
+version = "1.1.0"
 dependencies = [
  "cascade",
  "color-eyre",
@@ -3535,7 +3535,7 @@ dependencies = [
 
 [[package]]
 name = "ui-shell"
-version = "0.1.0"
+version = "1.1.0"
 dependencies = [
  "color-eyre",
  "colors-transform",
