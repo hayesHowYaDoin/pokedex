@@ -2,12 +2,21 @@
 
 use std::fs::File;
 
+use clap::Parser;
 use color_eyre::eyre::Result;
 use simplelog::{CombinedLogger, Config, LevelFilter, WriteLogger};
 
 use database::DatabaseMapper;
 use settings::Settings;
 use ui_shell::app::App;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    /// Run in silent mode (no sound effects)
+    #[arg(short, long)]
+    silent: bool,
+}
 
 async fn tokio_main() -> Result<()> {
     log::trace!("Connecting to database...");
@@ -26,7 +35,8 @@ async fn tokio_main() -> Result<()> {
 async fn main() -> Result<()> {
     color_eyre::install()?; // Enable colorized error output
 
-    let settings = Settings::new(false);
+    let cli = Cli::parse();
+    let settings = Settings::new(cli.silent);
     CombinedLogger::init(vec![WriteLogger::new(
         LevelFilter::Trace,
         Config::default(),
