@@ -39,6 +39,7 @@
         LD_LIBRARY_PATH = lib.makeLibraryPath buildInputs;
 
         shellHook = ''
+          export PROJECT_ROOT="''$(${lib.getExe config.flake-root.package})"
           export POKEDEX_DATABASE_PATH="''$(${lib.getExe config.flake-root.package})/data/pokedex.db"
           export POKEDEX_ASSETS_PATH="''$(${lib.getExe config.flake-root.package})/data/assets"
           export POKEDEX_LOG_PATH="''$(${lib.getExe config.flake-root.package})/logs/application.log"
