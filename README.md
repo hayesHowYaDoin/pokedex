@@ -7,7 +7,7 @@
 This application is intended to serve as a method of browsing the various
 statistics of the various Pokemon™ from the hit game series Pokemon™.
 
-![Screenshot](https://github.com/user-attachments/assets/3e569b5b-a2ff-44e1-85cd-3343647c31ef)
+https://github.com/user-attachments/assets/3e569b5b-a2ff-44e1-85cd-3343647c31ef
 
 ## Project Goals
 
@@ -88,3 +88,4 @@ Please refer to any open issues for any future planned work on this project.
 [3]: https://docs.determinate.systems/determinate-nix/
 [4]: https://direnv.net/
 [5]: https://git-scm.com/
+
