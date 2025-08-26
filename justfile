@@ -10,8 +10,19 @@ build *ARGS:
 build-deb *ARGS:
   cargo deb {{ARGS}}
 
+lint:
+  cargo clippy --workspace --all-targets -- -D warnings
+  cargo fmt --all -- --check
+
+test:
+  cargo test --workspace
+
 run *ARGS:
-  cargo run {{ARGS}}
+  ./target/debug/rich_pokedex {{ARGS}}
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}
+
+generate-database:
+  chmod +x ./data/generate.sh
+  ./data/generate.sh

@@ -1,0 +1,23 @@
+[package]
+name = "ui-shell"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Internal
+pokemon = { workspace = true }
+settings = { workspace = true }
+string = { workspace = true }
+ui-core = { workspace = true }
+# External
+color-eyre = { workspace = true }
+colors-transform = { workspace = true }
+crossterm = { workspace = true }
+futures = { workspace = true }
+fyrox-sound = { workspace = true }
+log = { workspace = true }
+ratatui = { workspace = true }
+ratatui-image = { workspace = true }
+signal-hook = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }

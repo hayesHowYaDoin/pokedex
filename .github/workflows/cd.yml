@@ -14,9 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: DeterminateSystems/nix-installer-action@main
-    - run: nix develop --command cargo fmt --all -- --check
-    - run: nix develop --command cargo clippy -- -D warnings
-    - run: nix develop --command cargo test
+    - name: Generate Database
+      run: ./database.sh
+    - run: nix develop --command just lint
+    - run: nix develop --command just test
 
   build-amd64-linux:
     needs: quality
@@ -26,6 +27,8 @@ jobs:
       with:
         lfs: true
     - uses: DeterminateSystems/nix-installer-action@main
+    - name: Generate Database
+      run: ./database.sh
     - run: nix develop --command cargo deb
     - name: Upload Debian Package
       uses: actions/upload-artifact@v4
@@ -37,7 +40,7 @@ jobs:
       run: |
         mkdir -p tmp/
         cp ./target/release/rich_pokedex tmp/
-        cp ./data/pokedex.sqlite tmp/
+        cp ./data/pokedex.db tmp/
         cp -r ./data/assets tmp/
         cd tmp
         zip -r ../rich_pokedex.zip ./*
@@ -55,6 +58,8 @@ jobs:
       with:
         lfs: true
     - uses: DeterminateSystems/nix-installer-action@main
+    - name: Generate Database
+      run: ./database.sh
     - run: nix develop --command cargo deb
     - name: Upload Debian Package
       uses: actions/upload-artifact@v4
@@ -66,7 +71,7 @@ jobs:
       run: |
         mkdir -p tmp/
         cp ./target/release/rich_pokedex tmp/
-        cp ./data/pokedex.sqlite tmp/
+        cp ./data/pokedex.db tmp/
         cp -r ./data/assets tmp/
         cd tmp
         zip -r ../rich_pokedex.zip ./*

@@ -1,0 +1,18 @@
+[package]
+name = "database"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# Internal
+pokemon = { workspace = true }
+settings = { workspace = true }
+string = { workspace = true }
+ui-core = { workspace = true }
+# External
+color-eyre = { workspace = true }
+derive-crud = { workspace = true }
+futures = { workspace = true }
+image = { workspace = true }
+log = { workspace = true }
+sqlx = { workspace = true }

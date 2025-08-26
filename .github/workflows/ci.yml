@@ -6,25 +6,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
+  ci:
     runs-on: ubuntu-latest
     steps:
+    - uses: DeterminateSystems/nix-installer-action@main
     - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo fmt --all -- --check
-    - run: cargo clippy -- -D warnings
-
-  test:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install System Dependencies
-      if: ${{ runner.os == 'Linux' }}
-      run: |
-        sudo apt-get update
-        sudo apt-get install --no-install-recommends -y libasound2-dev
-    - run: cargo test
+    - uses: nicknovitski/nix-develop@v1
+    - run: just generate-database
+    - run: ls -la data/pokedex.db
+    - run: just lint
+    - run: just test

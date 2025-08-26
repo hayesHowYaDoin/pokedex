@@ -1,23 +1,52 @@
-[package]
-name = "rich_pokedex"
+[workspace]
+members = [
+    "lib/database",
+    "lib/pokemon",
+    "lib/settings",
+    "lib/string",
+    "lib/ui-core",
+    "lib/ui-shell",
+]
+
+[workspace.package]
 description = "A modern Pokedex TUI application which appeals to the senses."
-authors = ["Jordan Hayes <jordanhayes98@gmail.com>"]
-version = "1.0.1"
-edition = "2021"
 repository = "https://github.com/hayesHowYaDoin/pokedex"
+authors = ["Jordan Hayes <jordanhayes98@gmail.com>"]
+version = "1.1.0"
+edition = "2021"
 license-file = "LICENSE"
 readme = "README.md"
-include = ["src/**", "data/pokedex.sqlite", "data/assets/**"]
-
 keywords = ["pokedex", "pokemon", "ratatui", "tui"]
+categories = ["command-line-utilities", "games"]
 
-[dependencies]
+[package]
+name = "rich_pokedex"
+description.workspace = true
+repository.workspace = true
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license-file.workspace = true
+readme.workspace = true
+include = ["src/**", "data/pokedex.db", "data/assets/**"]
+
+[workspace.dependencies]
+# Internal
+database = { path = "lib/database" }
+pokemon = { path = "lib/pokemon" }
+settings = { path = "lib/settings" }
+string = { path = "lib/string" }
+ui-core = { path = "lib/ui-core" }
+ui-shell = { path = "lib/ui-shell" }
+# External
 ansi-to-tui = "7.0.0"
 cascade = "1.0.1"
+clap = { version = "4.5.43", features = ["derive"] }
 color-eyre = "0.6.3"
 colors-transform = "0.2.11"
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 derivative = "2.2.0"
+derive-crud = { git = "https://github.com/hayesHowYaDoin/derive-crud", branch = "main" }
 derive_more = "0.99.18"
 futures = "0.3.30"
 fyrox-resource = "0.12.0"
@@ -27,23 +56,29 @@ log = "0.4.21"
 num-traits = "0.2.19"
 ratatui = "0.29.0"
 ratatui-image = "4.2.0"
-rusqlite = { version = "0.31.0", features = ["bundled"] }
 signal-hook = "0.3.17"
-thiserror = "1.0.61"
-tokio = { version = "1.38.0", features = [
-  "sync",
-  "rt",
-  "macros",
-  "time",
-  "rt-multi-thread",
-] }
+simplelog = { version = "0.12.2", features = ["paris"] }
+sqlx = "0.8.6"
+tokio = { version = "1.38.0", features = ["full"] }
 tokio-util = "0.7.11"
+
+[dependencies]
+# Internal
+database = { workspace = true }
+settings = { workspace = true }
+ui-shell = { workspace = true }
+# External
+clap = { workspace = true }
+color-eyre = { workspace = true }
+simplelog = { workspace = true }
+log = { workspace = true }
+tokio = { workspace = true }
 
 [package.metadata.deb]
 assets = [
   # Binary
   ["target/release/rich_pokedex", "usr/bin/rich_pokedex", "755"],
   # Assets
-  ["data/pokedex.sqlite", "usr/share/rich_pokedex/pokedex.sqlite", "644"],
+  ["data/pokedex.db", "usr/share/rich_pokedex/pokedex.db", "644"],
   ["data/assets/**/*", "usr/share/rich_pokedex/assets/", "644"],
 ]

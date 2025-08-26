@@ -1,2 +1,0 @@
-mod detail;
-mod list;
