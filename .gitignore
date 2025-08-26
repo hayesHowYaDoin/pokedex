@@ -31,5 +31,5 @@ target/
 .pre-commit-config.yaml
 result
 
-# Logging
-*.log
+# Logs
+logs/**

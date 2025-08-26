@@ -10,6 +10,9 @@
       hooks = {
         nixpkgs-fmt.enable = true;
         rustfmt.enable = true;
+        markdownlint.enable = true;
+        bats.enable = true;
+        pretty-format-json.enable = true;
       };
     };
   };
