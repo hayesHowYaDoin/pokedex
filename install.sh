@@ -46,7 +46,7 @@ install_release() {
         mkdir -p /usr/share/rich_pokedex;
         chmod +x ./rich_pokedex;
         mv ./rich_pokedex /usr/local/bin && \
-        mv ./pokedex.sqlite ./assets /usr/share/rich_pokedex;
+        mv ./pokedex.db ./assets /usr/share/rich_pokedex;
     } || { echo "Installation failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Cleaning up..."

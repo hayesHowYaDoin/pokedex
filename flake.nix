@@ -8,6 +8,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     flake-root.url = "github:srid/flake-root";
+    rust-overlay.url = "github:oxalica/rust-overlay";
     process-compose-flake.url = "github:Platonic-Systems/process-compose-flake";
     systems.url = "github:nix-systems/default";
     git-hooks = {

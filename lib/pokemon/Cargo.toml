@@ -1,0 +1,8 @@
+[package]
+name = "pokemon"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+# External
+color-eyre = { workspace = true }

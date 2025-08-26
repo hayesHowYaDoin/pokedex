@@ -1,17 +1,31 @@
 #![allow(dead_code)]
 
-mod core;
-mod shell;
+use std::fs::File;
 
+use clap::Parser;
 use color_eyre::eyre::Result;
+use simplelog::{CombinedLogger, Config, LevelFilter, WriteLogger};
 
-use crate::shell::ratatui::app::App;
-use crate::shell::sql::DatabaseMapper;
+use database::DatabaseMapper;
+use settings::Settings;
+use ui_shell::app::App;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Cli {
+    /// Run in silent mode (no sound effects)
+    #[arg(short, long)]
+    silent: bool,
+}
 
 async fn tokio_main() -> Result<()> {
-    let db = DatabaseMapper::new().expect("Failed to create database connection");
+    log::trace!("Connecting to database...");
+    let db = DatabaseMapper::new().await?;
 
-    let mut app = App::new(Box::new(db)).expect("Failed to create application");
+    log::trace!("Creating application...");
+    let mut app = App::new(Box::new(db)).await?;
+
+    log::trace!("Running application...");
     app.run().await?;
 
     Ok(())
@@ -19,8 +33,22 @@ async fn tokio_main() -> Result<()> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    color_eyre::install()?; // Enable colorized error output
+
+    let cli = Cli::parse();
+    Settings::init(cli.silent);
+    CombinedLogger::init(vec![WriteLogger::new(
+        LevelFilter::Trace,
+        Config::default(),
+        {
+            std::fs::create_dir_all(Settings::log_path().parent().unwrap()).unwrap();
+            File::create(Settings::log_path()).unwrap()
+        },
+    )])
+    .unwrap();
+
     if let Err(e) = tokio_main().await {
-        eprintln!("{} error: Something went wrong", env!("CARGO_PKG_NAME"));
+        log::error!("{} error: Something went wrong", env!("CARGO_PKG_NAME"));
         Err(e)
     } else {
         Ok(())
