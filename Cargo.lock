@@ -2434,6 +2434,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "pokedex"
+version = "1.1.0"
+dependencies = [
+ "clap",
+ "color-eyre",
+ "database",
+ "log",
+ "settings",
+ "simplelog",
+ "tokio",
+ "ui-shell",
+]
+
+[[package]]
 name = "pokemon"
 version = "1.1.0"
 dependencies = [
@@ -2784,20 +2798,6 @@ name = "rgb"
 version = "0.8.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c6a884d2998352bb4daf0183589aec883f16a6da1f4dde84d8e2e9a5409a1ce"
-
-[[package]]
-name = "rich_pokedex"
-version = "1.1.0"
-dependencies = [
- "clap",
- "color-eyre",
- "database",
- "log",
- "settings",
- "simplelog",
- "tokio",
- "ui-shell",
-]
 
 [[package]]
 name = "ron"

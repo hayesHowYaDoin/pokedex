@@ -39,16 +39,16 @@ jobs:
     - name: Zip Binaries
       run: |
         mkdir -p tmp/
-        cp ./target/release/rich_pokedex tmp/
+        cp ./target/release/pokedex tmp/
         cp ./data/pokedex.db tmp/
         cp -r ./data/assets tmp/
         cd tmp
-        zip -r ../rich_pokedex.zip ./*
+        zip -r ../pokedex.zip ./*
     - name: Upload Zipped Artifact
       uses: actions/upload-artifact@v4
       with:
         name: amd64-linux-binaries
-        path: 'rich_pokedex.zip'
+        path: 'pokedex.zip'
 
   build-arm64-linux:
     needs: quality
@@ -70,16 +70,16 @@ jobs:
     - name: Zip Binaries
       run: |
         mkdir -p tmp/
-        cp ./target/release/rich_pokedex tmp/
+        cp ./target/release/pokedex tmp/
         cp ./data/pokedex.db tmp/
         cp -r ./data/assets tmp/
         cd tmp
-        zip -r ../rich_pokedex.zip ./*
+        zip -r ../pokedex.zip ./*
     - name: Upload Zipped Binaries
       uses: actions/upload-artifact@v4
       with:
         name: arm64-linux-binaries
-        path: 'rich_pokedex.zip'
+        path: 'pokedex.zip'
 
   draft-release:
     needs: [build-amd64-linux, build-arm64-linux]
@@ -111,8 +111,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./amd64-linux-deb/rich-pokedex_${{ steps.versionNumber.outputs.substring }}-1_amd64.deb
-          asset_name: rich-pokedex_${{ steps.versionNumber.outputs.substring }}-1_amd64.deb
+          asset_path: ./amd64-linux-deb/pokedex_${{ steps.versionNumber.outputs.substring }}-1_amd64.deb
+          asset_name: pokedex_${{ steps.versionNumber.outputs.substring }}-1_amd64.deb
           asset_content_type: application/vnd.debian.binary-package
 
       - name: Upload amd64 Linux Binaries
@@ -121,7 +121,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./amd64-linux-binaries/rich_pokedex.zip
+          asset_path: ./amd64-linux-binaries/pokedex.zip
           asset_name: amd64-linux
           asset_content_type: application/zip
 
@@ -131,8 +131,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./arm64-linux-deb/rich-pokedex_${{ steps.versionNumber.outputs.substring }}-1_arm64.deb
-          asset_name: rich-pokedex_${{ steps.versionNumber.outputs.substring }}-1_arm64.deb
+          asset_path: ./arm64-linux-deb/pokedex_${{ steps.versionNumber.outputs.substring }}-1_arm64.deb
+          asset_name: pokedex_${{ steps.versionNumber.outputs.substring }}-1_arm64.deb
           asset_content_type: application/zip
 
       - name: Upload arm64 Linux Binaries
@@ -141,6 +141,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./arm64-linux-binaries/rich_pokedex.zip
+          asset_path: ./arm64-linux-binaries/pokedex.zip
           asset_name: arm64-linux
           asset_content_type: application/zip

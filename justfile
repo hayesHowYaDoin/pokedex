@@ -18,7 +18,7 @@ test:
   cargo test --workspace
 
 run *ARGS:
-  ./target/debug/rich_pokedex {{ARGS}}
+  ./target/debug/pokedex {{ARGS}}
 
 watch *ARGS:
   bacon --job run -- -- {{ ARGS }}

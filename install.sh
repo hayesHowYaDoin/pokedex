@@ -35,18 +35,18 @@ install_release() {
     url="https://github.com/hayesHowYaDoin/pokedex/releases/$version/download/$arch-$os";
     echo "Downloading from $url"
     {
-        curl -L $url -o rich_pokedex.zip;
+        curl -L $url -o pokedex.zip;
     } || { echo "Download failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Extracting files..."
-    unzip rich_pokedex.zip || { echo "Extraction failed"; cd .. && rm -fr ./tmp; exit 1; }
+    unzip pokedex.zip || { echo "Extraction failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Installing..."
     {
-        mkdir -p /usr/share/rich_pokedex;
-        chmod +x ./rich_pokedex;
-        mv ./rich_pokedex /usr/local/bin && \
-        mv ./pokedex.db ./assets /usr/share/rich_pokedex;
+        mkdir -p /usr/share/pokedex;
+        chmod +x ./pokedex;
+        mv ./pokedex /usr/local/bin && \
+        mv ./pokedex.db ./assets /usr/share/pokedex;
     } || { echo "Installation failed"; cd .. && rm -fr ./tmp; exit 1; }
 
     echo "Cleaning up..."

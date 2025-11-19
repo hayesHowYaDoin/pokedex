@@ -20,7 +20,7 @@ keywords = ["pokedex", "pokemon", "ratatui", "tui"]
 categories = ["command-line-utilities", "games"]
 
 [package]
-name = "rich_pokedex"
+name = "pokedex"
 description.workspace = true
 repository.workspace = true
 authors.workspace = true
@@ -77,8 +77,8 @@ tokio = { workspace = true }
 [package.metadata.deb]
 assets = [
   # Binary
-  ["target/release/rich_pokedex", "usr/bin/rich_pokedex", "755"],
+  ["target/release/pokedex", "usr/bin/pokedex", "755"],
   # Assets
-  ["data/pokedex.db", "usr/share/rich_pokedex/pokedex.db", "644"],
-  ["data/assets/**/*", "usr/share/rich_pokedex/assets/", "644"],
+  ["data/pokedex.db", "usr/share/pokedex/pokedex.db", "644"],
+  ["data/assets/**/*", "usr/share/pokedex/assets/", "644"],
 ]
