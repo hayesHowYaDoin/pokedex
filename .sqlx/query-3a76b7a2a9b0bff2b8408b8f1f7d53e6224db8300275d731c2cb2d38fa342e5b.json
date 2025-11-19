@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"stat_names\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "stat_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "local_language_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3a76b7a2a9b0bff2b8408b8f1f7d53e6224db8300275d731c2cb2d38fa342e5b"
+}

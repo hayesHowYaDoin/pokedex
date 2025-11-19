@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "identifier",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "species_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "5378b35d6333d71ceae475d9a9eef7ffc1b532ac727d08f32c33fd5d183978ce"
+}

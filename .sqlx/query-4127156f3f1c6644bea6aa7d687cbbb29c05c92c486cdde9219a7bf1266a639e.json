@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_species_names\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "pokemon_species_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "local_language_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "name",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "genus",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "4127156f3f1c6644bea6aa7d687cbbb29c05c92c486cdde9219a7bf1266a639e"
+}

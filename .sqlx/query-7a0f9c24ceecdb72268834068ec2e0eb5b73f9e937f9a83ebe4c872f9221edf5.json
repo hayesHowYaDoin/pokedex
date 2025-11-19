@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"abilities\" WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "identifier",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "generation_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "is_main_series",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "7a0f9c24ceecdb72268834068ec2e0eb5b73f9e937f9a83ebe4c872f9221edf5"
+}

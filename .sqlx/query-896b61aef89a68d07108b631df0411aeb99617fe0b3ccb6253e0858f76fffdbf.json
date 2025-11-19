@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_descriptions\" WHERE species_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "species_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "version_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "language_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "flavor_text",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "896b61aef89a68d07108b631df0411aeb99617fe0b3ccb6253e0858f76fffdbf"
+}

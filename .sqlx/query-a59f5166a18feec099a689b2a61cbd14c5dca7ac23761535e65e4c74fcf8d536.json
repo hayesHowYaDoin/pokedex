@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_types\" WHERE pokemon_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "pokemon_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "type_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "slot",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "a59f5166a18feec099a689b2a61cbd14c5dca7ac23761535e65e4c74fcf8d536"
+}
