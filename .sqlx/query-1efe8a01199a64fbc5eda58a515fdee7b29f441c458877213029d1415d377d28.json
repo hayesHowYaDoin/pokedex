@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_abilities\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "pokemon_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "ability_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "is_hidden",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "slot",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1efe8a01199a64fbc5eda58a515fdee7b29f441c458877213029d1415d377d28"
+}

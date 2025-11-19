@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_descriptions\"",
+  "describe": {
+    "columns": [
+      {
+        "name": "species_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "version_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "language_id",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "flavor_text",
+        "ordinal": 3,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3e60f7e77c3b1b1c0292125af65f946439f205d40181864deb879c83b857e668"
+}

@@ -12,19 +12,53 @@ pub struct Settings {
 }
 
 impl Settings {
+    fn resolve_paths() -> (PathBuf, PathBuf, PathBuf) {
+        // Try environment variables first (development/custom setups)
+        if let Ok(db) = std::env::var("POKEDEX_DATABASE_PATH") {
+            let log = std::env::var("POKEDEX_LOG_PATH")
+                .unwrap_or_else(|_| "/tmp/pokedex.log".to_string());
+            let assets = std::env::var("POKEDEX_ASSETS_PATH")
+                .unwrap_or_else(|_| "/usr/share/pokedex/assets".to_string());
+
+            return (
+                PathBuf::from(log.trim_end_matches('/')),
+                PathBuf::from(db.trim_end_matches('/')),
+                PathBuf::from(assets.trim_end_matches('/')),
+            );
+        }
+
+        // Check if running from a Nix store path
+        if let Ok(exe_path) = std::env::current_exe() {
+            if let Some(exe_str) = exe_path.to_str() {
+                if exe_str.contains("/nix/store/") {
+                    // Running from Nix store, use relative paths
+                    // Binary is at /nix/store/.../bin/pokedex
+                    // Data is at /nix/store/.../share/pokedex/
+                    if let Some(store_path) = exe_path.parent().and_then(|p| p.parent()) {
+                        let share_dir = store_path.join("share/pokedex");
+                        let log_dir = std::env::temp_dir().join("pokedex");
+                        let _ = std::fs::create_dir_all(&log_dir); // Best effort
+
+                        return (
+                            log_dir.join("pokedex.log"),
+                            share_dir.join("pokedex.db"),
+                            share_dir.join("assets"),
+                        );
+                    }
+                }
+            }
+        }
+
+        // Fallback to standard Unix paths (e.g., Debian package)
+        (
+            PathBuf::from("/tmp/pokedex.log"),
+            PathBuf::from("/usr/share/pokedex/pokedex.db"),
+            PathBuf::from("/usr/share/pokedex/assets"),
+        )
+    }
+
     pub fn init(is_silent: bool) {
-        let log_path = match std::env::var("POKEDEX_LOG_PATH").ok() {
-            Some(p) => PathBuf::from(p.trim_end_matches('/')),
-            None => PathBuf::from("/usr/share/rich_pokedex/pokedex.log"),
-        };
-        let database_path = match std::env::var("POKEDEX_DATABASE_PATH").ok() {
-            Some(p) => PathBuf::from(p.trim_end_matches('/')),
-            None => PathBuf::from("/usr/share/rich_pokedex/pokedex.db"),
-        };
-        let assets_path = match std::env::var("POKEDEX_ASSETS_PATH").ok() {
-            Some(p) => PathBuf::from(p.trim_end_matches('/')),
-            None => PathBuf::from("/usr/share/rich_pokedex/assets"),
-        };
+        let (log_path, database_path, assets_path) = Self::resolve_paths();
 
         SETTINGS
             .set(Settings {

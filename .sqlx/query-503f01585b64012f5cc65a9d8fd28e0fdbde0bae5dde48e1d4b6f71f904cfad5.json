@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_stats\" WHERE pokemon_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "pokemon_id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "stat_id",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "base_stat",
+        "ordinal": 2,
+        "type_info": "Integer"
+      },
+      {
+        "name": "effort",
+        "ordinal": 3,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "503f01585b64012f5cc65a9d8fd28e0fdbde0bae5dde48e1d4b6f71f904cfad5"
+}

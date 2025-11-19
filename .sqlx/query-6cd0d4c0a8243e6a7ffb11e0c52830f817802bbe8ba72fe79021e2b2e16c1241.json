@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT * FROM \"pokemon_sizes\" WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Integer"
+      },
+      {
+        "name": "height_dm",
+        "ordinal": 1,
+        "type_info": "Integer"
+      },
+      {
+        "name": "weight_dg",
+        "ordinal": 2,
+        "type_info": "Integer"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "6cd0d4c0a8243e6a7ffb11e0c52830f817802bbe8ba72fe79021e2b2e16c1241"
+}
