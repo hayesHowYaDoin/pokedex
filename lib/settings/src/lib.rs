@@ -32,10 +32,10 @@ impl Settings {
             if let Some(exe_str) = exe_path.to_str() {
                 if exe_str.contains("/nix/store/") {
                     // Running from Nix store, use relative paths
-                    // Binary is at /nix/store/.../bin/pokedex
-                    // Data is at /nix/store/.../share/pokedex/
+                    // Binary is at /nix/store/.../bin/rich_pokedex
+                    // Data is at /nix/store/.../share/rich_pokedex/
                     if let Some(store_path) = exe_path.parent().and_then(|p| p.parent()) {
-                        let share_dir = store_path.join("share/pokedex");
+                        let share_dir = store_path.join("share/rich_pokedex");
                         let log_dir = std::env::temp_dir().join("pokedex");
                         let _ = std::fs::create_dir_all(&log_dir); // Best effort
 
