@@ -3,6 +3,12 @@
     A Pokedex CLI application which takes full advantage of modern terminals.
   '';
 
+  # Binary cache configuration
+  nixConfig = {
+    extra-substituters = [ "https://pokedex.cachix.org" ];
+    extra-trusted-public-keys = [ "pokedex.cachix.org-1:pokedex.cachix.org-1:9hzldS9hK0NwoIBdVXB08Qc3aQ7QipFmErOFXeJboag=" ];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -22,9 +28,11 @@
       systems = import inputs.systems;
 
       # See ./nix/modules/*.nix for the modules that are imported here.
-      imports = [
-        inputs.flake-root.flakeModule
-      ] ++ (with builtins;
+      imports =
+        [
+          inputs.flake-root.flakeModule
+        ]
+        ++ (with builtins;
         map
           (fn: ./nix/${fn})
           (attrNames (readDir ./nix)));
