@@ -3,6 +3,7 @@ use std::pin::Pin;
 
 use color_eyre::{eyre::eyre, Result};
 use futures::{Stream, StreamExt};
+use image_cache::ImageCache;
 
 use crate::tables::*;
 use pokemon::{
@@ -18,6 +19,7 @@ use ui_core::{
 
 pub struct DatabaseMapper {
     pool: sqlx::SqlitePool,
+    image_cache: ImageCache,
 }
 
 impl DatabaseMapper {
@@ -26,7 +28,9 @@ impl DatabaseMapper {
             sqlx::SqlitePool::connect(&format!("sqlite://{}", Settings::database_path().display()))
                 .await
                 .map_err(|e| eyre!("Failed to connect to database: {}", e))?;
-        Ok(Self { pool })
+        let image_cache =
+            ImageCache::new().map_err(|e| eyre!("Failed to create image cache: {}", e))?;
+        Ok(Self { pool, image_cache })
     }
 }
 
@@ -86,8 +90,9 @@ impl DetailPagePokemonRepository for DatabaseMapper {
         number: u32,
     ) -> Pin<Box<dyn Future<Output = Result<DetailPagePokemon>> + Send>> {
         let pool = self.pool.clone();
+        let image_cache = self.image_cache.clone();
         Box::pin(async move {
-            let image = build_image(number);
+            let image = build_image(number, &image_cache).await;
             let types = build_types(&pool, number as i64);
             let description = build_description(&pool, number as i64);
             let attributes = build_attributes(&pool, number as i64);
@@ -127,12 +132,14 @@ where
     Ok(vec)
 }
 
-fn build_image(id: u32) -> Result<image::DynamicImage> {
+async fn build_image(id: u32, image_cache: &ImageCache) -> Result<image::DynamicImage> {
     let image_path =
         Settings::assets_path().join(format!("{}/bw_front.png", Into::<u32>::into(id)));
-    Ok(image::ImageReader::open(image_path)
-        .expect("Unable to open image.")
-        .decode()?)
+
+    image_cache
+        .get_or_load(id, &image_path)
+        .await
+        .map_err(|e| eyre!("Failed to load image: {}", e))
 }
 
 async fn build_types(pool: &sqlx::SqlitePool, number: i64) -> Result<PokemonTypes> {

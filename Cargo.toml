@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "lib/database",
+    "lib/image-cache",
     "lib/pokemon",
     "lib/settings",
     "lib/string",
@@ -33,6 +34,7 @@ include = ["src/**", "data/pokedex.db", "data/assets/**"]
 [workspace.dependencies]
 # Internal
 database = { path = "lib/database" }
+image-cache = { path = "lib/image-cache" }
 pokemon = { path = "lib/pokemon" }
 settings = { path = "lib/settings" }
 string = { path = "lib/string" }

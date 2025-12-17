@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 # Internal
+image-cache = { workspace = true }
 pokemon = { workspace = true }
 settings = { workspace = true }
 string = { workspace = true }

@@ -1,0 +1,46 @@
+name: Release Assets
+
+on:
+  push:
+    tags:
+      - 'v*-assets'  # Triggers on tags like v1.2.0-assets
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Download and prepare assets
+        run: |
+          cd data
+          nix shell nixpkgs#wget nixpkgs#ffmpeg -c bash download_assets.sh
+          tar -czf assets.tar.gz assets/
+          sha256sum assets.tar.gz > assets.tar.gz.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            data/assets.tar.gz
+            data/assets.tar.gz.sha256
+          body: |
+            Optimized Pokemon assets (PNGs + WAVs)
+
+            - 649 Pokemon sprites (original size, not upscaled)
+            - 649 Pokemon cries (WAV format)
+            - Total: 1,298 files
+
+            **Verification:**
+            ```bash
+            sha256sum -c assets.tar.gz.sha256
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

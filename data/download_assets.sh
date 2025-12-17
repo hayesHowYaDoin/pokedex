@@ -35,7 +35,6 @@ retrieve_assets() {
     if [ ! -f "${ASSETS_PATH}/${id}/bw_front.png" ]; then
         wget -nc -O ${ASSETS_PATH}/${id}/bw_front.png https://veekun.com/dex/media/pokemon/main-sprites/black-white/${id}.png
     fi
-    convert ${ASSETS_PATH}/${id}/bw_front.png -scale 3000x3000 ${ASSETS_PATH}/${id}/bw_front.png
 
     # Download cries
     if [ ! -f "${ASSETS_PATH}/${id}/cry.wav" ]; then

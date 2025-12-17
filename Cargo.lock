@@ -879,6 +879,7 @@ dependencies = [
  "derive-crud",
  "futures",
  "image",
+ "image-cache",
  "log",
  "pokemon",
  "settings",
@@ -1632,6 +1633,14 @@ dependencies = [
  "tiff",
  "zune-core 0.5.0",
  "zune-jpeg 0.5.5",
+]
+
+[[package]]
+name = "image-cache"
+version = "1.1.0"
+dependencies = [
+ "image",
+ "tokio",
 ]
 
 [[package]]
